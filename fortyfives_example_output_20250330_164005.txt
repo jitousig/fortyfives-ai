@@ -1,0 +1,1056 @@
+Number of actions: 18
+Number of players: 4
+State shape: [287]
+Action shape: []
+
+==========
+EPISODE 0
+==========
+Starting game...
+Kitty: 2H, TS, 8C
+Dealer: North (Player 0)
+
+Dealer: North (Player 0)
+
+Step 0, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: T♣, 2♣, Q♦, 9♣, A♦
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+Step 1, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 2♠, J♠, Q♥, A♠, 6♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 2, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 5♠, 8♥, 8♠, 3♠, A♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 3, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 7♣, J♣, T♥, K♥, 4♣
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 0 (Pass)
+
+Step 4, East (Player 1), Phase: 2
+Phase: Declaration
+East's hand: T♣, 2♣, Q♦, 9♣, A♦
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 1 (Declare trump: Hearts)
+East received kitty: 2♥, T♠, 8♣
+
+Step 5, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: T♣, 2♣, Q♦, 9♣, A♦, 2♥, T♠, 8♣
+Legal actions:
+  0: Discard: T♣
+  1: Discard: 2♣
+  2: Discard: Q♦
+  3: Discard: 9♣
+  4: Discard: A♦
+  5: Discard: 2♥
+  6: Discard: T♠
+  7: Discard: 8♣
+Action taken: 3 (Discard: 9♣)
+East discarded 9♣
+
+Step 6, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: T♣, 2♣, Q♦, A♦, 2♥, T♠, 8♣
+Legal actions:
+  0: Discard: T♣
+  1: Discard: 2♣
+  2: Discard: Q♦
+  3: Discard: A♦
+  4: Discard: 2♥
+  5: Discard: T♠
+  6: Discard: 8♣
+Action taken: 0 (Discard: T♣)
+East discarded T♣
+
+Step 7, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 2♣, Q♦, A♦, 2♥, T♠, 8♣
+Legal actions:
+  0: Discard: 2♣
+  1: Discard: Q♦
+  2: Discard: A♦
+  3: Discard: 2♥
+  4: Discard: T♠
+  5: Discard: 8♣
+Action taken: 4 (Discard: T♠)
+East discarded T♠
+
+Step 8, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 2♣, Q♦, A♦, 2♥, 8♣
+Legal actions:
+  0: Discard: 2♣
+  1: Discard: Q♦
+  2: Discard: A♦
+  3: Discard: 2♥
+  4: Discard: 8♣
+  16: Done discarding
+Action taken: 0 (Discard: 2♣)
+East discarded 2♣
+
+Step 9, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Q♦, A♦, 2♥, 8♣
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: A♦
+  2: Discard: 2♥
+  3: Discard: 8♣
+  16: Done discarding
+Action taken: 2 (Discard: 2♥)
+East discarded 2♥
+
+Step 10, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Q♦, A♦, 8♣
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: A♦
+  2: Discard: 8♣
+  16: Done discarding
+Action taken: 0 (Discard: Q♦)
+East discarded Q♦
+
+Step 11, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♦, 8♣
+Legal actions:
+  0: Discard: A♦
+  1: Discard: 8♣
+  16: Done discarding
+Action taken: 1 (Discard: 8♣)
+East discarded 8♣
+
+Step 12, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♦
+Legal actions:
+  0: Discard: A♦
+  16: Done discarding
+Action taken: 0 (Discard: A♦)
+East discarded A♦
+
+Step 13, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 14, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 2♠, J♠, Q♥, A♠, 6♥
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: J♠
+  2: Discard: Q♥
+  3: Discard: A♠
+  4: Discard: 6♥
+  16: Done discarding
+Action taken: 3 (Discard: A♠)
+South discarded A♠
+
+Step 15, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 2♠, J♠, Q♥, 6♥
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: J♠
+  2: Discard: Q♥
+  3: Discard: 6♥
+  16: Done discarding
+Action taken: 0 (Discard: 2♠)
+South discarded 2♠
+
+Step 16, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♠, Q♥, 6♥
+Legal actions:
+  0: Discard: J♠
+  1: Discard: Q♥
+  2: Discard: 6♥
+  16: Done discarding
+Action taken: 0 (Discard: J♠)
+South discarded J♠
+
+Step 17, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♥, 6♥
+Legal actions:
+  0: Discard: Q♥
+  1: Discard: 6♥
+  16: Done discarding
+Action taken: 1 (Discard: 6♥)
+South discarded 6♥
+
+Step 18, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♥
+Legal actions:
+  0: Discard: Q♥
+  16: Done discarding
+Action taken: 0 (Discard: Q♥)
+South discarded Q♥
+
+Step 19, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 20, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♠, 8♥, 8♠, 3♠, A♥
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 8♥
+  2: Discard: 8♠
+  3: Discard: 3♠
+  4: Discard: A♥
+  16: Done discarding
+Action taken: 0 (Discard: 5♠)
+West discarded 5♠
+
+Step 21, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 8♥, 8♠, 3♠, A♥
+Legal actions:
+  0: Discard: 8♥
+  1: Discard: 8♠
+  2: Discard: 3♠
+  3: Discard: A♥
+  16: Done discarding
+Action taken: 3 (Discard: A♥)
+West discarded A♥
+
+Step 22, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 8♥, 8♠, 3♠
+Legal actions:
+  0: Discard: 8♥
+  1: Discard: 8♠
+  2: Discard: 3♠
+  16: Done discarding
+Action taken: 1 (Discard: 8♠)
+West discarded 8♠
+
+Step 23, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 8♥, 3♠
+Legal actions:
+  0: Discard: 8♥
+  1: Discard: 3♠
+  16: Done discarding
+Action taken: 1 (Discard: 3♠)
+West discarded 3♠
+
+Step 24, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 8♥
+Legal actions:
+  0: Discard: 8♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 25, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 7♣, J♣, T♥, K♥, 4♣
+Legal actions:
+  0: Discard: 7♣
+  1: Discard: J♣
+  2: Discard: T♥
+  3: Discard: K♥
+  4: Discard: 4♣
+  16: Done discarding
+Action taken: 4 (Discard: 4♣)
+North discarded 4♣
+
+Step 26, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 7♣, J♣, T♥, K♥
+Legal actions:
+  0: Discard: 7♣
+  1: Discard: J♣
+  2: Discard: T♥
+  3: Discard: K♥
+  16: Done discarding
+Action taken: 3 (Discard: K♥)
+North discarded K♥
+
+Step 27, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 7♣, J♣, T♥
+Legal actions:
+  0: Discard: 7♣
+  1: Discard: J♣
+  2: Discard: T♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 2 card(s): 9♥, A♣
+East received 5 card(s): 5♥, 3♦, 7♠, 4♥, J♦
+South received 5 card(s): Q♣, 7♥, K♣, 9♦, 3♥
+West received 4 card(s): 9♠, 6♣, 5♣, 5♦
+
+Step 28, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♣, 7♥, K♣, 9♦, 3♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: Q♣
+  1: Play: 7♥
+  2: Play: K♣
+  3: Play: 9♦
+  4: Play: 3♥
+Action taken: 3 (Play: 9♦)
+
+Step 29, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 8♥, 9♠, 6♣, 5♣, 5♦
+Current trick: South: 9♦
+Legal actions:
+  4: Play: 5♦
+Action taken: 4 (Play: 5♦)
+
+Step 30, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 7♣, J♣, T♥, 9♥, A♣
+Current trick: South: 9♦, West: 5♦
+Legal actions:
+  0: Play: 7♣
+  1: Play: J♣
+  2: Play: T♥
+  3: Play: 9♥
+  4: Play: A♣
+Action taken: 1 (Play: J♣)
+
+Step 31, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 5♥, 3♦, 7♠, 4♥, J♦
+Current trick: North: J♣, South: 9♦, West: 5♦
+Legal actions:
+  1: Play: 3♦
+  4: Play: J♦
+Action taken: 1 (Play: 3♦)
+Trick 1: North: J♣, East: 3♦, South: 9♦, West: 5♦
+Winner: South with 9♦
+
+Step 32, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♣, 7♥, K♣, 3♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: Q♣
+  1: Play: 7♥
+  2: Play: K♣
+  3: Play: 3♥
+Action taken: 3 (Play: 3♥)
+
+Step 33, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 8♥, 9♠, 6♣, 5♣
+Current trick: South: 3♥
+Legal actions:
+  0: Play: 8♥
+Action taken: 0 (Play: 8♥)
+
+Step 34, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 7♣, T♥, 9♥, A♣
+Current trick: South: 3♥, West: 8♥
+Legal actions:
+  1: Play: T♥
+  2: Play: 9♥
+Action taken: 2 (Play: 9♥)
+
+Step 35, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 5♥, 7♠, 4♥, J♦
+Current trick: North: 9♥, South: 3♥, West: 8♥
+Legal actions:
+  0: Play: 5♥
+  2: Play: 4♥
+Action taken: 2 (Play: 4♥)
+Trick 2: North: 9♥, East: 4♥, South: 3♥, West: 8♥
+Winner: North with 9♥
+
+Step 36, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 7♣, T♥, A♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 7♣
+  1: Play: T♥
+  2: Play: A♣
+Action taken: 1 (Play: T♥)
+
+Step 37, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 5♥, 7♠, J♦
+Current trick: North: T♥
+Legal actions:
+  0: Play: 5♥
+Action taken: 0 (Play: 5♥)
+
+Step 38, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♣, 7♥, K♣
+Current trick: North: T♥, East: 5♥
+Legal actions:
+  1: Play: 7♥
+Action taken: 1 (Play: 7♥)
+
+Step 39, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 9♠, 6♣, 5♣
+Current trick: North: T♥, East: 5♥, South: 7♥
+Legal actions:
+  0: Play: 9♠
+  1: Play: 6♣
+  2: Play: 5♣
+Action taken: 0 (Play: 9♠)
+Trick 3: North: T♥, East: 5♥, South: 7♥, West: 9♠
+Winner: North with T♥
+
+Step 40, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 7♣, A♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 7♣
+  1: Play: A♣
+Action taken: 0 (Play: 7♣)
+
+Step 41, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 7♠, J♦
+Current trick: North: 7♣
+Legal actions:
+  0: Play: 7♠
+  1: Play: J♦
+Action taken: 0 (Play: 7♠)
+
+Step 42, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♣, K♣
+Current trick: North: 7♣, East: 7♠
+Legal actions:
+  0: Play: Q♣
+  1: Play: K♣
+Action taken: 0 (Play: Q♣)
+
+Step 43, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 6♣, 5♣
+Current trick: North: 7♣, East: 7♠, South: Q♣
+Legal actions:
+  0: Play: 6♣
+  1: Play: 5♣
+Action taken: 1 (Play: 5♣)
+Trick 4: North: 7♣, East: 7♠, South: Q♣, West: 5♣
+Winner: South with Q♣
+
+Step 44, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: K♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♣
+Action taken: 0 (Play: K♣)
+
+Step 45, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 6♣
+Current trick: South: K♣
+Legal actions:
+  0: Play: 6♣
+Action taken: 0 (Play: 6♣)
+
+Step 46, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: A♣
+Current trick: South: K♣, West: 6♣
+Legal actions:
+  0: Play: A♣
+Action taken: 0 (Play: A♣)
+
+Step 47, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: J♦
+Current trick: North: A♣, South: K♣, West: 6♣
+Legal actions:
+  0: Play: J♦
+Action taken: 0 (Play: J♦)
+Trick 5: North: A♣, East: J♦, South: K♣, West: 6♣
+Winner: South with K♣
+Trick points: North/South: 5 tricks = 25 points
+Trick points: East/West: 0 tricks = 0 points
+Total points earned: North/South: 25, East/West: 0
+East/West bid 30
+East/West failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 25, East/West: 0
+Game points after penalties: N/S: 25, E/W: -30
+----------------------
+New hand starting. Dealer: East
+Kitty: AH, QS, 9H
+
+Step 48, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: Q♦, 6♥, 7♦, K♠, 3♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 2 (Bid 25)
+
+Step 49, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 7♠, 4♥, 3♠, 7♥, A♠
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+Step 50, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 2♠, A♦, 6♠, 9♣, 3♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 51, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: A♣, 3♣, 4♣, J♦, K♣
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 0 (Pass)
+
+Step 52, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: Q♦, 6♥, 7♦, K♠, 3♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 53, West (Player 3), Phase: 2
+Phase: Declaration
+West's hand: 7♠, 4♥, 3♠, 7♥, A♠
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 1 (Declare trump: Hearts)
+West received kitty: A♥, Q♠, 9♥
+
+Step 54, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♦, 6♥, 7♦, K♠, 3♥
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: 6♥
+  2: Discard: 7♦
+  3: Discard: K♠
+  4: Discard: 3♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 55, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 4♥, 3♠, 7♥, A♠, A♥, Q♠, 9♥
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 4♥
+  2: Discard: 3♠
+  3: Discard: 7♥
+  4: Discard: A♠
+  5: Discard: A♥
+  6: Discard: Q♠
+  7: Discard: 9♥
+Action taken: 7 (Discard: 9♥)
+West discarded 9♥
+
+Step 56, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 4♥, 3♠, 7♥, A♠, A♥, Q♠
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 4♥
+  2: Discard: 3♠
+  3: Discard: 7♥
+  4: Discard: A♠
+  5: Discard: A♥
+  6: Discard: Q♠
+Action taken: 4 (Discard: A♠)
+West discarded A♠
+
+Step 57, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 4♥, 3♠, 7♥, A♥, Q♠
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 4♥
+  2: Discard: 3♠
+  3: Discard: 7♥
+  4: Discard: A♥
+  5: Discard: Q♠
+Action taken: 5 (Discard: Q♠)
+West discarded Q♠
+
+Step 58, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 4♥, 3♠, 7♥, A♥
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 4♥
+  2: Discard: 3♠
+  3: Discard: 7♥
+  4: Discard: A♥
+  16: Done discarding
+Action taken: 1 (Discard: 4♥)
+West discarded 4♥
+
+Step 59, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 3♠, 7♥, A♥
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 3♠
+  2: Discard: 7♥
+  3: Discard: A♥
+  16: Done discarding
+Action taken: 1 (Discard: 3♠)
+West discarded 3♠
+
+Step 60, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 7♥, A♥
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 7♥
+  2: Discard: A♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 61, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 2♠, A♦, 6♠, 9♣, 3♦
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: A♦
+  2: Discard: 6♠
+  3: Discard: 9♣
+  4: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: 2♠)
+North discarded 2♠
+
+Step 62, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: A♦, 6♠, 9♣, 3♦
+Legal actions:
+  0: Discard: A♦
+  1: Discard: 6♠
+  2: Discard: 9♣
+  3: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: A♦)
+North discarded A♦
+
+Step 63, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♠, 9♣, 3♦
+Legal actions:
+  0: Discard: 6♠
+  1: Discard: 9♣
+  2: Discard: 3♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 64, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♣, 3♣, 4♣, J♦, K♣
+Legal actions:
+  0: Discard: A♣
+  1: Discard: 3♣
+  2: Discard: 4♣
+  3: Discard: J♦
+  4: Discard: K♣
+  16: Done discarding
+Action taken: 4 (Discard: K♣)
+East discarded K♣
+
+Step 65, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♣, 3♣, 4♣, J♦
+Legal actions:
+  0: Discard: A♣
+  1: Discard: 3♣
+  2: Discard: 4♣
+  3: Discard: J♦
+  16: Done discarding
+Action taken: 0 (Discard: A♣)
+East discarded A♣
+
+Step 66, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 3♣, 4♣, J♦
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: 4♣
+  2: Discard: J♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 2 card(s): K♦, 6♣
+East received 2 card(s): 8♠, T♣
+West received 2 card(s): 7♣, 5♦
+
+Step 67, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 6♠, 9♣, 3♦, K♦, 6♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 6♠
+  1: Play: 9♣
+  2: Play: 3♦
+  3: Play: K♦
+  4: Play: 6♣
+Action taken: 3 (Play: K♦)
+
+Step 68, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♣, 4♣, J♦, 8♠, T♣
+Current trick: North: K♦
+Legal actions:
+  2: Play: J♦
+Action taken: 2 (Play: J♦)
+
+Step 69, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♦, 6♥, 7♦, K♠, 3♥
+Current trick: North: K♦, East: J♦
+Legal actions:
+  0: Play: Q♦
+  2: Play: 7♦
+Action taken: 0 (Play: Q♦)
+
+Step 70, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♠, 7♥, A♥, 7♣, 5♦
+Current trick: North: K♦, East: J♦, South: Q♦
+Legal actions:
+  2: Play: A♥
+  4: Play: 5♦
+Action taken: 2 (Play: A♥)
+Trick 1: North: K♦, East: J♦, South: Q♦, West: A♥
+Winner: West with A♥
+
+Step 71, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♠, 7♥, 7♣, 5♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 7♠
+  1: Play: 7♥
+  2: Play: 7♣
+  3: Play: 5♦
+Action taken: 0 (Play: 7♠)
+
+Step 72, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 6♠, 9♣, 3♦, 6♣
+Current trick: West: 7♠
+Legal actions:
+  0: Play: 6♠
+Action taken: 0 (Play: 6♠)
+
+Step 73, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♣, 4♣, 8♠, T♣
+Current trick: North: 6♠, West: 7♠
+Legal actions:
+  2: Play: 8♠
+Action taken: 2 (Play: 8♠)
+
+Step 74, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 6♥, 7♦, K♠, 3♥
+Current trick: North: 6♠, East: 8♠, West: 7♠
+Legal actions:
+  2: Play: K♠
+Action taken: 2 (Play: K♠)
+Trick 2: North: 6♠, East: 8♠, South: K♠, West: 7♠
+Winner: South with K♠
+
+Step 75, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 6♥, 7♦, 3♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 6♥
+  1: Play: 7♦
+  2: Play: 3♥
+Action taken: 2 (Play: 3♥)
+
+Step 76, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♥, 7♣, 5♦
+Current trick: South: 3♥
+Legal actions:
+  0: Play: 7♥
+Action taken: 0 (Play: 7♥)
+
+Step 77, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 9♣, 3♦, 6♣
+Current trick: South: 3♥, West: 7♥
+Legal actions:
+  0: Play: 9♣
+  1: Play: 3♦
+  2: Play: 6♣
+Action taken: 2 (Play: 6♣)
+
+Step 78, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♣, 4♣, T♣
+Current trick: North: 6♣, South: 3♥, West: 7♥
+Legal actions:
+  0: Play: 3♣
+  1: Play: 4♣
+  2: Play: T♣
+Action taken: 2 (Play: T♣)
+Trick 3: North: 6♣, East: T♣, South: 3♥, West: 7♥
+Winner: West with 7♥
+
+Step 79, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♣, 5♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 7♣
+  1: Play: 5♦
+Action taken: 1 (Play: 5♦)
+
+Step 80, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 9♣, 3♦
+Current trick: West: 5♦
+Legal actions:
+  1: Play: 3♦
+Action taken: 1 (Play: 3♦)
+
+Step 81, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♣, 4♣
+Current trick: North: 3♦, West: 5♦
+Legal actions:
+  0: Play: 3♣
+  1: Play: 4♣
+Action taken: 0 (Play: 3♣)
+
+Step 82, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 6♥, 7♦
+Current trick: North: 3♦, East: 3♣, West: 5♦
+Legal actions:
+  1: Play: 7♦
+Action taken: 1 (Play: 7♦)
+Trick 4: North: 3♦, East: 3♣, South: 7♦, West: 5♦
+Winner: South with 7♦
+
+Step 83, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 6♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 6♥
+Action taken: 0 (Play: 6♥)
+
+Step 84, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♣
+Current trick: South: 6♥
+Legal actions:
+  0: Play: 7♣
+Action taken: 0 (Play: 7♣)
+
+Step 85, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 9♣
+Current trick: South: 6♥, West: 7♣
+Legal actions:
+  0: Play: 9♣
+Action taken: 0 (Play: 9♣)
+
+Step 86, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 4♣
+Current trick: North: 9♣, South: 6♥, West: 7♣
+Legal actions:
+  0: Play: 4♣
+Action taken: 0 (Play: 4♣)
+Trick 5: North: 9♣, East: 4♣, South: 6♥, West: 7♣
+Winner: South with 6♥
+Trick points: North/South: 3 tricks = 15 points
+Trick points: East/West: 2 tricks = 10 points
+Highest trump bonus (+5) to East/West for playing AH
+Total points earned: North/South: 15, East/West: 15
+East/West bid 30
+East/West failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 15, East/West: 15
+Game points after penalties: N/S: 40, E/W: -60
+----------------------
+New hand starting. Dealer: South
+Kitty: 6H, 9D, 3D
+
+Step 87, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 5♠, 2♣, Q♠, J♦, 9♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 0 (Pass)
+
+Step 88, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: T♦, A♣, T♥, Q♥, 6♦
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 1 (Bid 20)
+
+Step 89, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: J♣, 5♣, J♠, 4♠, K♣
+Legal actions:
+  0: Pass
+  2: Bid 25
+  3: Bid 30
+Action taken: 2 (Bid 25)
+
+Step 90, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 5♦, 2♥, 2♠, T♣, 7♥
+Legal actions:
+  0: Pass
+  3: Bid 30
+  4: Hold
+Action taken: 0 (Pass)
+
+Step 91, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 5♠, 2♣, Q♠, J♦, 9♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 92, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: T♦, A♣, T♥, Q♥, 6♦
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+Step 93, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: J♣, 5♣, J♠, 4♠, K♣
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 94, North (Player 0), Phase: 2
+Phase: Declaration
+North's hand: T♦, A♣, T♥, Q♥, 6♦
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 3 (Declare trump: Clubs)
+North received kitty: 6♥, 9♦, 3♦
+
+Step 95, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♠, 2♣, Q♠, J♦, 9♥
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 2♣
+  2: Discard: Q♠
+  3: Discard: J♦
+  4: Discard: 9♥
+  16: Done discarding
+Action taken: 0 (Discard: 5♠)
+West discarded 5♠
+
+Step 96, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 2♣, Q♠, J♦, 9♥
+Legal actions:
+  0: Discard: 2♣
+  1: Discard: Q♠
+  2: Discard: J♦
+  3: Discard: 9♥
+  16: Done discarding
+Action taken: 2 (Discard: J♦)
+West discarded J♦
+
+Step 97, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 2♣, Q♠, 9♥
+Legal actions:
+  0: Discard: 2♣
+  1: Discard: Q♠
+  2: Discard: 9♥
+  16: Done discarding
+Action taken: 2 (Discard: 9♥)
+West discarded 9♥
+
+Step 98, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 2♣, Q♠
+Legal actions:
+  0: Discard: 2♣
+  1: Discard: Q♠
+  16: Done discarding
+Action taken: 1 (Discard: Q♠)
+West discarded Q♠
+
+Step 99, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 2♣
+Legal actions:
+  0: Discard: 2♣
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Maximum steps reached (100). Ending early.
+Done!

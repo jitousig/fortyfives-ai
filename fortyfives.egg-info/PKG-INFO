@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: fortyfives
+Version: 0.1.0
+Summary: Fortyfives card game environment based on RLCard
+Home-page: https://github.com/yourusername/fortyfives
+Author: Your Name
+Author-email: your.email@example.com
+License: UNKNOWN
+Keywords: Reinforcement Learning,card games,AI,Fortyfives
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+
+UNKNOWN
+
