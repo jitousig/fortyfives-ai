@@ -113,7 +113,7 @@ print("")
 
 # Play multiple episodes
 num_episodes = 1
-max_steps = 100  # Prevent infinite loops during development
+max_steps = 5000  # Increase max steps to allow for complete games
 
 for episode in range(num_episodes):
     print(f"==========\nEPISODE {episode}\n==========")
@@ -127,6 +127,7 @@ for episode in range(num_episodes):
     
     step = 0
     done = False
+    hand_count = 0
     
     while not done and step < max_steps:
         # Get player's name based on ID
@@ -134,6 +135,11 @@ for episode in range(num_episodes):
         
         # Current phase
         phase_name = get_phase_name(state['raw_obs']['phase'])
+        
+        # Count hands - a new hand starts when dealer changes
+        if state['raw_obs']['phase'] == 1 and player_id == dealer_id and step > 1:
+            hand_count += 1
+            print(f"\n====== HAND #{hand_count} COMPLETE ======\n")
         
         print(f"Step {step}, {player_name} (Player {player_id}), Phase: {state['raw_obs']['phase']}")
         print(f"Phase: {phase_name}")
@@ -172,6 +178,16 @@ for episode in range(num_episodes):
         
         # Check if the game is over
         try:
+            # Get current scores and print them after each hand ends
+            if 'points' in state['raw_obs'] and state['raw_obs']['points']:
+                current_points = state['raw_obs']['points']
+                # Print current points after each hand
+                if state['raw_obs']['phase'] == 1 and step > 1:  # New auction phase means a new hand has started
+                    print(f"\n----- Current Scores -----")
+                    print(f"North/South (Players 0/2): {current_points.get(0, 0)} points")
+                    print(f"East/West (Players 1/3): {current_points.get(1, 0)} points")
+                    print(f"--------------------------\n")
+            
             if callable(env.game.is_over):
                 game_over = env.game.is_over()
             else:
@@ -180,7 +196,7 @@ for episode in range(num_episodes):
             
             if game_over:
                 done = True
-                print(f"Game over after {step} steps")
+                print(f"Game over after {step} steps and {hand_count} hands")
                 
                 # Get payoffs
                 payoffs = env.get_payoffs()
@@ -189,6 +205,36 @@ for episode in range(num_episodes):
                 # Get perfect information
                 perfect_info = env.get_perfect_information()
                 print(f"Final game scores: {perfect_info['points']}")
+                
+                # Determine the winning team
+                ns_score = perfect_info['points'].get(0, 0)
+                ew_score = perfect_info['points'].get(1, 0)
+                print(f"\n===== FINAL RESULTS =====")
+                print(f"Total hands played: {hand_count}")
+                print(f"Total steps: {step}")
+                print(f"North/South (Players 0/2): {ns_score} points")
+                print(f"East/West (Players 1/3): {ew_score} points")
+                
+                # Check status even when max steps is reached
+                if ns_score <= -125:
+                    print(f"North/South team LOST by reaching {ns_score} points (-125 or lower)")
+                    print(f"East/West team would have won!")
+                elif ew_score <= -125:
+                    print(f"East/West team LOST by reaching {ew_score} points (-125 or lower)")
+                    print(f"North/South team would have won!")
+                # Regular winning condition
+                elif ns_score >= 125:
+                    print(f"North/South team WINS by reaching {ns_score} points (125 or higher)")
+                elif ew_score >= 125:
+                    print(f"East/West team WINS by reaching {ew_score} points (125 or higher)")
+                # Compare scores if no one reached either threshold
+                elif ns_score > ew_score:
+                    print(f"North/South team has higher score")
+                elif ew_score > ns_score:
+                    print(f"East/West team has higher score")
+                else:
+                    print(f"The scores are tied!")
+                print(f"========================\n")
         except Exception as e:
             print(f"Error checking game over: {e}")
         
@@ -196,5 +242,37 @@ for episode in range(num_episodes):
     
     if step >= max_steps:
         print(f"Maximum steps reached ({max_steps}). Ending early.")
+        # Show final scores even if max steps reached
+        try:
+            perfect_info = env.get_perfect_information()
+            ns_score = perfect_info['points'].get(0, 0)
+            ew_score = perfect_info['points'].get(1, 0)
+            print(f"\n===== CURRENT SCORES (MAX STEPS REACHED) =====")
+            print(f"Total hands played: {hand_count}")
+            print(f"North/South (Players 0/2): {ns_score} points")
+            print(f"East/West (Players 1/3): {ew_score} points")
+            
+            # Check status even when max steps is reached
+            if ns_score <= -125:
+                print(f"North/South team LOST by reaching {ns_score} points (-125 or lower)")
+                print(f"East/West team would have won!")
+            elif ew_score <= -125:
+                print(f"East/West team LOST by reaching {ew_score} points (-125 or lower)")
+                print(f"North/South team would have won!")
+            # Regular winning condition
+            elif ns_score >= 125:
+                print(f"North/South team WINS by reaching {ns_score} points (125 or higher)")
+            elif ew_score >= 125:
+                print(f"East/West team WINS by reaching {ew_score} points (125 or higher)")
+            # Compare scores if no one reached either threshold
+            elif ns_score > ew_score:
+                print(f"North/South team has higher score")
+            elif ew_score > ns_score:
+                print(f"East/West team has higher score")
+            else:
+                print(f"The scores are tied!")
+            print(f"=============================================\n")
+        except Exception as e:
+            print(f"Error getting final scores: {e}")
 
 print("Done!") 

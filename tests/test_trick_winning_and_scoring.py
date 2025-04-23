@@ -484,5 +484,144 @@ class TestTrickWinningAndScoring(unittest.TestCase):
         self.assertEqual(game.points[0], 20, "N/S game points should be 20 (made their bid)")
         self.assertEqual(game.points[1], 10, "E/W game points should be 10")
 
+    def test_thirty_for_sixty_rule(self):
+        """Test that the 30 for 60 rule is correctly applied in scoring."""
+        # 1. Test successful 30 bid gets 60 points
+        game = FortyfivesGame()
+        
+        # Set up a completed hand where a team made a 30 bid
+        game.trump_suit = 'H'  # Hearts is trump
+        game.tricks_won = [3, 0, 2, 0]  # N/S: 5 tricks (25 points), E/W: 0 tricks (0 points)
+        game.highest_trump_player = 0  # North played highest trump
+        game.highest_trump_played = create_card('5', 'H')  # 5 of Hearts
+        game.highest_bid = BID_30
+        game.highest_bidder = 0  # North was highest bidder (NS team)
+        
+        # Score the hand
+        game.score_hand()
+        
+        # Verify bid was made (30 raw points is enough to make a 30 bid)
+        self.assertTrue(game.bid_made, "Bid of 30 should be considered made with 30 raw points")
+        
+        # Check raw hand points (without special 30 for 60 rule)
+        # N/S: 5 tricks × 5 = 25 points + 5 for highest trump = 30
+        # E/W: 0 tricks × 5 = 0 points
+        self.assertEqual(game.hand_points[0], 30, "N/S should have 30 raw hand points")
+        self.assertEqual(game.hand_points[1], 0, "E/W should have 0 raw hand points")
+        
+        # End the hand to apply the 30 for 60 rule
+        game.end_hand()
+        
+        # Check game points (after 30 for 60 rule applied)
+        # N/S should get 60 points instead of 30
+        # E/W still get their 0 points
+        self.assertEqual(game.points[0], 60, "N/S should get 60 game points (30 for 60 rule)")
+        self.assertEqual(game.points[1], 0, "E/W should get 0 game points")
+
+        # 2. Test failed 30 bid loses 30 points
+        game = FortyfivesGame()
+        
+        # Set up a completed hand where a team failed a 30 bid
+        game.trump_suit = 'S'  # Spades is trump
+        game.tricks_won = [1, 3, 1, 0]  # N/S: 2 tricks (10 points), E/W: 3 tricks (15 points)
+        game.highest_trump_player = 1  # East played highest trump
+        game.highest_trump_played = create_card('5', 'S')  # 5 of Spades
+        game.highest_bid = BID_30
+        game.highest_bidder = 2  # South was highest bidder (NS team)
+        
+        # Score the hand
+        game.score_hand()
+        
+        # Verify bid was not made (15 raw points is not enough to make a 30 bid)
+        self.assertFalse(game.bid_made, "Bid of 30 should be considered failed with only 15 raw points")
+        
+        # Check raw hand points
+        # N/S: 2 tricks × 5 = 10 points + 0 for highest trump = 10
+        # E/W: 3 tricks × 5 = 15 points + 5 for highest trump = 20
+        self.assertEqual(game.hand_points[0], 10, "N/S should have 10 raw hand points")
+        self.assertEqual(game.hand_points[1], 20, "E/W should have 20 raw hand points")
+        
+        # End the hand to apply penalty
+        game.end_hand()
+        
+        # Check game points (after penalties)
+        # N/S should get -30 points (penalty for failing a 30 bid)
+        # E/W still get their 20 points
+        self.assertEqual(game.points[0], -30, "N/S should get -30 game points (failed 30 bid)")
+        self.assertEqual(game.points[1], 20, "E/W should get 20 game points")
+
+    def test_pegging_restriction_after_100_points(self):
+        """Test that teams with 100+ points can only peg when declaring team fails their bid."""
+        
+        # 1. Test when declaring team makes their bid - no pegging for defending team with 100+ points
+        game = FortyfivesGame()
+        
+        # Set initial points: N/S team has 100+ points
+        game.points = {0: 120, 1: 70, 2: 120, 3: 70}  # N/S: 120, E/W: 70
+        
+        # Set up a completed hand where E/W team made a 20 bid
+        game.trump_suit = 'H'  # Hearts is trump
+        game.tricks_won = [2, 3, 0, 0]  # N/S: 2 tricks (10 points), E/W: 3 tricks (15 points)
+        game.highest_trump_player = 1  # East played highest trump
+        game.highest_trump_played = create_card('5', 'H')  # 5 of Hearts
+        game.highest_bid = BID_20
+        game.highest_bidder = 1  # East was highest bidder (E/W team)
+        
+        # Score the hand
+        game.score_hand()
+        
+        # Verify bid was made (20 raw points is enough to make a 20 bid)
+        self.assertTrue(game.bid_made, "Bid of 20 should be considered made with 20 raw points")
+        
+        # Check raw hand points
+        # N/S: 2 tricks × 5 = 10 points + 0 for highest trump = 10
+        # E/W: 3 tricks × 5 = 15 points + 5 for highest trump = 20
+        self.assertEqual(game.hand_points[0], 10, "N/S should have 10 raw hand points")
+        self.assertEqual(game.hand_points[1], 20, "E/W should have 20 raw hand points")
+        
+        # End the hand to apply scoring rules
+        game.end_hand()
+        
+        # Check game points:
+        # N/S should NOT peg (still 120 points, no change)
+        # E/W should get their 20 points (70 + 20 = 90)
+        self.assertEqual(game.points[0], 120, "N/S should not peg when they have 100+ points and E/W makes bid")
+        self.assertEqual(game.points[1], 90, "E/W should get 20 game points for making their bid")
+        
+        # 2. Test when declaring team fails their bid - pegging IS allowed for defending team with 100+ points
+        game = FortyfivesGame()
+        
+        # Set initial points: N/S team has 100+ points
+        game.points = {0: 120, 1: 70, 2: 120, 3: 70}  # N/S: 120, E/W: 70
+        
+        # Set up a completed hand where E/W team failed a 25 bid
+        game.trump_suit = 'S'  # Spades is trump
+        game.tricks_won = [3, 2, 0, 0]  # N/S: 3 tricks (15 points), E/W: 2 tricks (10 points)
+        game.highest_trump_player = 0  # North played highest trump
+        game.highest_trump_played = create_card('5', 'S')  # 5 of Spades
+        game.highest_bid = BID_25
+        game.highest_bidder = 3  # West was highest bidder (E/W team)
+        
+        # Score the hand
+        game.score_hand()
+        
+        # Verify bid was not made (15 raw points is not enough to make a 25 bid)
+        self.assertFalse(game.bid_made, "Bid of 25 should be considered failed with only 15 raw points")
+        
+        # Check raw hand points
+        # N/S: 3 tricks × 5 = 15 points + 5 for highest trump = 20
+        # E/W: 2 tricks × 5 = 10 points + 0 for highest trump = 10
+        self.assertEqual(game.hand_points[0], 20, "N/S should have 20 raw hand points")
+        self.assertEqual(game.hand_points[1], 10, "E/W should have 10 raw hand points")
+        
+        # End the hand to apply scoring rules
+        game.end_hand()
+        
+        # Check game points:
+        # N/S should be allowed to peg since E/W failed bid (120 + 20 = 140)
+        # E/W should get penalty points (-25 for failing bid)
+        self.assertEqual(game.points[0], 140, "N/S should be allowed to peg when E/W fails their bid")
+        self.assertEqual(game.points[1], 45, "E/W should get -25 game points for failing their bid")
+
 if __name__ == '__main__':
     unittest.main() 

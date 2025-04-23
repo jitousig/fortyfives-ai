@@ -46,6 +46,14 @@ BID_VALUES = {
     BID_HOLD: None  # Determined by highest bid
 }
 
+# Successful bid values (for the 30 for 60 rule)
+BID_SUCCESS_VALUES = {
+    BID_20: 20,  # Standard: earn 20 points for making a 20 bid
+    BID_25: 25,  # Standard: earn 25 points for making a 25 bid
+    BID_30: 60,  # Special rule: earn 60 points for making a 30 bid
+    BID_HOLD: None  # Determined by highest bid
+}
+
 class FortyfivesGame:
     '''
     Fortyfives game class
@@ -150,7 +158,7 @@ class FortyfivesGame:
         self.trick_starter = None  # Player who started the current trick
         self.trick_pile = {}  # Cards won in tricks
         self.points = {i: 0 for i in range(self.num_players)}  # Game points
-        self.is_over = False  # Whether the game is over
+        self.game_over = False  # Whether the game is over (renamed from is_over)
         self.tricks_won = [0, 0, 0, 0]  # Number of tricks won by each player
         self.passed = [False] * self.num_players  # Whether each player has passed
         self.trick_winners = []  # Winners of each trick
@@ -271,19 +279,20 @@ class FortyfivesGame:
         Check if the game is over
         
         Returns:
-            (boolean): True if one partnership has 125+ points
+            (boolean): True if one partnership has 125+ points or -125 or lower points
         '''
         # Correctly access the values in the points dictionary
         if not self.points:
             return False
-        return max(self.points.values()) >= 125
+        point_values = list(self.points.values())
+        return max(point_values) >= 125 or min(point_values) <= -125
 
     def is_over(self):
         '''
         Check if the game is over - for environment interface
         
         Returns:
-            (boolean): True if one partnership has 125+ points
+            (boolean): True if one partnership has 125+ points or -125 or lower points
         '''
         # Implementation for the RLCard environment
         # This needs to be a callable method
@@ -294,7 +303,7 @@ class FortyfivesGame:
             point_values = list(self.points.values())
             if not point_values:
                 return False
-            return max(point_values) >= 125
+            return max(point_values) >= 125 or min(point_values) <= -125
         except (AttributeError, ValueError, TypeError):
             # Safely handle any potential errors
             return False
@@ -425,6 +434,16 @@ class FortyfivesGame:
         legal_plays = []
         hand = self.hands[self.current_player_id]
         
+        # Print debug information to diagnose issues
+        if hasattr(self, 'verbose') and self.verbose:
+            print(f"DEBUG - Get legal plays for player {self.current_player_id}")
+            print(f"DEBUG - Trump suit: '{self.trump_suit}' (type: {type(self.trump_suit)})")
+            print(f"DEBUG - Lead suit: '{self.trick_lead_suit}' (type: {type(self.trick_lead_suit)})")
+            print(f"DEBUG - Player hand: {[f'{card.rank}{card.suit}' for card in hand]}")
+            print(f"DEBUG - Trick started by player: {self.trick_starter}")
+            hand_suits = [card.suit for card in hand]
+            print(f"DEBUG - Hand suits: {hand_suits}")
+        
         # If the player is leading or hand is empty, they can play any card
         if len(hand) == 0 or self.trick_starter == self.current_player_id:
             return list(range(len(hand)))
@@ -444,6 +463,10 @@ class FortyfivesGame:
             # Normal mode: A♥ is always considered a trump
             trump_cards = [i for i, card in enumerate(hand) 
                          if card.suit == self.trump_suit or (card.rank == 'A' and card.suit == 'H')]
+        
+        if hasattr(self, 'verbose') and self.verbose:
+            print(f"DEBUG - Lead suit cards indices: {lead_suit_cards}")
+            print(f"DEBUG - Trump cards indices: {trump_cards}")
         
         # Get high trumps (5, J, and A♥)
         high_trumps = [i for i, card in enumerate(hand) 
@@ -516,18 +539,22 @@ class FortyfivesGame:
             # Add all cards of the lead suit if available
             if lead_suit_cards:
                 legal_plays.extend(lead_suit_cards)
-            
-            # Always add all trump cards to legal plays
-            for i in trump_cards:
-                if i not in legal_plays:
-                    legal_plays.append(i)
-            
-            # If no cards of lead suit and no trump, can play any card
-            if not legal_plays:
+                
+                # NOVA SCOTIA 45s RULES: Always add all trump cards to legal plays, even when following suit
+                for i in trump_cards:
+                    if i not in legal_plays:
+                        legal_plays.append(i)
+            else:
+                # FIXED: If no cards of lead suit, player can play ANY card in their hand
+                # (not just trump cards)
                 legal_plays = list(range(len(hand)))
             
             # Sort for consistent ordering
             legal_plays.sort()
+            
+            if hasattr(self, 'verbose') and self.verbose:
+                print(f"DEBUG - Final legal plays: {legal_plays}")
+                print(f"DEBUG - Legal cards: {[f'{hand[i].rank}{hand[i].suit}' for i in legal_plays]}")
             
             return legal_plays
 
@@ -569,10 +596,22 @@ class FortyfivesGame:
         Process a trump declaration action
         
         Args:
-            action (int): Declaration action (suit selection)
+            action (int or str): Declaration action (suit selection)
+                               - Int: 0=Spades, 1=Hearts, 2=Diamonds, 3=Clubs
+                               - Str: 'S', 'H', 'D', 'C'
         '''
         # Set the trump suit
-        self.trump_suit = action
+        # Convert the action to a suit string (S, H, D, C) if it's a number
+        if isinstance(action, (int, np.int32, np.int64)):
+            suit_mapping = {0: 'S', 1: 'H', 2: 'D', 3: 'C'}
+            action_int = int(action)  # Convert numpy int to Python int
+            self.trump_suit = suit_mapping.get(action_int, 'S')  # Default to Spades if unknown
+        else:
+            # Action is already a string suit
+            self.trump_suit = action
+        
+        if self.verbose:
+            print(f"Trump suit declared: {self.trump_suit}")
         
         # First, add the kitty to the highest bidder's hand BEFORE the discard phase
         if self.highest_bidder is not None and self.dealer.pot:
@@ -793,13 +832,18 @@ class FortyfivesGame:
             (int): Player ID of the winner
         '''
         # Find the first non-None card to use as the starter
-        starter_id = None
-        for i, card in enumerate(self.current_trick):
-            if card is not None:
-                starter_id = i
-                break
+        starter_id = self.trick_starter
                 
-        if starter_id is None:
+        if self.current_trick[starter_id] is None:
+            # Somehow there's no card from the trick starter
+            if hasattr(self, 'verbose') and self.verbose:
+                print("Warning: No card from trick starter, finding first non-None card")
+            for i, card in enumerate(self.current_trick):
+                if card is not None:
+                    starter_id = i
+                    break
+                    
+        if all(card is None for card in self.current_trick):
             # Somehow there are no cards in the trick
             if hasattr(self, 'verbose') and self.verbose:
                 print("Warning: No cards in trick, using trick_starter as winner")
@@ -890,22 +934,42 @@ class FortyfivesGame:
         # Score the hand
         self.score_hand()
         
-        # Add hand points to game points, applying bid penalties to the game score only
+        # Add hand points to game points, applying bid penalties or bonuses to the game score
         bid_team = self.highest_bidder % 2 if self.highest_bidder is not None else None
         bid_value = BID_VALUES[self.highest_bid] if self.highest_bid is not None else None
         
-        # Initialize game point adjustments
+        # Initialize game point adjustments (start with raw hand points)
         ns_game_points = self.hand_points[0]
         ew_game_points = self.hand_points[1]
         
-        # Apply bid penalties to game score (not hand score)
+        # Apply bid results to game score (not hand score)
         if bid_team is not None and bid_value is not None:
+            # Determine if pegging should be restricted due to 100+ points rule
+            ns_has_100_plus = self.points[0] >= 100
+            ew_has_100_plus = self.points[1] >= 100
+            
             if bid_team == 0:  # NS bid
-                if not getattr(self, 'bid_made', True):  # If NS failed their bid
+                if self.bid_made:  # NS made their bid
+                    # Apply special scoring for successful bids (like 30 for 60)
+                    ns_game_points = BID_SUCCESS_VALUES[self.highest_bid]
+                    
+                    # EW can't peg if they have 100+ points and NS made their bid
+                    if ew_has_100_plus:
+                        ew_game_points = 0
+                else:  # NS failed their bid
                     ns_game_points = -bid_value  # Replace with negative bid value
+                    # EW can peg regardless of points (no restriction when declaring team fails)
             else:  # EW bid
-                if not getattr(self, 'bid_made', True):  # If EW failed their bid
+                if self.bid_made:  # EW made their bid
+                    # Apply special scoring for successful bids (like 30 for 60)
+                    ew_game_points = BID_SUCCESS_VALUES[self.highest_bid]
+                    
+                    # NS can't peg if they have 100+ points and EW made their bid
+                    if ns_has_100_plus:
+                        ns_game_points = 0
+                else:  # EW failed their bid
                     ew_game_points = -bid_value  # Replace with negative bid value
+                    # NS can peg regardless of points (no restriction when declaring team fails)
         
         # Update NS partnership (players 0 and 2)
         self.points[0] += ns_game_points
@@ -922,6 +986,10 @@ class FortyfivesGame:
         # Print hand summary for debugging
         if hasattr(self, 'verbose') and self.verbose:
             print(f"Game points after penalties: N/S: {self.points[0]}, E/W: {self.points[1]}")
+            if bid_team is not None:
+                if (bid_team == 0 and self.bid_made and ew_has_100_plus) or \
+                   (bid_team == 1 and self.bid_made and ns_has_100_plus):
+                    print("Note: Pegging was restricted due to 100+ points rule")
             print("----------------------")
     
     def score_hand(self):
@@ -993,6 +1061,8 @@ class FortyfivesGame:
                 print(f"{bidding_team} bid {bid_value}")
                 if bid_made:
                     print(f"{bidding_team} made their bid")
+                    if self.highest_bid == BID_30:
+                        print(f"{bidding_team} gets 60 points for making a bid of 30 (30 for 60 rule)")
                 else:
                     print(f"{bidding_team} failed to make their bid (will lose {bid_value} points in game score)")
             
