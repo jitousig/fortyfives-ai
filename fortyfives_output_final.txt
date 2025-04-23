@@ -1,0 +1,6329 @@
+Number of actions: 18
+Number of players: 4
+State shape: [287]
+Action shape: []
+
+==========
+EPISODE 0
+==========
+Starting game...
+Kitty: 2H, TS, 8C
+Dealer: North (Player 0)
+
+Dealer: North (Player 0)
+
+Step 0, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: T♣, 2♣, Q♦, 9♣, A♦
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+Step 1, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 2♠, J♠, Q♥, A♠, 6♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 0 points
+East/West (Players 1/3): 0 points
+--------------------------
+
+
+Step 2, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 5♠, 8♥, 8♠, 3♠, A♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 0 points
+East/West (Players 1/3): 0 points
+--------------------------
+
+
+
+====== HAND #1 COMPLETE ======
+
+Step 3, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 7♣, J♣, T♥, K♥, 4♣
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 0 (Pass)
+
+Step 4, East (Player 1), Phase: 2
+Phase: Declaration
+East's hand: T♣, 2♣, Q♦, 9♣, A♦
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 0 (Declare trump: Spades)
+Trump suit declared: S
+East received kitty: 2♥, T♠, 8♣
+
+Step 5, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: T♣, 2♣, Q♦, 9♣, A♦, 2♥, T♠, 8♣
+Legal actions:
+  0: Discard: T♣
+  1: Discard: 2♣
+  2: Discard: Q♦
+  3: Discard: 9♣
+  4: Discard: A♦
+  5: Discard: 2♥
+  6: Discard: T♠
+  7: Discard: 8♣
+Action taken: 7 (Discard: 8♣)
+East discarded 8♣
+
+Step 6, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: T♣, 2♣, Q♦, 9♣, A♦, 2♥, T♠
+Legal actions:
+  0: Discard: T♣
+  1: Discard: 2♣
+  2: Discard: Q♦
+  3: Discard: 9♣
+  4: Discard: A♦
+  5: Discard: 2♥
+  6: Discard: T♠
+Action taken: 0 (Discard: T♣)
+East discarded T♣
+
+Step 7, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 2♣, Q♦, 9♣, A♦, 2♥, T♠
+Legal actions:
+  0: Discard: 2♣
+  1: Discard: Q♦
+  2: Discard: 9♣
+  3: Discard: A♦
+  4: Discard: 2♥
+  5: Discard: T♠
+Action taken: 0 (Discard: 2♣)
+East discarded 2♣
+
+Step 8, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Q♦, 9♣, A♦, 2♥, T♠
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: 9♣
+  2: Discard: A♦
+  3: Discard: 2♥
+  4: Discard: T♠
+  16: Done discarding
+Action taken: 4 (Discard: T♠)
+East discarded T♠
+
+Step 9, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Q♦, 9♣, A♦, 2♥
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: 9♣
+  2: Discard: A♦
+  3: Discard: 2♥
+  16: Done discarding
+Action taken: 1 (Discard: 9♣)
+East discarded 9♣
+
+Step 10, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Q♦, A♦, 2♥
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: A♦
+  2: Discard: 2♥
+  16: Done discarding
+Action taken: 0 (Discard: Q♦)
+East discarded Q♦
+
+Step 11, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♦, 2♥
+Legal actions:
+  0: Discard: A♦
+  1: Discard: 2♥
+  16: Done discarding
+Action taken: 1 (Discard: 2♥)
+East discarded 2♥
+
+Step 12, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♦
+Legal actions:
+  0: Discard: A♦
+  16: Done discarding
+Action taken: 0 (Discard: A♦)
+East discarded A♦
+
+Step 13, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 14, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 2♠, J♠, Q♥, A♠, 6♥
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: J♠
+  2: Discard: Q♥
+  3: Discard: A♠
+  4: Discard: 6♥
+  16: Done discarding
+Action taken: 1 (Discard: J♠)
+South discarded J♠
+
+Step 15, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 2♠, Q♥, A♠, 6♥
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: Q♥
+  2: Discard: A♠
+  3: Discard: 6♥
+  16: Done discarding
+Action taken: 0 (Discard: 2♠)
+South discarded 2♠
+
+Step 16, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♥, A♠, 6♥
+Legal actions:
+  0: Discard: Q♥
+  1: Discard: A♠
+  2: Discard: 6♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 17, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♠, 8♥, 8♠, 3♠, A♥
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 8♥
+  2: Discard: 8♠
+  3: Discard: 3♠
+  4: Discard: A♥
+  16: Done discarding
+Action taken: 1 (Discard: 8♥)
+West discarded 8♥
+
+Step 18, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♠, 8♠, 3♠, A♥
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 8♠
+  2: Discard: 3♠
+  3: Discard: A♥
+  16: Done discarding
+Action taken: 1 (Discard: 8♠)
+West discarded 8♠
+
+Step 19, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♠, 3♠, A♥
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 3♠
+  2: Discard: A♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 20, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 7♣, J♣, T♥, K♥, 4♣
+Legal actions:
+  0: Discard: 7♣
+  1: Discard: J♣
+  2: Discard: T♥
+  3: Discard: K♥
+  4: Discard: 4♣
+  16: Done discarding
+Action taken: 4 (Discard: 4♣)
+North discarded 4♣
+
+Step 21, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 7♣, J♣, T♥, K♥
+Legal actions:
+  0: Discard: 7♣
+  1: Discard: J♣
+  2: Discard: T♥
+  3: Discard: K♥
+  16: Done discarding
+Action taken: 0 (Discard: 7♣)
+North discarded 7♣
+
+Step 22, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: J♣, T♥, K♥
+Legal actions:
+  0: Discard: J♣
+  1: Discard: T♥
+  2: Discard: K♥
+  16: Done discarding
+Action taken: 1 (Discard: T♥)
+North discarded T♥
+
+Step 23, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: J♣, K♥
+Legal actions:
+  0: Discard: J♣
+  1: Discard: K♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 3 card(s): 9♥, A♣, 5♥
+East received 5 card(s): 3♦, 7♠, 4♥, J♦, Q♣
+South received 2 card(s): 7♥, K♣
+West received 2 card(s): 9♦, 3♥
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['QH', 'AS', '6H', '7H', 'KC']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H', 'S', 'H', 'H', 'C']
+
+Step 24, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♥, A♠, 6♥, 7♥, K♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: Q♥
+  1: Play: A♠
+  2: Play: 6♥
+  3: Play: 7♥
+  4: Play: K♣
+Action taken: 2 (Play: 6♥)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['5S', '3S', 'AH', '9D', '3H']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S', 'S', 'H', 'D', 'H']
+DEBUG - Lead suit cards indices: [2, 4]
+DEBUG - Trump cards indices: [0, 1, 2]
+DEBUG - Final legal plays: [0, 1, 2, 4]
+DEBUG - Legal cards: ['5S', '3S', 'AH', '3H']
+
+Step 25, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 5♠, 3♠, A♥, 9♦, 3♥
+Current trick: South: 6♥
+Legal actions:
+  0: Play: 5♠
+  1: Play: 3♠
+  2: Play: A♥
+  4: Play: 3♥
+Action taken: 4 (Play: 3♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['JC', 'KH', '9H', 'AC', '5H']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'H', 'H', 'C', 'H']
+DEBUG - Lead suit cards indices: [1, 2, 4]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1, 2, 4]
+DEBUG - Legal cards: ['KH', '9H', '5H']
+
+Step 26, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♣, K♥, 9♥, A♣, 5♥
+Current trick: South: 6♥, West: 3♥
+Legal actions:
+  1: Play: K♥
+  2: Play: 9♥
+  4: Play: 5♥
+Action taken: 2 (Play: 9♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', '7S', '4H', 'JD', 'QC']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'S', 'H', 'D', 'C']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [1, 2]
+DEBUG - Legal cards: ['7S', '4H']
+
+Step 27, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♦, 7♠, 4♥, J♦, Q♣
+Current trick: North: 9♥, South: 6♥, West: 3♥
+Legal actions:
+  1: Play: 7♠
+  2: Play: 4♥
+Action taken: 2 (Play: 4♥)
+Trick 1: North: 9♥, East: 4♥, South: 6♥, West: 3♥
+Winner: North with 9♥
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['JC', 'KH', 'AC', '5H']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['C', 'H', 'C', 'H']
+
+Step 28, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♣, K♥, A♣, 5♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: J♣
+  1: Play: K♥
+  2: Play: A♣
+  3: Play: 5♥
+Action taken: 2 (Play: A♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', '7S', 'JD', 'QC']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'S', 'D', 'C']
+DEBUG - Lead suit cards indices: [3]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [1, 3]
+DEBUG - Legal cards: ['7S', 'QC']
+
+Step 29, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♦, 7♠, J♦, Q♣
+Current trick: North: A♣
+Legal actions:
+  1: Play: 7♠
+  3: Play: Q♣
+Action taken: 3 (Play: Q♣)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['QH', 'AS', '7H', 'KC']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['H', 'S', 'H', 'C']
+DEBUG - Lead suit cards indices: [3]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [1, 3]
+DEBUG - Legal cards: ['AS', 'KC']
+
+Step 30, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♥, A♠, 7♥, K♣
+Current trick: North: A♣, East: Q♣
+Legal actions:
+  1: Play: A♠
+  3: Play: K♣
+Action taken: 1 (Play: A♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['5S', '3S', 'AH', '9D']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['S', 'S', 'H', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0, 1, 2]
+DEBUG - Final legal plays: [0, 1, 2, 3]
+DEBUG - Legal cards: ['5S', '3S', 'AH', '9D']
+
+Step 31, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 5♠, 3♠, A♥, 9♦
+Current trick: North: A♣, East: Q♣, South: A♠
+Legal actions:
+  0: Play: 5♠
+  1: Play: 3♠
+  2: Play: A♥
+  3: Play: 9♦
+Action taken: 0 (Play: 5♠)
+Trick 2: North: A♣, East: Q♣, South: A♠, West: 5♠
+Winner: West with 5♠
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['3S', 'AH', '9D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'H', 'D']
+
+Step 32, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 3♠, A♥, 9♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 3♠
+  1: Play: A♥
+  2: Play: 9♦
+Action taken: 2 (Play: 9♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['JC', 'KH', '5H']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'H', 'H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['JC', 'KH', '5H']
+
+Step 33, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♣, K♥, 5♥
+Current trick: West: 9♦
+Legal actions:
+  0: Play: J♣
+  1: Play: K♥
+  2: Play: 5♥
+Action taken: 1 (Play: K♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', '7S', 'JD']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'S', 'D']
+DEBUG - Lead suit cards indices: [0, 2]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['3D', '7S', 'JD']
+
+Step 34, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♦, 7♠, J♦
+Current trick: North: K♥, West: 9♦
+Legal actions:
+  0: Play: 3♦
+  1: Play: 7♠
+  2: Play: J♦
+Action taken: 0 (Play: 3♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['QH', '7H', 'KC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['QH', '7H', 'KC']
+
+Step 35, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♥, 7♥, K♣
+Current trick: North: K♥, East: 3♦, West: 9♦
+Legal actions:
+  0: Play: Q♥
+  1: Play: 7♥
+  2: Play: K♣
+Action taken: 1 (Play: 7♥)
+Trick 3: North: K♥, East: 3♦, South: 7♥, West: 9♦
+Winner: West with 9♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['3S', 'AH']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'H']
+
+Step 36, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 3♠, A♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 3♠
+  1: Play: A♥
+Action taken: 1 (Play: A♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['JC', '5H']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'H']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1]
+DEBUG - Legal cards: ['5H']
+
+Step 37, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♣, 5♥
+Current trick: West: A♥
+Legal actions:
+  1: Play: 5♥
+Action taken: 1 (Play: 5♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['7S', 'JD']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['7S', 'JD']
+
+Step 38, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 7♠, J♦
+Current trick: North: 5♥, West: A♥
+Legal actions:
+  0: Play: 7♠
+  1: Play: J♦
+Action taken: 1 (Play: J♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['QH', 'KC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['QH']
+
+Step 39, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♥, K♣
+Current trick: North: 5♥, East: J♦, West: A♥
+Legal actions:
+  0: Play: Q♥
+Action taken: 0 (Play: Q♥)
+Trick 4: North: 5♥, East: J♦, South: Q♥, West: A♥
+Winner: West with A♥
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['3S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S']
+
+Step 40, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 3♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 3♠
+Action taken: 0 (Play: 3♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['JC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 41, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♣
+Current trick: West: 3♠
+Legal actions:
+  0: Play: J♣
+Action taken: 0 (Play: J♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['7S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [0]
+
+Step 42, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 7♠
+Current trick: North: J♣, West: 3♠
+Legal actions:
+  0: Play: 7♠
+Action taken: 0 (Play: 7♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'S' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['KC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 43, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: K♣
+Current trick: North: J♣, East: 7♠, West: 3♠
+Legal actions:
+  0: Play: K♣
+Action taken: 0 (Play: K♣)
+Trick 5: North: J♣, East: 7♠, South: K♣, West: 3♠
+Winner: West with 3♠
+Trick points: North/South: 1 tricks = 5 points
+Trick points: East/West: 4 tricks = 20 points
+Highest trump bonus (+5) to East/West for playing 5S
+Total points earned: North/South: 5, East/West: 25
+East/West bid 30
+East/West failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 5, East/West: 25
+Game points after penalties: N/S: 5, E/W: -30
+----------------------
+New hand starting. Dealer: East
+Kitty: AH, QS, 9H
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -30 points
+--------------------------
+
+
+Step 44, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: Q♦, 6♥, 7♦, K♠, 3♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 2 (Bid 25)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -30 points
+--------------------------
+
+
+Step 45, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 7♠, 4♥, 3♠, 7♥, A♠
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -30 points
+--------------------------
+
+
+
+====== HAND #2 COMPLETE ======
+
+Step 46, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 2♠, A♦, 6♠, 9♣, 3♦
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -30 points
+--------------------------
+
+
+Step 47, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: A♣, 3♣, 4♣, J♦, K♣
+Legal actions:
+  0: Pass
+  3: Bid 30
+  4: Hold
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -30 points
+--------------------------
+
+
+Step 48, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: Q♦, 6♥, 7♦, K♠, 3♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 49, East (Player 1), Phase: 2
+Phase: Declaration
+East's hand: A♣, 3♣, 4♣, J♦, K♣
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 2 (Declare trump: Diamonds)
+Trump suit declared: D
+East received kitty: A♥, Q♠, 9♥
+
+Step 50, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♦, 6♥, 7♦, K♠, 3♥
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: 6♥
+  2: Discard: 7♦
+  3: Discard: K♠
+  4: Discard: 3♥
+  16: Done discarding
+Action taken: 4 (Discard: 3♥)
+South discarded 3♥
+
+Step 51, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♦, 6♥, 7♦, K♠
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: 6♥
+  2: Discard: 7♦
+  3: Discard: K♠
+  16: Done discarding
+Action taken: 1 (Discard: 6♥)
+South discarded 6♥
+
+Step 52, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♦, 7♦, K♠
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: 7♦
+  2: Discard: K♠
+  16: Done discarding
+Action taken: 1 (Discard: 7♦)
+South discarded 7♦
+
+Step 53, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Q♦, K♠
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: K♠
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 54, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 4♥, 3♠, 7♥, A♠
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 4♥
+  2: Discard: 3♠
+  3: Discard: 7♥
+  4: Discard: A♠
+  16: Done discarding
+Action taken: 0 (Discard: 7♠)
+West discarded 7♠
+
+Step 55, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 4♥, 3♠, 7♥, A♠
+Legal actions:
+  0: Discard: 4♥
+  1: Discard: 3♠
+  2: Discard: 7♥
+  3: Discard: A♠
+  16: Done discarding
+Action taken: 0 (Discard: 4♥)
+West discarded 4♥
+
+Step 56, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 3♠, 7♥, A♠
+Legal actions:
+  0: Discard: 3♠
+  1: Discard: 7♥
+  2: Discard: A♠
+  16: Done discarding
+Action taken: 2 (Discard: A♠)
+West discarded A♠
+
+Step 57, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 3♠, 7♥
+Legal actions:
+  0: Discard: 3♠
+  1: Discard: 7♥
+  16: Done discarding
+Action taken: 0 (Discard: 3♠)
+West discarded 3♠
+
+Step 58, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♥
+Legal actions:
+  0: Discard: 7♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 59, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 2♠, A♦, 6♠, 9♣, 3♦
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: A♦
+  2: Discard: 6♠
+  3: Discard: 9♣
+  4: Discard: 3♦
+  16: Done discarding
+Action taken: 1 (Discard: A♦)
+North discarded A♦
+
+Step 60, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 2♠, 6♠, 9♣, 3♦
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: 6♠
+  2: Discard: 9♣
+  3: Discard: 3♦
+  16: Done discarding
+Action taken: 2 (Discard: 9♣)
+North discarded 9♣
+
+Step 61, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 2♠, 6♠, 3♦
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: 6♠
+  2: Discard: 3♦
+  16: Done discarding
+Action taken: 1 (Discard: 6♠)
+North discarded 6♠
+
+Step 62, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 2♠, 3♦
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: 3♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 63, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♣, 3♣, 4♣, J♦, K♣, A♥, Q♠, 9♥
+Legal actions:
+  0: Discard: A♣
+  1: Discard: 3♣
+  2: Discard: 4♣
+  3: Discard: J♦
+  4: Discard: K♣
+  5: Discard: A♥
+  6: Discard: Q♠
+  7: Discard: 9♥
+Action taken: 6 (Discard: Q♠)
+East discarded Q♠
+
+Step 64, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♣, 3♣, 4♣, J♦, K♣, A♥, 9♥
+Legal actions:
+  0: Discard: A♣
+  1: Discard: 3♣
+  2: Discard: 4♣
+  3: Discard: J♦
+  4: Discard: K♣
+  5: Discard: A♥
+  6: Discard: 9♥
+Action taken: 0 (Discard: A♣)
+East discarded A♣
+
+Step 65, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 3♣, 4♣, J♦, K♣, A♥, 9♥
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: 4♣
+  2: Discard: J♦
+  3: Discard: K♣
+  4: Discard: A♥
+  5: Discard: 9♥
+Action taken: 0 (Discard: 3♣)
+East discarded 3♣
+
+Step 66, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 4♣, J♦, K♣, A♥, 9♥
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: J♦
+  2: Discard: K♣
+  3: Discard: A♥
+  4: Discard: 9♥
+  16: Done discarding
+Action taken: 2 (Discard: K♣)
+East discarded K♣
+
+Step 67, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 4♣, J♦, A♥, 9♥
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: J♦
+  2: Discard: A♥
+  3: Discard: 9♥
+  16: Done discarding
+Action taken: 3 (Discard: 9♥)
+East discarded 9♥
+
+Step 68, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 4♣, J♦, A♥
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: J♦
+  2: Discard: A♥
+  16: Done discarding
+Action taken: 0 (Discard: 4♣)
+East discarded 4♣
+
+Step 69, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♦, A♥
+Legal actions:
+  0: Discard: J♦
+  1: Discard: A♥
+  16: Done discarding
+Action taken: 1 (Discard: A♥)
+East discarded A♥
+
+Step 70, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♦
+Legal actions:
+  0: Discard: J♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 3 card(s): K♦, 6♣, 8♠
+East received 4 card(s): T♣, 7♣, 5♦, 5♠
+South received 3 card(s): 8♦, 5♣, T♠
+West received 4 card(s): 9♦, K♥, J♥, 6♦
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['QD', 'KS', '8D', '5C', 'TS']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'S', 'D', 'C', 'S']
+
+Step 71, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♦, K♠, 8♦, 5♣, T♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: Q♦
+  1: Play: K♠
+  2: Play: 8♦
+  3: Play: 5♣
+  4: Play: T♠
+Action taken: 2 (Play: 8♦)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['7H', '9D', 'KH', 'JH', '6D']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H', 'D', 'H', 'H', 'D']
+DEBUG - Lead suit cards indices: [1, 4]
+DEBUG - Trump cards indices: [1, 4]
+
+Step 72, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♥, 9♦, K♥, J♥, 6♦
+Current trick: South: 8♦
+Legal actions:
+  0: Play: 7♥
+  1: Play: 9♦
+  2: Play: K♥
+  3: Play: J♥
+  4: Play: 6♦
+Action taken: 1 (Play: 9♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['2S', '3D', 'KD', '6C', '8S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S', 'D', 'D', 'C', 'S']
+DEBUG - Lead suit cards indices: [1, 2]
+DEBUG - Trump cards indices: [1, 2]
+
+Step 73, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 2♠, 3♦, K♦, 6♣, 8♠
+Current trick: South: 8♦, West: 9♦
+Legal actions:
+  0: Play: 2♠
+  1: Play: 3♦
+  2: Play: K♦
+  3: Play: 6♣
+  4: Play: 8♠
+Action taken: 0 (Play: 2♠)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', 'TC', '7C', '5D', '5S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'C', 'C', 'D', 'S']
+DEBUG - Lead suit cards indices: [0, 3]
+DEBUG - Trump cards indices: [0, 3]
+
+Step 74, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: J♦, T♣, 7♣, 5♦, 5♠
+Current trick: North: 2♠, South: 8♦, West: 9♦
+Legal actions:
+  0: Play: J♦
+  1: Play: T♣
+  2: Play: 7♣
+  3: Play: 5♦
+  4: Play: 5♠
+Action taken: 3 (Play: 5♦)
+Trick 1: North: 2♠, East: 5♦, South: 8♦, West: 9♦
+Winner: East with 5♦
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['JD', 'TC', '7C', '5S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'C', 'C', 'S']
+
+Step 75, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: J♦, T♣, 7♣, 5♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: J♦
+  1: Play: T♣
+  2: Play: 7♣
+  3: Play: 5♠
+Action taken: 2 (Play: 7♣)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['QD', 'KS', '5C', 'TS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'S', 'C', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 2]
+DEBUG - Legal cards: ['QD', '5C']
+
+Step 76, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: Q♦, K♠, 5♣, T♠
+Current trick: East: 7♣
+Legal actions:
+  0: Play: Q♦
+  2: Play: 5♣
+Action taken: 0 (Play: Q♦)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['7H', 'KH', 'JH', '6D']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'H', 'H', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [3]
+DEBUG - Final legal plays: [0, 1, 2, 3]
+DEBUG - Legal cards: ['7H', 'KH', 'JH', '6D']
+
+Step 77, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♥, K♥, J♥, 6♦
+Current trick: East: 7♣, South: Q♦
+Legal actions:
+  0: Play: 7♥
+  1: Play: K♥
+  2: Play: J♥
+  3: Play: 6♦
+Action taken: 0 (Play: 7♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', 'KD', '6C', '8S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'D', 'C', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [0, 1]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['3D', 'KD', '6C']
+
+Step 78, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 3♦, K♦, 6♣, 8♠
+Current trick: East: 7♣, South: Q♦, West: 7♥
+Legal actions:
+  0: Play: 3♦
+  1: Play: K♦
+  2: Play: 6♣
+Action taken: 2 (Play: 6♣)
+Trick 2: North: 6♣, East: 7♣, South: Q♦, West: 7♥
+Winner: South with Q♦
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KS', '5C', 'TS']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S', 'C', 'S']
+
+Step 79, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: K♠, 5♣, T♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♠
+  1: Play: 5♣
+  2: Play: T♠
+Action taken: 0 (Play: K♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['KH', 'JH', '6D']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H', 'H', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [2]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['KH', 'JH', '6D']
+
+Step 80, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♥, J♥, 6♦
+Current trick: South: K♠
+Legal actions:
+  0: Play: K♥
+  1: Play: J♥
+  2: Play: 6♦
+Action taken: 2 (Play: 6♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', 'KD', '8S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'D', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [0, 1]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['3D', 'KD', '8S']
+
+Step 81, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 3♦, K♦, 8♠
+Current trick: South: K♠, West: 6♦
+Legal actions:
+  0: Play: 3♦
+  1: Play: K♦
+  2: Play: 8♠
+Action taken: 0 (Play: 3♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', 'TC', '5S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'C', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 2]
+DEBUG - Legal cards: ['JD', '5S']
+
+Step 82, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: J♦, T♣, 5♠
+Current trick: North: 3♦, South: K♠, West: 6♦
+Legal actions:
+  0: Play: J♦
+  2: Play: 5♠
+Action taken: 2 (Play: 5♠)
+Trick 3: North: 3♦, East: 5♠, South: K♠, West: 6♦
+Winner: West with 6♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KH', 'JH']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'H']
+
+Step 83, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♥, J♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♥
+  1: Play: J♥
+Action taken: 1 (Play: J♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['KD', '8S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['KD', '8S']
+
+Step 84, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: K♦, 8♠
+Current trick: West: J♥
+Legal actions:
+  0: Play: K♦
+  1: Play: 8♠
+Action taken: 0 (Play: K♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', 'TC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['JD', 'TC']
+
+Step 85, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: J♦, T♣
+Current trick: North: K♦, West: J♥
+Legal actions:
+  0: Play: J♦
+  1: Play: T♣
+Action taken: 0 (Play: J♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['5C', 'TS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['5C', 'TS']
+
+Step 86, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 5♣, T♠
+Current trick: North: K♦, East: J♦, West: J♥
+Legal actions:
+  0: Play: 5♣
+  1: Play: T♠
+Action taken: 0 (Play: 5♣)
+Trick 4: North: K♦, East: J♦, South: 5♣, West: J♥
+Winner: East with J♦
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['TC']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['C']
+
+Step 87, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: T♣
+Action taken: 0 (Play: T♣)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['TS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['TS']
+
+Step 88, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: T♠
+Current trick: East: T♣
+Legal actions:
+  0: Play: T♠
+Action taken: 0 (Play: T♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['KH']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['KH']
+
+Step 89, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♥
+Current trick: East: T♣, South: T♠
+Legal actions:
+  0: Play: K♥
+Action taken: 0 (Play: K♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['8S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['8S']
+
+Step 90, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 8♠
+Current trick: East: T♣, South: T♠, West: K♥
+Legal actions:
+  0: Play: 8♠
+Action taken: 0 (Play: 8♠)
+Trick 5: North: 8♠, East: T♣, South: T♠, West: K♥
+Winner: East with T♣
+Trick points: North/South: 1 tricks = 5 points
+Trick points: East/West: 4 tricks = 20 points
+Highest trump bonus (+5) to East/West for playing 5D
+Total points earned: North/South: 5, East/West: 25
+East/West bid 30
+East/West failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 5, East/West: 25
+Game points after penalties: N/S: 10, E/W: -60
+----------------------
+New hand starting. Dealer: South
+Kitty: 6H, 9D, 3D
+
+----- Current Scores -----
+North/South (Players 0/2): 10 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 91, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 5♠, 2♣, Q♠, J♦, 9♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): 10 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+
+====== HAND #3 COMPLETE ======
+
+Step 92, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: T♦, A♣, T♥, Q♥, 6♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 10 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 93, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: J♣, 5♣, J♠, 4♠, K♣
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 10 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 94, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 5♦, 2♥, 2♠, T♣, 7♥
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 0 (Pass)
+
+Step 95, West (Player 3), Phase: 2
+Phase: Declaration
+West's hand: 5♠, 2♣, Q♠, J♦, 9♥
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 3 (Declare trump: Clubs)
+Trump suit declared: C
+West received kitty: 6♥, 9♦, 3♦
+
+Step 96, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♠, 2♣, Q♠, J♦, 9♥, 6♥, 9♦, 3♦
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 2♣
+  2: Discard: Q♠
+  3: Discard: J♦
+  4: Discard: 9♥
+  5: Discard: 6♥
+  6: Discard: 9♦
+  7: Discard: 3♦
+Action taken: 0 (Discard: 5♠)
+West discarded 5♠
+
+Step 97, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 2♣, Q♠, J♦, 9♥, 6♥, 9♦, 3♦
+Legal actions:
+  0: Discard: 2♣
+  1: Discard: Q♠
+  2: Discard: J♦
+  3: Discard: 9♥
+  4: Discard: 6♥
+  5: Discard: 9♦
+  6: Discard: 3♦
+Action taken: 0 (Discard: 2♣)
+West discarded 2♣
+
+Step 98, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Q♠, J♦, 9♥, 6♥, 9♦, 3♦
+Legal actions:
+  0: Discard: Q♠
+  1: Discard: J♦
+  2: Discard: 9♥
+  3: Discard: 6♥
+  4: Discard: 9♦
+  5: Discard: 3♦
+Action taken: 5 (Discard: 3♦)
+West discarded 3♦
+
+Step 99, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Q♠, J♦, 9♥, 6♥, 9♦
+Legal actions:
+  0: Discard: Q♠
+  1: Discard: J♦
+  2: Discard: 9♥
+  3: Discard: 6♥
+  4: Discard: 9♦
+  16: Done discarding
+Action taken: 3 (Discard: 6♥)
+West discarded 6♥
+
+Step 100, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Q♠, J♦, 9♥, 9♦
+Legal actions:
+  0: Discard: Q♠
+  1: Discard: J♦
+  2: Discard: 9♥
+  3: Discard: 9♦
+  16: Done discarding
+Action taken: 0 (Discard: Q♠)
+West discarded Q♠
+
+Step 101, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: J♦, 9♥, 9♦
+Legal actions:
+  0: Discard: J♦
+  1: Discard: 9♥
+  2: Discard: 9♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 102, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: T♦, A♣, T♥, Q♥, 6♦
+Legal actions:
+  0: Discard: T♦
+  1: Discard: A♣
+  2: Discard: T♥
+  3: Discard: Q♥
+  4: Discard: 6♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 103, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♣, 5♣, J♠, 4♠, K♣
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 5♣
+  2: Discard: J♠
+  3: Discard: 4♠
+  4: Discard: K♣
+  16: Done discarding
+Action taken: 2 (Discard: J♠)
+East discarded J♠
+
+Step 104, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♣, 5♣, 4♠, K♣
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 5♣
+  2: Discard: 4♠
+  3: Discard: K♣
+  16: Done discarding
+Action taken: 1 (Discard: 5♣)
+East discarded 5♣
+
+Step 105, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♣, 4♠, K♣
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 4♠
+  2: Discard: K♣
+  16: Done discarding
+Action taken: 1 (Discard: 4♠)
+East discarded 4♠
+
+Step 106, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♣, K♣
+Legal actions:
+  0: Discard: J♣
+  1: Discard: K♣
+  16: Done discarding
+Action taken: 1 (Discard: K♣)
+East discarded K♣
+
+Step 107, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♣
+Legal actions:
+  0: Discard: J♣
+  16: Done discarding
+Action taken: 0 (Discard: J♣)
+East discarded J♣
+
+Step 108, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 109, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♦, 2♥, 2♠, T♣, 7♥
+Legal actions:
+  0: Discard: 5♦
+  1: Discard: 2♥
+  2: Discard: 2♠
+  3: Discard: T♣
+  4: Discard: 7♥
+  16: Done discarding
+Action taken: 1 (Discard: 2♥)
+South discarded 2♥
+
+Step 110, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♦, 2♠, T♣, 7♥
+Legal actions:
+  0: Discard: 5♦
+  1: Discard: 2♠
+  2: Discard: T♣
+  3: Discard: 7♥
+  16: Done discarding
+Action taken: 1 (Discard: 2♠)
+South discarded 2♠
+
+Step 111, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♦, T♣, 7♥
+Legal actions:
+  0: Discard: 5♦
+  1: Discard: T♣
+  2: Discard: 7♥
+  16: Done discarding
+Action taken: 0 (Discard: 5♦)
+South discarded 5♦
+
+Step 112, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: T♣, 7♥
+Legal actions:
+  0: Discard: T♣
+  1: Discard: 7♥
+  16: Done discarding
+Action taken: 1 (Discard: 7♥)
+South discarded 7♥
+
+Step 113, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: T♣
+Legal actions:
+  0: Discard: T♣
+  16: Done discarding
+Action taken: 16 (Done discarding)
+East received 5 card(s): 3♥, 9♣, 2♦, 3♠, 6♠
+South received 4 card(s): 3♣, J♥, K♠, T♠
+West received 2 card(s): 6♣, A♦
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['TD', 'AC', 'TH', 'QH', '6D']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'C', 'H', 'H', 'D']
+
+Step 114, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: T♦, A♣, T♥, Q♥, 6♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: T♦
+  1: Play: A♣
+  2: Play: T♥
+  3: Play: Q♥
+  4: Play: 6♦
+Action taken: 4 (Play: 6♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3H', '9C', '2D', '3S', '6S']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['H', 'C', 'D', 'S', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [1, 2]
+DEBUG - Legal cards: ['9C', '2D']
+
+Step 115, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♥, 9♣, 2♦, 3♠, 6♠
+Current trick: North: 6♦
+Legal actions:
+  1: Play: 9♣
+  2: Play: 2♦
+Action taken: 1 (Play: 9♣)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['TC', '3C', 'JH', 'KS', 'TS']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['C', 'C', 'H', 'S', 'S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0, 1]
+DEBUG - Final legal plays: [0, 1, 2, 3, 4]
+DEBUG - Legal cards: ['TC', '3C', 'JH', 'KS', 'TS']
+
+Step 116, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: T♣, 3♣, J♥, K♠, T♠
+Current trick: North: 6♦, East: 9♣
+Legal actions:
+  0: Play: T♣
+  1: Play: 3♣
+  2: Play: J♥
+  3: Play: K♠
+  4: Play: T♠
+Action taken: 0 (Play: T♣)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '9H', '9D', '6C', 'AD']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'H', 'D', 'C', 'D']
+DEBUG - Lead suit cards indices: [0, 2, 4]
+DEBUG - Trump cards indices: [3]
+DEBUG - Final legal plays: [0, 2, 3, 4]
+DEBUG - Legal cards: ['JD', '9D', '6C', 'AD']
+
+Step 117, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: J♦, 9♥, 9♦, 6♣, A♦
+Current trick: North: 6♦, East: 9♣, South: T♣
+Legal actions:
+  0: Play: J♦
+  2: Play: 9♦
+  3: Play: 6♣
+  4: Play: A♦
+Action taken: 2 (Play: 9♦)
+Trick 1: North: 6♦, East: 9♣, South: T♣, West: 9♦
+Winner: East with 9♣
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['3H', '2D', '3S', '6S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'D', 'S', 'S']
+
+Step 118, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♥, 2♦, 3♠, 6♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 3♥
+  1: Play: 2♦
+  2: Play: 3♠
+  3: Play: 6♠
+Action taken: 3 (Play: 6♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['3C', 'JH', 'KS', 'TS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['C', 'H', 'S', 'S']
+DEBUG - Lead suit cards indices: [2, 3]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 2, 3]
+DEBUG - Legal cards: ['3C', 'KS', 'TS']
+
+Step 119, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 3♣, J♥, K♠, T♠
+Current trick: East: 6♠
+Legal actions:
+  0: Play: 3♣
+  2: Play: K♠
+  3: Play: T♠
+Action taken: 2 (Play: K♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '9H', '6C', 'AD']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'H', 'C', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [2]
+DEBUG - Final legal plays: [0, 1, 2, 3]
+DEBUG - Legal cards: ['JD', '9H', '6C', 'AD']
+
+Step 120, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: J♦, 9♥, 6♣, A♦
+Current trick: East: 6♠, South: K♠
+Legal actions:
+  0: Play: J♦
+  1: Play: 9♥
+  2: Play: 6♣
+  3: Play: A♦
+Action taken: 1 (Play: 9♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['TD', 'AC', 'TH', 'QH']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'C', 'H', 'H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1, 2, 3]
+DEBUG - Legal cards: ['TD', 'AC', 'TH', 'QH']
+
+Step 121, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: T♦, A♣, T♥, Q♥
+Current trick: East: 6♠, South: K♠, West: 9♥
+Legal actions:
+  0: Play: T♦
+  1: Play: A♣
+  2: Play: T♥
+  3: Play: Q♥
+Action taken: 2 (Play: T♥)
+Trick 2: North: T♥, East: 6♠, South: K♠, West: 9♥
+Winner: South with K♠
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['3C', 'JH', 'TS']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'H', 'S']
+
+Step 122, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 3♣, J♥, T♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 3♣
+  1: Play: J♥
+  2: Play: T♠
+Action taken: 2 (Play: T♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '6C', 'AD']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'C', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['JD', '6C', 'AD']
+
+Step 123, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: J♦, 6♣, A♦
+Current trick: South: T♠
+Legal actions:
+  0: Play: J♦
+  1: Play: 6♣
+  2: Play: A♦
+Action taken: 2 (Play: A♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['TD', 'AC', 'QH']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'C', 'H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['TD', 'AC', 'QH']
+
+Step 124, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: T♦, A♣, Q♥
+Current trick: South: T♠, West: A♦
+Legal actions:
+  0: Play: T♦
+  1: Play: A♣
+  2: Play: Q♥
+Action taken: 1 (Play: A♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['3H', '2D', '3S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H', 'D', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [2]
+DEBUG - Legal cards: ['3S']
+
+Step 125, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♥, 2♦, 3♠
+Current trick: North: A♣, South: T♠, West: A♦
+Legal actions:
+  2: Play: 3♠
+Action taken: 2 (Play: 3♠)
+Trick 3: North: A♣, East: 3♠, South: T♠, West: A♦
+Winner: North with A♣
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['TD', 'QH']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'H']
+
+Step 126, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: T♦, Q♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: T♦
+  1: Play: Q♥
+Action taken: 0 (Play: T♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3H', '2D']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['H', 'D']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1]
+DEBUG - Legal cards: ['2D']
+
+Step 127, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♥, 2♦
+Current trick: North: T♦
+Legal actions:
+  1: Play: 2♦
+Action taken: 1 (Play: 2♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3C', 'JH']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['C', 'H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['3C', 'JH']
+
+Step 128, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 3♣, J♥
+Current trick: North: T♦, East: 2♦
+Legal actions:
+  0: Play: 3♣
+  1: Play: J♥
+Action taken: 0 (Play: 3♣)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '6C']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['JD', '6C']
+
+Step 129, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: J♦, 6♣
+Current trick: North: T♦, East: 2♦, South: 3♣
+Legal actions:
+  0: Play: J♦
+  1: Play: 6♣
+Action taken: 1 (Play: 6♣)
+Trick 4: North: T♦, East: 2♦, South: 3♣, West: 6♣
+Winner: South with 3♣
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['JH']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H']
+
+Step 130, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: J♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: J♥
+Action taken: 0 (Play: J♥)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['JD']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['JD']
+
+Step 131, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: J♦
+Current trick: South: J♥
+Legal actions:
+  0: Play: J♦
+Action taken: 0 (Play: J♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['QH']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['QH']
+
+Step 132, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: Q♥
+Current trick: South: J♥, West: J♦
+Legal actions:
+  0: Play: Q♥
+Action taken: 0 (Play: Q♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['3H']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['3H']
+
+Step 133, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 3♥
+Current trick: North: Q♥, South: J♥, West: J♦
+Legal actions:
+  0: Play: 3♥
+Action taken: 0 (Play: 3♥)
+Trick 5: North: Q♥, East: 3♥, South: J♥, West: J♦
+Winner: North with Q♥
+Trick points: North/South: 4 tricks = 20 points
+Trick points: East/West: 1 tricks = 5 points
+Highest trump bonus (+5) to North/South for playing AC
+Total points earned: North/South: 25, East/West: 5
+East/West bid 30
+East/West failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 25, East/West: 5
+Game points after penalties: N/S: 35, E/W: -90
+----------------------
+New hand starting. Dealer: West
+Kitty: KH, 5D, TH
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+
+====== HAND #4 COMPLETE ======
+
+Step 134, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 6♣, T♠, 2♦, 8♦, J♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 1 (Bid 20)
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+Step 135, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: 2♥, 8♥, 4♠, 6♠, K♣
+Legal actions:
+  0: Pass
+  2: Bid 25
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+Step 136, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: J♣, 7♦, 5♠, 4♣, Q♦
+Legal actions:
+  0: Pass
+  2: Bid 25
+  3: Bid 30
+Action taken: 2 (Bid 25)
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+Step 137, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 3♣, T♣, 3♥, K♠, 5♥
+Legal actions:
+  0: Pass
+  3: Bid 30
+  4: Hold
+Action taken: 4 (Hold)
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+
+====== HAND #5 COMPLETE ======
+
+Step 138, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 6♣, T♠, 2♦, 8♦, J♥
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+Step 139, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: 2♥, 8♥, 4♠, 6♠, K♣
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+Step 140, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: J♣, 7♦, 5♠, 4♣, Q♦
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): 35 points
+East/West (Players 1/3): -90 points
+--------------------------
+
+
+Step 141, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 3♣, T♣, 3♥, K♠, 5♥
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 0 (Pass)
+
+Step 142, South (Player 2), Phase: 2
+Phase: Declaration
+South's hand: J♣, 7♦, 5♠, 4♣, Q♦
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 2 (Declare trump: Diamonds)
+Trump suit declared: D
+South received kitty: K♥, 5♦, T♥
+
+Step 143, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♣, T♠, 2♦, 8♦, J♥
+Legal actions:
+  0: Discard: 6♣
+  1: Discard: T♠
+  2: Discard: 2♦
+  3: Discard: 8♦
+  4: Discard: J♥
+  16: Done discarding
+Action taken: 4 (Discard: J♥)
+North discarded J♥
+
+Step 144, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♣, T♠, 2♦, 8♦
+Legal actions:
+  0: Discard: 6♣
+  1: Discard: T♠
+  2: Discard: 2♦
+  3: Discard: 8♦
+  16: Done discarding
+Action taken: 1 (Discard: T♠)
+North discarded T♠
+
+Step 145, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♣, 2♦, 8♦
+Legal actions:
+  0: Discard: 6♣
+  1: Discard: 2♦
+  2: Discard: 8♦
+  16: Done discarding
+Action taken: 2 (Discard: 8♦)
+North discarded 8♦
+
+Step 146, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♣, 2♦
+Legal actions:
+  0: Discard: 6♣
+  1: Discard: 2♦
+  16: Done discarding
+Action taken: 1 (Discard: 2♦)
+North discarded 2♦
+
+Step 147, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♣
+Legal actions:
+  0: Discard: 6♣
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 148, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 2♥, 8♥, 4♠, 6♠, K♣
+Legal actions:
+  0: Discard: 2♥
+  1: Discard: 8♥
+  2: Discard: 4♠
+  3: Discard: 6♠
+  4: Discard: K♣
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 149, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♣, 7♦, 5♠, 4♣, Q♦, K♥, 5♦, T♥
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 7♦
+  2: Discard: 5♠
+  3: Discard: 4♣
+  4: Discard: Q♦
+  5: Discard: K♥
+  6: Discard: 5♦
+  7: Discard: T♥
+Action taken: 7 (Discard: T♥)
+South discarded T♥
+
+Step 150, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♣, 7♦, 5♠, 4♣, Q♦, K♥, 5♦
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 7♦
+  2: Discard: 5♠
+  3: Discard: 4♣
+  4: Discard: Q♦
+  5: Discard: K♥
+  6: Discard: 5♦
+Action taken: 2 (Discard: 5♠)
+South discarded 5♠
+
+Step 151, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♣, 7♦, 4♣, Q♦, K♥, 5♦
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 7♦
+  2: Discard: 4♣
+  3: Discard: Q♦
+  4: Discard: K♥
+  5: Discard: 5♦
+Action taken: 5 (Discard: 5♦)
+South discarded 5♦
+
+Step 152, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♣, 7♦, 4♣, Q♦, K♥
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 7♦
+  2: Discard: 4♣
+  3: Discard: Q♦
+  4: Discard: K♥
+  16: Done discarding
+Action taken: 3 (Discard: Q♦)
+South discarded Q♦
+
+Step 153, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♣, 7♦, 4♣, K♥
+Legal actions:
+  0: Discard: J♣
+  1: Discard: 7♦
+  2: Discard: 4♣
+  3: Discard: K♥
+  16: Done discarding
+Action taken: 0 (Discard: J♣)
+South discarded J♣
+
+Step 154, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 7♦, 4♣, K♥
+Legal actions:
+  0: Discard: 7♦
+  1: Discard: 4♣
+  2: Discard: K♥
+  16: Done discarding
+Action taken: 1 (Discard: 4♣)
+South discarded 4♣
+
+Step 155, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 7♦, K♥
+Legal actions:
+  0: Discard: 7♦
+  1: Discard: K♥
+  16: Done discarding
+Action taken: 1 (Discard: K♥)
+South discarded K♥
+
+Step 156, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 7♦
+Legal actions:
+  0: Discard: 7♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 157, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 3♣, T♣, 3♥, K♠, 5♥
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: T♣
+  2: Discard: 3♥
+  3: Discard: K♠
+  4: Discard: 5♥
+  16: Done discarding
+Action taken: 2 (Discard: 3♥)
+West discarded 3♥
+
+Step 158, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 3♣, T♣, K♠, 5♥
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: T♣
+  2: Discard: K♠
+  3: Discard: 5♥
+  16: Done discarding
+Action taken: 2 (Discard: K♠)
+West discarded K♠
+
+Step 159, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 3♣, T♣, 5♥
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: T♣
+  2: Discard: 5♥
+  16: Done discarding
+Action taken: 0 (Discard: 3♣)
+West discarded 3♣
+
+Step 160, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: T♣, 5♥
+Legal actions:
+  0: Discard: T♣
+  1: Discard: 5♥
+  16: Done discarding
+Action taken: 0 (Discard: T♣)
+West discarded T♣
+
+Step 161, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♥
+Legal actions:
+  0: Discard: 5♥
+  16: Done discarding
+Action taken: 0 (Discard: 5♥)
+West discarded 5♥
+
+Step 162, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 4 card(s): Q♣, A♥, 2♣, 3♦
+South received 4 card(s): J♦, 6♦, 9♣, 3♠
+West received 5 card(s): 7♣, 2♠, A♦, 8♠, T♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['7C', '2S', 'AD', '8S', 'TD']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'S', 'D', 'S', 'D']
+
+Step 163, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♣, 2♠, A♦, 8♠, T♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 7♣
+  1: Play: 2♠
+  2: Play: A♦
+  3: Play: 8♠
+  4: Play: T♦
+Action taken: 4 (Play: T♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['6C', 'QC', 'AH', '2C', '3D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'C', 'H', 'C', 'D']
+DEBUG - Lead suit cards indices: [4]
+DEBUG - Trump cards indices: [2, 4]
+
+Step 164, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 6♣, Q♣, A♥, 2♣, 3♦
+Current trick: West: T♦
+Legal actions:
+  0: Play: 6♣
+  1: Play: Q♣
+  2: Play: A♥
+  3: Play: 2♣
+  4: Play: 3♦
+Action taken: 4 (Play: 3♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['2H', '8H', '4S', '6S', 'KC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'H', 'S', 'S', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 165, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♥, 8♥, 4♠, 6♠, K♣
+Current trick: North: 3♦, West: T♦
+Legal actions:
+  0: Play: 2♥
+  1: Play: 8♥
+  2: Play: 4♠
+  3: Play: 6♠
+  4: Play: K♣
+Action taken: 1 (Play: 8♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['7D', 'JD', '6D', '9C', '3S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'D', 'D', 'C', 'S']
+DEBUG - Lead suit cards indices: [0, 1, 2]
+DEBUG - Trump cards indices: [0, 1, 2]
+
+Step 166, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 7♦, J♦, 6♦, 9♣, 3♠
+Current trick: North: 3♦, East: 8♥, West: T♦
+Legal actions:
+  0: Play: 7♦
+  1: Play: J♦
+  2: Play: 6♦
+  3: Play: 9♣
+  4: Play: 3♠
+Action taken: 2 (Play: 6♦)
+Trick 1: North: 3♦, East: 8♥, South: 6♦, West: T♦
+Winner: West with T♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['7C', '2S', 'AD', '8S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'S', 'D', 'S']
+
+Step 167, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♣, 2♠, A♦, 8♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 7♣
+  1: Play: 2♠
+  2: Play: A♦
+  3: Play: 8♠
+Action taken: 3 (Play: 8♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['6C', 'QC', 'AH', '2C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'C', 'H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [2]
+DEBUG - Final legal plays: [0, 1, 2, 3]
+DEBUG - Legal cards: ['6C', 'QC', 'AH', '2C']
+
+Step 168, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 6♣, Q♣, A♥, 2♣
+Current trick: West: 8♠
+Legal actions:
+  0: Play: 6♣
+  1: Play: Q♣
+  2: Play: A♥
+  3: Play: 2♣
+Action taken: 1 (Play: Q♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['2H', '4S', '6S', 'KC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'S', 'S', 'C']
+DEBUG - Lead suit cards indices: [1, 2]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1, 2]
+DEBUG - Legal cards: ['4S', '6S']
+
+Step 169, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♥, 4♠, 6♠, K♣
+Current trick: North: Q♣, West: 8♠
+Legal actions:
+  1: Play: 4♠
+  2: Play: 6♠
+Action taken: 1 (Play: 4♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['7D', 'JD', '9C', '3S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'D', 'C', 'S']
+DEBUG - Lead suit cards indices: [3]
+DEBUG - Trump cards indices: [0, 1]
+DEBUG - Final legal plays: [0, 1, 3]
+DEBUG - Legal cards: ['7D', 'JD', '3S']
+
+Step 170, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 7♦, J♦, 9♣, 3♠
+Current trick: North: Q♣, East: 4♠, West: 8♠
+Legal actions:
+  0: Play: 7♦
+  1: Play: J♦
+  3: Play: 3♠
+Action taken: 0 (Play: 7♦)
+Trick 2: North: Q♣, East: 4♠, South: 7♦, West: 8♠
+Winner: South with 7♦
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['JD', '9C', '3S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D', 'C', 'S']
+
+Step 171, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: J♦, 9♣, 3♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: J♦
+  1: Play: 9♣
+  2: Play: 3♠
+Action taken: 0 (Play: J♦)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['7C', '2S', 'AD']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'S', 'D']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [2]
+
+Step 172, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♣, 2♠, A♦
+Current trick: South: J♦
+Legal actions:
+  2: Play: A♦
+Action taken: 2 (Play: A♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['6C', 'AH', '2C']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [1]
+
+Step 173, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 6♣, A♥, 2♣
+Current trick: South: J♦, West: A♦
+Legal actions:
+  1: Play: A♥
+Action taken: 1 (Play: A♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['2H', '6S', 'KC']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H', 'S', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 174, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♥, 6♠, K♣
+Current trick: North: A♥, South: J♦, West: A♦
+Legal actions:
+  0: Play: 2♥
+  1: Play: 6♠
+  2: Play: K♣
+Action taken: 2 (Play: K♣)
+Trick 3: North: A♥, East: K♣, South: J♦, West: A♦
+Winner: South with J♦
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['9C', '3S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'S']
+
+Step 175, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 9♣, 3♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 9♣
+  1: Play: 3♠
+Action taken: 1 (Play: 3♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['7C', '2S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'S']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1]
+DEBUG - Legal cards: ['2S']
+
+Step 176, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♣, 2♠
+Current trick: South: 3♠
+Legal actions:
+  1: Play: 2♠
+Action taken: 1 (Play: 2♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['6C', '2C']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['6C', '2C']
+
+Step 177, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 6♣, 2♣
+Current trick: South: 3♠, West: 2♠
+Legal actions:
+  0: Play: 6♣
+  1: Play: 2♣
+Action taken: 1 (Play: 2♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['2H', '6S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H', 'S']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1]
+DEBUG - Legal cards: ['6S']
+
+Step 178, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♥, 6♠
+Current trick: North: 2♣, South: 3♠, West: 2♠
+Legal actions:
+  1: Play: 6♠
+Action taken: 1 (Play: 6♠)
+Trick 4: North: 2♣, East: 6♠, South: 3♠, West: 2♠
+Winner: West with 2♠
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['7C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C']
+
+Step 179, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 7♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 7♣
+Action taken: 0 (Play: 7♣)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['6C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['6C']
+
+Step 180, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 6♣
+Current trick: West: 7♣
+Legal actions:
+  0: Play: 6♣
+Action taken: 0 (Play: 6♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['2H']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['2H']
+
+Step 181, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♥
+Current trick: North: 6♣, West: 7♣
+Legal actions:
+  0: Play: 2♥
+Action taken: 0 (Play: 2♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['9C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['9C']
+
+Step 182, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 9♣
+Current trick: North: 6♣, East: 2♥, West: 7♣
+Legal actions:
+  0: Play: 9♣
+Action taken: 0 (Play: 9♣)
+Trick 5: North: 6♣, East: 2♥, South: 9♣, West: 7♣
+Winner: North with 6♣
+Trick points: North/South: 3 tricks = 15 points
+Trick points: East/West: 2 tricks = 10 points
+Highest trump bonus (+5) to North/South for playing JD
+Total points earned: North/South: 20, East/West: 10
+North/South bid 30
+North/South failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 20, East/West: 10
+Game points after penalties: N/S: 5, E/W: -80
+----------------------
+New hand starting. Dealer: North
+Kitty: 8H, AH, 2C
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -80 points
+--------------------------
+
+
+Step 183, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: A♣, Q♣, J♦, 8♦, 4♦
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -80 points
+--------------------------
+
+
+Step 184, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 5♠, 5♣, J♥, K♠, 4♠
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -80 points
+--------------------------
+
+
+Step 185, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 7♥, A♠, 7♠, 9♥, 3♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -80 points
+--------------------------
+
+
+
+====== HAND #6 COMPLETE ======
+
+Step 186, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: K♥, T♣, A♦, Q♥, Q♠
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 4 (Hold)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -80 points
+--------------------------
+
+
+Step 187, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: A♣, Q♣, J♦, 8♦, 4♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): 5 points
+East/West (Players 1/3): -80 points
+--------------------------
+
+
+Step 188, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 5♠, 5♣, J♥, K♠, 4♠
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 189, North (Player 0), Phase: 2
+Phase: Declaration
+North's hand: K♥, T♣, A♦, Q♥, Q♠
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 3 (Declare trump: Clubs)
+Trump suit declared: C
+North received kitty: 8♥, A♥, 2♣
+
+Step 190, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: A♣, Q♣, J♦, 8♦, 4♦
+Legal actions:
+  0: Discard: A♣
+  1: Discard: Q♣
+  2: Discard: J♦
+  3: Discard: 8♦
+  4: Discard: 4♦
+  16: Done discarding
+Action taken: 0 (Discard: A♣)
+East discarded A♣
+
+Step 191, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Q♣, J♦, 8♦, 4♦
+Legal actions:
+  0: Discard: Q♣
+  1: Discard: J♦
+  2: Discard: 8♦
+  3: Discard: 4♦
+  16: Done discarding
+Action taken: 3 (Discard: 4♦)
+East discarded 4♦
+
+Step 192, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Q♣, J♦, 8♦
+Legal actions:
+  0: Discard: Q♣
+  1: Discard: J♦
+  2: Discard: 8♦
+  16: Done discarding
+Action taken: 0 (Discard: Q♣)
+East discarded Q♣
+
+Step 193, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♦, 8♦
+Legal actions:
+  0: Discard: J♦
+  1: Discard: 8♦
+  16: Done discarding
+Action taken: 1 (Discard: 8♦)
+East discarded 8♦
+
+Step 194, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♦
+Legal actions:
+  0: Discard: J♦
+  16: Done discarding
+Action taken: 0 (Discard: J♦)
+East discarded J♦
+
+Step 195, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 196, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♠, 5♣, J♥, K♠, 4♠
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 5♣
+  2: Discard: J♥
+  3: Discard: K♠
+  4: Discard: 4♠
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 197, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♥, A♠, 7♠, 9♥, 3♦
+Legal actions:
+  0: Discard: 7♥
+  1: Discard: A♠
+  2: Discard: 7♠
+  3: Discard: 9♥
+  4: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: 7♥)
+West discarded 7♥
+
+Step 198, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: A♠, 7♠, 9♥, 3♦
+Legal actions:
+  0: Discard: A♠
+  1: Discard: 7♠
+  2: Discard: 9♥
+  3: Discard: 3♦
+  16: Done discarding
+Action taken: 3 (Discard: 3♦)
+West discarded 3♦
+
+Step 199, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: A♠, 7♠, 9♥
+Legal actions:
+  0: Discard: A♠
+  1: Discard: 7♠
+  2: Discard: 9♥
+  16: Done discarding
+Action taken: 0 (Discard: A♠)
+West discarded A♠
+
+Step 200, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 7♠, 9♥
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: 9♥
+  16: Done discarding
+Action taken: 0 (Discard: 7♠)
+West discarded 7♠
+
+Step 201, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 9♥
+Legal actions:
+  0: Discard: 9♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 202, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: K♥, T♣, A♦, Q♥, Q♠, 8♥, A♥, 2♣
+Legal actions:
+  0: Discard: K♥
+  1: Discard: T♣
+  2: Discard: A♦
+  3: Discard: Q♥
+  4: Discard: Q♠
+  5: Discard: 8♥
+  6: Discard: A♥
+  7: Discard: 2♣
+Action taken: 2 (Discard: A♦)
+North discarded A♦
+
+Step 203, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: K♥, T♣, Q♥, Q♠, 8♥, A♥, 2♣
+Legal actions:
+  0: Discard: K♥
+  1: Discard: T♣
+  2: Discard: Q♥
+  3: Discard: Q♠
+  4: Discard: 8♥
+  5: Discard: A♥
+  6: Discard: 2♣
+Action taken: 0 (Discard: K♥)
+North discarded K♥
+
+Step 204, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: T♣, Q♥, Q♠, 8♥, A♥, 2♣
+Legal actions:
+  0: Discard: T♣
+  1: Discard: Q♥
+  2: Discard: Q♠
+  3: Discard: 8♥
+  4: Discard: A♥
+  5: Discard: 2♣
+Action taken: 0 (Discard: T♣)
+North discarded T♣
+
+Step 205, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: Q♥, Q♠, 8♥, A♥, 2♣
+Legal actions:
+  0: Discard: Q♥
+  1: Discard: Q♠
+  2: Discard: 8♥
+  3: Discard: A♥
+  4: Discard: 2♣
+  16: Done discarding
+Action taken: 16 (Done discarding)
+East received 5 card(s): T♥, 7♦, 3♥, Q♦, T♦
+West received 4 card(s): 9♣, 5♦, 9♠, J♠
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['TH', '7D', '3H', 'QD', 'TD']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'D', 'H', 'D', 'D']
+
+Step 206, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♥, 7♦, 3♥, Q♦, T♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: T♥
+  1: Play: 7♦
+  2: Play: 3♥
+  3: Play: Q♦
+  4: Play: T♦
+Action taken: 4 (Play: T♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['5S', '5C', 'JH', 'KS', '4S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'C', 'H', 'S', 'S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1, 2, 3, 4]
+DEBUG - Legal cards: ['5S', '5C', 'JH', 'KS', '4S']
+
+Step 207, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 5♠, 5♣, J♥, K♠, 4♠
+Current trick: East: T♦
+Legal actions:
+  0: Play: 5♠
+  1: Play: 5♣
+  2: Play: J♥
+  3: Play: K♠
+  4: Play: 4♠
+Action taken: 4 (Play: 4♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['9H', '9C', '5D', '9S', 'JS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'C', 'D', 'S', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [1, 2]
+DEBUG - Legal cards: ['9C', '5D']
+
+Step 208, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 9♥, 9♣, 5♦, 9♠, J♠
+Current trick: East: T♦, South: 4♠
+Legal actions:
+  1: Play: 9♣
+  2: Play: 5♦
+Action taken: 2 (Play: 5♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['QH', 'QS', '8H', 'AH', '2C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'S', 'H', 'H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [3, 4]
+DEBUG - Final legal plays: [0, 1, 2, 3, 4]
+DEBUG - Legal cards: ['QH', 'QS', '8H', 'AH', '2C']
+
+Step 209, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: Q♥, Q♠, 8♥, A♥, 2♣
+Current trick: East: T♦, South: 4♠, West: 5♦
+Legal actions:
+  0: Play: Q♥
+  1: Play: Q♠
+  2: Play: 8♥
+  3: Play: A♥
+  4: Play: 2♣
+Action taken: 0 (Play: Q♥)
+Trick 1: North: Q♥, East: T♦, South: 4♠, West: 5♦
+Winner: East with T♦
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['TH', '7D', '3H', 'QD']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'D', 'H', 'D']
+
+Step 210, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♥, 7♦, 3♥, Q♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: T♥
+  1: Play: 7♦
+  2: Play: 3♥
+  3: Play: Q♦
+Action taken: 2 (Play: 3♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['5S', '5C', 'JH', 'KS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'C', 'H', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [1, 2]
+DEBUG - Legal cards: ['5C', 'JH']
+
+Step 211, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 5♠, 5♣, J♥, K♠
+Current trick: East: 3♥
+Legal actions:
+  1: Play: 5♣
+  2: Play: J♥
+Action taken: 1 (Play: 5♣)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['9H', '9C', '9S', 'JS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'C', 'S', 'S']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['9H', '9C']
+
+Step 212, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 9♥, 9♣, 9♠, J♠
+Current trick: East: 3♥, South: 5♣
+Legal actions:
+  0: Play: 9♥
+  1: Play: 9♣
+Action taken: 0 (Play: 9♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['QS', '8H', 'AH', '2C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'H', 'H', 'C']
+DEBUG - Lead suit cards indices: [1, 2]
+DEBUG - Trump cards indices: [2, 3]
+DEBUG - Final legal plays: [1, 2, 3]
+DEBUG - Legal cards: ['8H', 'AH', '2C']
+
+Step 213, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: Q♠, 8♥, A♥, 2♣
+Current trick: East: 3♥, South: 5♣, West: 9♥
+Legal actions:
+  1: Play: 8♥
+  2: Play: A♥
+  3: Play: 2♣
+Action taken: 2 (Play: A♥)
+Trick 2: North: A♥, East: 3♥, South: 5♣, West: 9♥
+Winner: South with 5♣
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['5S', 'JH', 'KS']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S', 'H', 'S']
+
+Step 214, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 5♠, J♥, K♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 5♠
+  1: Play: J♥
+  2: Play: K♠
+Action taken: 0 (Play: 5♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['9C', '9S', 'JS']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C', 'S', 'S']
+DEBUG - Lead suit cards indices: [1, 2]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['9C', '9S', 'JS']
+
+Step 215, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 9♣, 9♠, J♠
+Current trick: South: 5♠
+Legal actions:
+  0: Play: 9♣
+  1: Play: 9♠
+  2: Play: J♠
+Action taken: 0 (Play: 9♣)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['QS', '8H', '2C']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S', 'H', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [2]
+DEBUG - Final legal plays: [0, 2]
+DEBUG - Legal cards: ['QS', '2C']
+
+Step 216, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: Q♠, 8♥, 2♣
+Current trick: South: 5♠, West: 9♣
+Legal actions:
+  0: Play: Q♠
+  2: Play: 2♣
+Action taken: 0 (Play: Q♠)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['TH', '7D', 'QD']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H', 'D', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['TH', '7D', 'QD']
+
+Step 217, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♥, 7♦, Q♦
+Current trick: North: Q♠, South: 5♠, West: 9♣
+Legal actions:
+  0: Play: T♥
+  1: Play: 7♦
+  2: Play: Q♦
+Action taken: 2 (Play: Q♦)
+Trick 3: North: Q♠, East: Q♦, South: 5♠, West: 9♣
+Winner: West with 9♣
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['9S', 'JS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'S']
+
+Step 218, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 9♠, J♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 9♠
+  1: Play: J♠
+Action taken: 0 (Play: 9♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['8H', '2C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['8H', '2C']
+
+Step 219, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 8♥, 2♣
+Current trick: West: 9♠
+Legal actions:
+  0: Play: 8♥
+  1: Play: 2♣
+Action taken: 0 (Play: 8♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['TH', '7D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['TH', '7D']
+
+Step 220, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♥, 7♦
+Current trick: North: 8♥, West: 9♠
+Legal actions:
+  0: Play: T♥
+  1: Play: 7♦
+Action taken: 0 (Play: T♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['JH', 'KS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'S']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1]
+DEBUG - Legal cards: ['KS']
+
+Step 221, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: J♥, K♠
+Current trick: North: 8♥, East: T♥, West: 9♠
+Legal actions:
+  1: Play: K♠
+Action taken: 1 (Play: K♠)
+Trick 4: North: 8♥, East: T♥, South: K♠, West: 9♠
+Winner: South with K♠
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['JH']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['H']
+
+Step 222, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: J♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: J♥
+Action taken: 0 (Play: J♥)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['JS']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['JS']
+
+Step 223, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: J♠
+Current trick: South: J♥
+Legal actions:
+  0: Play: J♠
+Action taken: 0 (Play: J♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['2C']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['2C']
+
+Step 224, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 2♣
+Current trick: South: J♥, West: J♠
+Legal actions:
+  0: Play: 2♣
+Action taken: 0 (Play: 2♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['7D']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['7D']
+
+Step 225, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 7♦
+Current trick: North: 2♣, South: J♥, West: J♠
+Legal actions:
+  0: Play: 7♦
+Action taken: 0 (Play: 7♦)
+Trick 5: North: 2♣, East: 7♦, South: J♥, West: J♠
+Winner: North with 2♣
+Trick points: North/South: 3 tricks = 15 points
+Trick points: East/West: 2 tricks = 10 points
+Highest trump bonus (+5) to North/South for playing 5C
+Total points earned: North/South: 20, East/West: 10
+North/South bid 30
+North/South failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 20, East/West: 10
+Game points after penalties: N/S: -25, E/W: -70
+----------------------
+New hand starting. Dealer: East
+Kitty: QC, AC, 9H
+
+----- Current Scores -----
+North/South (Players 0/2): -25 points
+East/West (Players 1/3): -70 points
+--------------------------
+
+
+Step 226, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 3♣, T♦, 3♠, J♣, 5♦
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -25 points
+East/West (Players 1/3): -70 points
+--------------------------
+
+
+Step 227, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: Q♦, K♣, 6♥, A♥, 7♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 1 (Bid 20)
+
+----- Current Scores -----
+North/South (Players 0/2): -25 points
+East/West (Players 1/3): -70 points
+--------------------------
+
+
+
+====== HAND #7 COMPLETE ======
+
+Step 228, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 9♦, 2♠, 5♥, J♦, 5♠
+Legal actions:
+  0: Pass
+  2: Bid 25
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): -25 points
+East/West (Players 1/3): -70 points
+--------------------------
+
+
+Step 229, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: 7♠, K♠, T♠, 3♦, 6♦
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -25 points
+East/West (Players 1/3): -70 points
+--------------------------
+
+
+Step 230, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 3♣, T♦, 3♠, J♣, 5♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -25 points
+East/West (Players 1/3): -70 points
+--------------------------
+
+
+Step 231, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: Q♦, K♣, 6♥, A♥, 7♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 232, North (Player 0), Phase: 2
+Phase: Declaration
+North's hand: 9♦, 2♠, 5♥, J♦, 5♠
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 2 (Declare trump: Diamonds)
+Trump suit declared: D
+North received kitty: Q♣, A♣, 9♥
+
+Step 233, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 3♣, T♦, 3♠, J♣, 5♦
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: T♦
+  2: Discard: 3♠
+  3: Discard: J♣
+  4: Discard: 5♦
+  16: Done discarding
+Action taken: 3 (Discard: J♣)
+South discarded J♣
+
+Step 234, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 3♣, T♦, 3♠, 5♦
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: T♦
+  2: Discard: 3♠
+  3: Discard: 5♦
+  16: Done discarding
+Action taken: 2 (Discard: 3♠)
+South discarded 3♠
+
+Step 235, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 3♣, T♦, 5♦
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: T♦
+  2: Discard: 5♦
+  16: Done discarding
+Action taken: 1 (Discard: T♦)
+South discarded T♦
+
+Step 236, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 3♣, 5♦
+Legal actions:
+  0: Discard: 3♣
+  1: Discard: 5♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 237, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Q♦, K♣, 6♥, A♥, 7♥
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: K♣
+  2: Discard: 6♥
+  3: Discard: A♥
+  4: Discard: 7♥
+  16: Done discarding
+Action taken: 2 (Discard: 6♥)
+West discarded 6♥
+
+Step 238, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Q♦, K♣, A♥, 7♥
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: K♣
+  2: Discard: A♥
+  3: Discard: 7♥
+  16: Done discarding
+Action taken: 1 (Discard: K♣)
+West discarded K♣
+
+Step 239, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Q♦, A♥, 7♥
+Legal actions:
+  0: Discard: Q♦
+  1: Discard: A♥
+  2: Discard: 7♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 240, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 9♦, 2♠, 5♥, J♦, 5♠, Q♣, A♣, 9♥
+Legal actions:
+  0: Discard: 9♦
+  1: Discard: 2♠
+  2: Discard: 5♥
+  3: Discard: J♦
+  4: Discard: 5♠
+  5: Discard: Q♣
+  6: Discard: A♣
+  7: Discard: 9♥
+Action taken: 1 (Discard: 2♠)
+North discarded 2♠
+
+Step 241, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 9♦, 5♥, J♦, 5♠, Q♣, A♣, 9♥
+Legal actions:
+  0: Discard: 9♦
+  1: Discard: 5♥
+  2: Discard: J♦
+  3: Discard: 5♠
+  4: Discard: Q♣
+  5: Discard: A♣
+  6: Discard: 9♥
+Action taken: 0 (Discard: 9♦)
+North discarded 9♦
+
+Step 242, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 5♥, J♦, 5♠, Q♣, A♣, 9♥
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: J♦
+  2: Discard: 5♠
+  3: Discard: Q♣
+  4: Discard: A♣
+  5: Discard: 9♥
+Action taken: 2 (Discard: 5♠)
+North discarded 5♠
+
+Step 243, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 5♥, J♦, Q♣, A♣, 9♥
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: J♦
+  2: Discard: Q♣
+  3: Discard: A♣
+  4: Discard: 9♥
+  16: Done discarding
+Action taken: 3 (Discard: A♣)
+North discarded A♣
+
+Step 244, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 5♥, J♦, Q♣, 9♥
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: J♦
+  2: Discard: Q♣
+  3: Discard: 9♥
+  16: Done discarding
+Action taken: 2 (Discard: Q♣)
+North discarded Q♣
+
+Step 245, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 5♥, J♦, 9♥
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: J♦
+  2: Discard: 9♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 246, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 7♠, K♠, T♠, 3♦, 6♦
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: K♠
+  2: Discard: T♠
+  3: Discard: 3♦
+  4: Discard: 6♦
+  16: Done discarding
+Action taken: 4 (Discard: 6♦)
+East discarded 6♦
+
+Step 247, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 7♠, K♠, T♠, 3♦
+Legal actions:
+  0: Discard: 7♠
+  1: Discard: K♠
+  2: Discard: T♠
+  3: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: 7♠)
+East discarded 7♠
+
+Step 248, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: K♠, T♠, 3♦
+Legal actions:
+  0: Discard: K♠
+  1: Discard: T♠
+  2: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: K♠)
+East discarded K♠
+
+Step 249, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: T♠, 3♦
+Legal actions:
+  0: Discard: T♠
+  1: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: T♠)
+East discarded T♠
+
+Step 250, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 3♦
+Legal actions:
+  0: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: 3♦)
+East discarded 3♦
+
+Step 251, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 2 card(s): 4♠, 7♣
+East received 5 card(s): A♦, A♠, K♦, T♥, 4♦
+South received 3 card(s): 4♥, 9♠, 8♣
+West received 2 card(s): 9♣, 7♦
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['AD', 'AS', 'KD', 'TH', '4D']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'S', 'D', 'H', 'D']
+
+Step 252, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: A♦, A♠, K♦, T♥, 4♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: A♦
+  1: Play: A♠
+  2: Play: K♦
+  3: Play: T♥
+  4: Play: 4♦
+Action taken: 2 (Play: K♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3C', '5D', '4H', '9S', '8C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['C', 'D', 'H', 'S', 'C']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: [1]
+
+Step 253, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 3♣, 5♦, 4♥, 9♠, 8♣
+Current trick: East: K♦
+Legal actions:
+  0: Play: 3♣
+  1: Play: 5♦
+  2: Play: 4♥
+  3: Play: 9♠
+  4: Play: 8♣
+Action taken: 2 (Play: 4♥)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['QD', 'AH', '7H', '9C', '7D']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'H', 'H', 'C', 'D']
+DEBUG - Lead suit cards indices: [0, 4]
+DEBUG - Trump cards indices: [0, 1, 4]
+
+Step 254, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: Q♦, A♥, 7♥, 9♣, 7♦
+Current trick: East: K♦, South: 4♥
+Legal actions:
+  0: Play: Q♦
+  1: Play: A♥
+  2: Play: 7♥
+  3: Play: 9♣
+  4: Play: 7♦
+Action taken: 1 (Play: A♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['5H', 'JD', '9H', '4S', '7C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'D', 'H', 'S', 'C']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: [1]
+
+Step 255, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 5♥, J♦, 9♥, 4♠, 7♣
+Current trick: East: K♦, South: 4♥, West: A♥
+Legal actions:
+  0: Play: 5♥
+  1: Play: J♦
+  2: Play: 9♥
+  3: Play: 4♠
+  4: Play: 7♣
+Action taken: 0 (Play: 5♥)
+Trick 1: North: 5♥, East: K♦, South: 4♥, West: A♥
+Winner: West with A♥
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['QD', '7H', '9C', '7D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'H', 'C', 'D']
+
+Step 256, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: Q♦, 7♥, 9♣, 7♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: Q♦
+  1: Play: 7♥
+  2: Play: 9♣
+  3: Play: 7♦
+Action taken: 3 (Play: 7♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '9H', '4S', '7C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'H', 'S', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [0]
+
+Step 257, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♦, 9♥, 4♠, 7♣
+Current trick: West: 7♦
+Legal actions:
+  0: Play: J♦
+  1: Play: 9♥
+  2: Play: 4♠
+  3: Play: 7♣
+Action taken: 0 (Play: J♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['AD', 'AS', 'TH', '4D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'S', 'H', 'D']
+DEBUG - Lead suit cards indices: [0, 3]
+DEBUG - Trump cards indices: [0, 3]
+
+Step 258, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: A♦, A♠, T♥, 4♦
+Current trick: North: J♦, West: 7♦
+Legal actions:
+  0: Play: A♦
+  1: Play: A♠
+  2: Play: T♥
+  3: Play: 4♦
+Action taken: 3 (Play: 4♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3C', '5D', '9S', '8C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'D', 'S', 'C']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: [1]
+
+Step 259, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 3♣, 5♦, 9♠, 8♣
+Current trick: North: J♦, East: 4♦, West: 7♦
+Legal actions:
+  0: Play: 3♣
+  1: Play: 5♦
+  2: Play: 9♠
+  3: Play: 8♣
+Action taken: 0 (Play: 3♣)
+Trick 2: North: J♦, East: 4♦, South: 3♣, West: 7♦
+Winner: North with J♦
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['9H', '4S', '7C']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['H', 'S', 'C']
+
+Step 260, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 9♥, 4♠, 7♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 9♥
+  1: Play: 4♠
+  2: Play: 7♣
+Action taken: 0 (Play: 9♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['AD', 'AS', 'TH']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'S', 'H']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 2]
+DEBUG - Legal cards: ['AD', 'TH']
+
+Step 261, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: A♦, A♠, T♥
+Current trick: North: 9♥
+Legal actions:
+  0: Play: A♦
+  2: Play: T♥
+Action taken: 0 (Play: A♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['5D', '9S', '8C']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'S', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['5D', '9S', '8C']
+
+Step 262, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 5♦, 9♠, 8♣
+Current trick: North: 9♥, East: A♦
+Legal actions:
+  0: Play: 5♦
+  1: Play: 9♠
+  2: Play: 8♣
+Action taken: 1 (Play: 9♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['QD', '7H', '9C']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D', 'H', 'C']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['QD', '7H']
+
+Step 263, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: Q♦, 7♥, 9♣
+Current trick: North: 9♥, East: A♦, South: 9♠
+Legal actions:
+  0: Play: Q♦
+  1: Play: 7♥
+Action taken: 1 (Play: 7♥)
+Trick 3: North: 9♥, East: A♦, South: 9♠, West: 7♥
+Winner: East with A♦
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['AS', 'TH']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'H']
+
+Step 264, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: A♠, T♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: A♠
+  1: Play: T♥
+Action taken: 1 (Play: T♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['5D', '8C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['5D', '8C']
+
+Step 265, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 5♦, 8♣
+Current trick: East: T♥
+Legal actions:
+  0: Play: 5♦
+  1: Play: 8♣
+Action taken: 0 (Play: 5♦)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['QD', '9C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['QD', '9C']
+
+Step 266, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: Q♦, 9♣
+Current trick: East: T♥, South: 5♦
+Legal actions:
+  0: Play: Q♦
+  1: Play: 9♣
+Action taken: 0 (Play: Q♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['4S', '7C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['4S', '7C']
+
+Step 267, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 4♠, 7♣
+Current trick: East: T♥, South: 5♦, West: Q♦
+Legal actions:
+  0: Play: 4♠
+  1: Play: 7♣
+Action taken: 1 (Play: 7♣)
+Trick 4: North: 7♣, East: T♥, South: 5♦, West: Q♦
+Winner: South with 5♦
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['8C']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C']
+
+Step 268, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 8♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 8♣
+Action taken: 0 (Play: 8♣)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['9C']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['9C']
+
+Step 269, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 9♣
+Current trick: South: 8♣
+Legal actions:
+  0: Play: 9♣
+Action taken: 0 (Play: 9♣)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['4S']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['4S']
+
+Step 270, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 4♠
+Current trick: South: 8♣, West: 9♣
+Legal actions:
+  0: Play: 4♠
+Action taken: 0 (Play: 4♠)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['AS']
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['AS']
+
+Step 271, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: A♠
+Current trick: North: 4♠, South: 8♣, West: 9♣
+Legal actions:
+  0: Play: A♠
+Action taken: 0 (Play: A♠)
+Trick 5: North: 4♠, East: A♠, South: 8♣, West: 9♣
+Winner: South with 8♣
+Trick points: North/South: 3 tricks = 15 points
+Trick points: East/West: 2 tricks = 10 points
+Highest trump bonus (+5) to North/South for playing 5D
+Total points earned: North/South: 20, East/West: 10
+North/South bid 30
+North/South failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 20, East/West: 10
+Game points after penalties: N/S: -55, E/W: -60
+----------------------
+New hand starting. Dealer: South
+Kitty: 2H, 2D, KC
+
+----- Current Scores -----
+North/South (Players 0/2): -55 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 272, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 2♠, Q♦, T♠, 8♦, K♦
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -55 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+
+====== HAND #8 COMPLETE ======
+
+Step 273, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 6♣, J♥, 6♦, 3♦, 8♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 2 (Bid 25)
+
+----- Current Scores -----
+North/South (Players 0/2): -55 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 274, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: 6♥, 5♥, K♥, 5♦, 3♣
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): -55 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 275, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 4♣, 5♣, 5♠, Q♥, 9♠
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 4 (Hold)
+
+----- Current Scores -----
+North/South (Players 0/2): -55 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 276, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 2♠, Q♦, T♠, 8♦, K♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -55 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+
+====== HAND #9 COMPLETE ======
+
+Step 277, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: 6♣, J♥, 6♦, 3♦, 8♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -55 points
+East/West (Players 1/3): -60 points
+--------------------------
+
+
+Step 278, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: 6♥, 5♥, K♥, 5♦, 3♣
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 279, South (Player 2), Phase: 2
+Phase: Declaration
+South's hand: 4♣, 5♣, 5♠, Q♥, 9♠
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 2 (Declare trump: Diamonds)
+Trump suit declared: D
+South received kitty: 2♥, 2♦, K♣
+
+Step 280, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 2♠, Q♦, T♠, 8♦, K♦
+Legal actions:
+  0: Discard: 2♠
+  1: Discard: Q♦
+  2: Discard: T♠
+  3: Discard: 8♦
+  4: Discard: K♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 281, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♣, J♥, 6♦, 3♦, 8♥
+Legal actions:
+  0: Discard: 6♣
+  1: Discard: J♥
+  2: Discard: 6♦
+  3: Discard: 3♦
+  4: Discard: 8♥
+  16: Done discarding
+Action taken: 0 (Discard: 6♣)
+North discarded 6♣
+
+Step 282, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: J♥, 6♦, 3♦, 8♥
+Legal actions:
+  0: Discard: J♥
+  1: Discard: 6♦
+  2: Discard: 3♦
+  3: Discard: 8♥
+  16: Done discarding
+Action taken: 1 (Discard: 6♦)
+North discarded 6♦
+
+Step 283, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: J♥, 3♦, 8♥
+Legal actions:
+  0: Discard: J♥
+  1: Discard: 3♦
+  2: Discard: 8♥
+  16: Done discarding
+Action taken: 2 (Discard: 8♥)
+North discarded 8♥
+
+Step 284, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: J♥, 3♦
+Legal actions:
+  0: Discard: J♥
+  1: Discard: 3♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 285, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 6♥, 5♥, K♥, 5♦, 3♣
+Legal actions:
+  0: Discard: 6♥
+  1: Discard: 5♥
+  2: Discard: K♥
+  3: Discard: 5♦
+  4: Discard: 3♣
+  16: Done discarding
+Action taken: 0 (Discard: 6♥)
+East discarded 6♥
+
+Step 286, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 5♥, K♥, 5♦, 3♣
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: K♥
+  2: Discard: 5♦
+  3: Discard: 3♣
+  16: Done discarding
+Action taken: 1 (Discard: K♥)
+East discarded K♥
+
+Step 287, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 5♥, 5♦, 3♣
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: 5♦
+  2: Discard: 3♣
+  16: Done discarding
+Action taken: 2 (Discard: 3♣)
+East discarded 3♣
+
+Step 288, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 5♥, 5♦
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: 5♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 289, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 4♣, 5♣, 5♠, Q♥, 9♠, 2♥, 2♦, K♣
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: 5♣
+  2: Discard: 5♠
+  3: Discard: Q♥
+  4: Discard: 9♠
+  5: Discard: 2♥
+  6: Discard: 2♦
+  7: Discard: K♣
+Action taken: 1 (Discard: 5♣)
+South discarded 5♣
+
+Step 290, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 4♣, 5♠, Q♥, 9♠, 2♥, 2♦, K♣
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: 5♠
+  2: Discard: Q♥
+  3: Discard: 9♠
+  4: Discard: 2♥
+  5: Discard: 2♦
+  6: Discard: K♣
+Action taken: 2 (Discard: Q♥)
+South discarded Q♥
+
+Step 291, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 4♣, 5♠, 9♠, 2♥, 2♦, K♣
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: 5♠
+  2: Discard: 9♠
+  3: Discard: 2♥
+  4: Discard: 2♦
+  5: Discard: K♣
+Action taken: 0 (Discard: 4♣)
+South discarded 4♣
+
+Step 292, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♠, 9♠, 2♥, 2♦, K♣
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 9♠
+  2: Discard: 2♥
+  3: Discard: 2♦
+  4: Discard: K♣
+  16: Done discarding
+Action taken: 4 (Discard: K♣)
+South discarded K♣
+
+Step 293, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♠, 9♠, 2♥, 2♦
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 9♠
+  2: Discard: 2♥
+  3: Discard: 2♦
+  16: Done discarding
+Action taken: 2 (Discard: 2♥)
+South discarded 2♥
+
+Step 294, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♠, 9♠, 2♦
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 9♠
+  2: Discard: 2♦
+  16: Done discarding
+Action taken: 1 (Discard: 9♠)
+South discarded 9♠
+
+Step 295, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 5♠, 2♦
+Legal actions:
+  0: Discard: 5♠
+  1: Discard: 2♦
+  16: Done discarding
+Action taken: 0 (Discard: 5♠)
+South discarded 5♠
+
+Step 296, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 2♦
+Legal actions:
+  0: Discard: 2♦
+  16: Done discarding
+Action taken: 0 (Discard: 2♦)
+South discarded 2♦
+
+Step 297, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 3 card(s): 8♣, 9♥, 7♣
+East received 3 card(s): J♣, K♠, 6♠
+South received 5 card(s): A♥, Q♠, 3♥, 7♥, A♣
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['2S', 'QD', 'TS', '8D', 'KD']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'D', 'S', 'D', 'D']
+
+Step 298, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 2♠, Q♦, T♠, 8♦, K♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 2♠
+  1: Play: Q♦
+  2: Play: T♠
+  3: Play: 8♦
+  4: Play: K♦
+Action taken: 1 (Play: Q♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['JH', '3D', '8C', '9H', '7C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'D', 'C', 'H', 'C']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: [1]
+
+Step 299, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♥, 3♦, 8♣, 9♥, 7♣
+Current trick: West: Q♦
+Legal actions:
+  0: Play: J♥
+  1: Play: 3♦
+  2: Play: 8♣
+  3: Play: 9♥
+  4: Play: 7♣
+Action taken: 0 (Play: J♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['5H', '5D', 'JC', 'KS', '6S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'D', 'C', 'S', 'S']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: [1]
+
+Step 300, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 5♥, 5♦, J♣, K♠, 6♠
+Current trick: North: J♥, West: Q♦
+Legal actions:
+  0: Play: 5♥
+  1: Play: 5♦
+  2: Play: J♣
+  3: Play: K♠
+  4: Play: 6♠
+Action taken: 2 (Play: J♣)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['AH', 'QS', '3H', '7H', 'AC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'S', 'H', 'H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+
+Step 301, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: A♥, Q♠, 3♥, 7♥, A♣
+Current trick: North: J♥, East: J♣, West: Q♦
+Legal actions:
+  0: Play: A♥
+  1: Play: Q♠
+  2: Play: 3♥
+  3: Play: 7♥
+  4: Play: A♣
+Action taken: 1 (Play: Q♠)
+Trick 1: North: J♥, East: J♣, South: Q♠, West: Q♦
+Winner: West with Q♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['2S', 'TS', '8D', 'KD']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'S', 'D', 'D']
+
+Step 302, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 2♠, T♠, 8♦, K♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 2♠
+  1: Play: T♠
+  2: Play: 8♦
+  3: Play: K♦
+Action taken: 2 (Play: 8♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', '8C', '9H', '7C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'C', 'H', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [0]
+
+Step 303, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 3♦, 8♣, 9♥, 7♣
+Current trick: West: 8♦
+Legal actions:
+  0: Play: 3♦
+  1: Play: 8♣
+  2: Play: 9♥
+  3: Play: 7♣
+Action taken: 1 (Play: 8♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['5H', '5D', 'KS', '6S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'D', 'S', 'S']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: [1]
+
+Step 304, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 5♥, 5♦, K♠, 6♠
+Current trick: North: 8♣, West: 8♦
+Legal actions:
+  0: Play: 5♥
+  1: Play: 5♦
+  2: Play: K♠
+  3: Play: 6♠
+Action taken: 0 (Play: 5♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['AH', '3H', '7H', 'AC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'H', 'H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+
+Step 305, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: A♥, 3♥, 7♥, A♣
+Current trick: North: 8♣, East: 5♥, West: 8♦
+Legal actions:
+  0: Play: A♥
+  1: Play: 3♥
+  2: Play: 7♥
+  3: Play: A♣
+Action taken: 2 (Play: 7♥)
+Trick 2: North: 8♣, East: 5♥, South: 7♥, West: 8♦
+Winner: West with 8♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['2S', 'TS', 'KD']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'S', 'D']
+
+Step 306, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 2♠, T♠, K♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 2♠
+  1: Play: T♠
+  2: Play: K♦
+Action taken: 2 (Play: K♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', '9H', '7C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'H', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [0]
+
+Step 307, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 3♦, 9♥, 7♣
+Current trick: West: K♦
+Legal actions:
+  0: Play: 3♦
+  1: Play: 9♥
+  2: Play: 7♣
+Action taken: 2 (Play: 7♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['5D', 'KS', '6S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'S', 'S']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [0]
+
+Step 308, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 5♦, K♠, 6♠
+Current trick: North: 7♣, West: K♦
+Legal actions:
+  0: Play: 5♦
+  1: Play: K♠
+  2: Play: 6♠
+Action taken: 0 (Play: 5♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['AH', '3H', 'AC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+
+Step 309, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: A♥, 3♥, A♣
+Current trick: North: 7♣, East: 5♦, West: K♦
+Legal actions:
+  0: Play: A♥
+  1: Play: 3♥
+  2: Play: A♣
+Action taken: 0 (Play: A♥)
+Trick 3: North: 7♣, East: 5♦, South: A♥, West: K♦
+Winner: East with 5♦
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KS', '6S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'S']
+
+Step 310, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: K♠, 6♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♠
+  1: Play: 6♠
+Action taken: 1 (Play: 6♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['3H', 'AC']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['3H', 'AC']
+
+Step 311, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 3♥, A♣
+Current trick: East: 6♠
+Legal actions:
+  0: Play: 3♥
+  1: Play: A♣
+Action taken: 0 (Play: 3♥)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['2S', 'TS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'S']
+DEBUG - Lead suit cards indices: [0, 1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['2S', 'TS']
+
+Step 312, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 2♠, T♠
+Current trick: East: 6♠, South: 3♥
+Legal actions:
+  0: Play: 2♠
+  1: Play: T♠
+Action taken: 1 (Play: T♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['3D', '9H']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['3D', '9H']
+
+Step 313, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 3♦, 9♥
+Current trick: East: 6♠, South: 3♥, West: T♠
+Legal actions:
+  0: Play: 3♦
+  1: Play: 9♥
+Action taken: 1 (Play: 9♥)
+Trick 4: North: 9♥, East: 6♠, South: 3♥, West: T♠
+Winner: East with 6♠
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S']
+
+Step 314, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: K♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♠
+Action taken: 0 (Play: K♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['AC']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['AC']
+
+Step 315, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: A♣
+Current trick: East: K♠
+Legal actions:
+  0: Play: A♣
+Action taken: 0 (Play: A♣)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['2S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['2S']
+
+Step 316, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 2♠
+Current trick: East: K♠, South: A♣
+Legal actions:
+  0: Play: 2♠
+Action taken: 0 (Play: 2♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'D' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['3D']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['3D']
+
+Step 317, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 3♦
+Current trick: East: K♠, South: A♣, West: 2♠
+Legal actions:
+  0: Play: 3♦
+Action taken: 0 (Play: 3♦)
+Trick 5: North: 3♦, East: K♠, South: A♣, West: 2♠
+Winner: North with 3♦
+Trick points: North/South: 1 tricks = 5 points
+Trick points: East/West: 4 tricks = 20 points
+Highest trump bonus (+5) to East/West for playing 5D
+Total points earned: North/South: 5, East/West: 25
+North/South bid 30
+North/South failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 5, East/West: 25
+Game points after penalties: N/S: -85, E/W: -35
+----------------------
+New hand starting. Dealer: West
+Kitty: 9C, KH, 9S
+
+----- Current Scores -----
+North/South (Players 0/2): -85 points
+East/West (Players 1/3): -35 points
+--------------------------
+
+
+
+====== HAND #10 COMPLETE ======
+
+Step 318, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: Q♣, 7♥, T♣, 8♣, J♠
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -85 points
+East/West (Players 1/3): -35 points
+--------------------------
+
+
+Step 319, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: 3♦, T♦, Q♥, 5♥, 2♥
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 2 (Bid 25)
+
+----- Current Scores -----
+North/South (Players 0/2): -85 points
+East/West (Players 1/3): -35 points
+--------------------------
+
+
+Step 320, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: J♦, 6♦, 3♠, 2♦, 3♣
+Legal actions:
+  0: Pass
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): -85 points
+East/West (Players 1/3): -35 points
+--------------------------
+
+
+Step 321, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 4♣, 6♣, 8♠, A♣, T♠
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -85 points
+East/West (Players 1/3): -35 points
+--------------------------
+
+
+
+====== HAND #11 COMPLETE ======
+
+Step 322, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: Q♣, 7♥, T♣, 8♣, J♠
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -85 points
+East/West (Players 1/3): -35 points
+--------------------------
+
+
+Step 323, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: 3♦, T♦, Q♥, 5♥, 2♥
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 324, South (Player 2), Phase: 2
+Phase: Declaration
+South's hand: J♦, 6♦, 3♠, 2♦, 3♣
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 3 (Declare trump: Clubs)
+Trump suit declared: C
+South received kitty: 9♣, K♥, 9♠
+
+Step 325, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: Q♣, 7♥, T♣, 8♣, J♠
+Legal actions:
+  0: Discard: Q♣
+  1: Discard: 7♥
+  2: Discard: T♣
+  3: Discard: 8♣
+  4: Discard: J♠
+  16: Done discarding
+Action taken: 4 (Discard: J♠)
+North discarded J♠
+
+Step 326, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: Q♣, 7♥, T♣, 8♣
+Legal actions:
+  0: Discard: Q♣
+  1: Discard: 7♥
+  2: Discard: T♣
+  3: Discard: 8♣
+  16: Done discarding
+Action taken: 3 (Discard: 8♣)
+North discarded 8♣
+
+Step 327, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: Q♣, 7♥, T♣
+Legal actions:
+  0: Discard: Q♣
+  1: Discard: 7♥
+  2: Discard: T♣
+  16: Done discarding
+Action taken: 2 (Discard: T♣)
+North discarded T♣
+
+Step 328, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: Q♣, 7♥
+Legal actions:
+  0: Discard: Q♣
+  1: Discard: 7♥
+  16: Done discarding
+Action taken: 0 (Discard: Q♣)
+North discarded Q♣
+
+Step 329, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 7♥
+Legal actions:
+  0: Discard: 7♥
+  16: Done discarding
+Action taken: 0 (Discard: 7♥)
+North discarded 7♥
+
+Step 330, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 331, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 3♦, T♦, Q♥, 5♥, 2♥
+Legal actions:
+  0: Discard: 3♦
+  1: Discard: T♦
+  2: Discard: Q♥
+  3: Discard: 5♥
+  4: Discard: 2♥
+  16: Done discarding
+Action taken: 3 (Discard: 5♥)
+East discarded 5♥
+
+Step 332, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 3♦, T♦, Q♥, 2♥
+Legal actions:
+  0: Discard: 3♦
+  1: Discard: T♦
+  2: Discard: Q♥
+  3: Discard: 2♥
+  16: Done discarding
+Action taken: 3 (Discard: 2♥)
+East discarded 2♥
+
+Step 333, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: 3♦, T♦, Q♥
+Legal actions:
+  0: Discard: 3♦
+  1: Discard: T♦
+  2: Discard: Q♥
+  16: Done discarding
+Action taken: 0 (Discard: 3♦)
+East discarded 3♦
+
+Step 334, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: T♦, Q♥
+Legal actions:
+  0: Discard: T♦
+  1: Discard: Q♥
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 335, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♦, 6♦, 3♠, 2♦, 3♣, 9♣, K♥, 9♠
+Legal actions:
+  0: Discard: J♦
+  1: Discard: 6♦
+  2: Discard: 3♠
+  3: Discard: 2♦
+  4: Discard: 3♣
+  5: Discard: 9♣
+  6: Discard: K♥
+  7: Discard: 9♠
+Action taken: 2 (Discard: 3♠)
+South discarded 3♠
+
+Step 336, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♦, 6♦, 2♦, 3♣, 9♣, K♥, 9♠
+Legal actions:
+  0: Discard: J♦
+  1: Discard: 6♦
+  2: Discard: 2♦
+  3: Discard: 3♣
+  4: Discard: 9♣
+  5: Discard: K♥
+  6: Discard: 9♠
+Action taken: 6 (Discard: 9♠)
+South discarded 9♠
+
+Step 337, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♦, 6♦, 2♦, 3♣, 9♣, K♥
+Legal actions:
+  0: Discard: J♦
+  1: Discard: 6♦
+  2: Discard: 2♦
+  3: Discard: 3♣
+  4: Discard: 9♣
+  5: Discard: K♥
+Action taken: 5 (Discard: K♥)
+South discarded K♥
+
+Step 338, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: J♦, 6♦, 2♦, 3♣, 9♣
+Legal actions:
+  0: Discard: J♦
+  1: Discard: 6♦
+  2: Discard: 2♦
+  3: Discard: 3♣
+  4: Discard: 9♣
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 339, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 4♣, 6♣, 8♠, A♣, T♠
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: 6♣
+  2: Discard: 8♠
+  3: Discard: A♣
+  4: Discard: T♠
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 5 card(s): A♦, 2♣, J♥, K♣, 4♥
+East received 3 card(s): 8♦, 5♠, 9♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['4C', '6C', '8S', 'AC', 'TS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'C', 'S', 'C', 'S']
+
+Step 340, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 4♣, 6♣, 8♠, A♣, T♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 4♣
+  1: Play: 6♣
+  2: Play: 8♠
+  3: Play: A♣
+  4: Play: T♠
+Action taken: 0 (Play: 4♣)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['AD', '2C', 'JH', 'KC', '4H']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'C', 'H', 'C', 'H']
+DEBUG - Lead suit cards indices: [1, 3]
+DEBUG - Trump cards indices: [1, 3]
+
+Step 341, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: A♦, 2♣, J♥, K♣, 4♥
+Current trick: West: 4♣
+Legal actions:
+  0: Play: A♦
+  1: Play: 2♣
+  2: Play: J♥
+  3: Play: K♣
+  4: Play: 4♥
+Action taken: 2 (Play: J♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['TD', 'QH', '8D', '5S', '9D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'H', 'D', 'S', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 342, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♦, Q♥, 8♦, 5♠, 9♦
+Current trick: North: J♥, West: 4♣
+Legal actions:
+  0: Play: T♦
+  1: Play: Q♥
+  2: Play: 8♦
+  3: Play: 5♠
+  4: Play: 9♦
+Action taken: 2 (Play: 8♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '6D', '2D', '3C', '9C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'D', 'D', 'C', 'C']
+DEBUG - Lead suit cards indices: [3, 4]
+DEBUG - Trump cards indices: [3, 4]
+
+Step 343, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: J♦, 6♦, 2♦, 3♣, 9♣
+Current trick: North: J♥, East: 8♦, West: 4♣
+Legal actions:
+  0: Play: J♦
+  1: Play: 6♦
+  2: Play: 2♦
+  3: Play: 3♣
+  4: Play: 9♣
+Action taken: 4 (Play: 9♣)
+Trick 1: North: J♥, East: 8♦, South: 9♣, West: 4♣
+Winner: West with 4♣
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['6C', '8S', 'AC', 'TS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'S', 'C', 'S']
+
+Step 344, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 6♣, 8♠, A♣, T♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 6♣
+  1: Play: 8♠
+  2: Play: A♣
+  3: Play: T♠
+Action taken: 2 (Play: A♣)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['AD', '2C', 'KC', '4H']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'C', 'C', 'H']
+DEBUG - Lead suit cards indices: [1, 2]
+DEBUG - Trump cards indices: [1, 2]
+
+Step 345, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: A♦, 2♣, K♣, 4♥
+Current trick: West: A♣
+Legal actions:
+  0: Play: A♦
+  1: Play: 2♣
+  2: Play: K♣
+  3: Play: 4♥
+Action taken: 0 (Play: A♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['TD', 'QH', '5S', '9D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'H', 'S', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 346, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♦, Q♥, 5♠, 9♦
+Current trick: North: A♦, West: A♣
+Legal actions:
+  0: Play: T♦
+  1: Play: Q♥
+  2: Play: 5♠
+  3: Play: 9♦
+Action taken: 3 (Play: 9♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '6D', '2D', '3C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'D', 'D', 'C']
+DEBUG - Lead suit cards indices: [3]
+DEBUG - Trump cards indices: [3]
+
+Step 347, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: J♦, 6♦, 2♦, 3♣
+Current trick: North: A♦, East: 9♦, West: A♣
+Legal actions:
+  0: Play: J♦
+  1: Play: 6♦
+  2: Play: 2♦
+  3: Play: 3♣
+Action taken: 3 (Play: 3♣)
+Trick 2: North: A♦, East: 9♦, South: 3♣, West: A♣
+Winner: West with A♣
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['6C', '8S', 'TS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'S', 'S']
+
+Step 348, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 6♣, 8♠, T♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 6♣
+  1: Play: 8♠
+  2: Play: T♠
+Action taken: 2 (Play: T♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['2C', 'KC', '4H']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C', 'C', 'H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0, 1]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['2C', 'KC', '4H']
+
+Step 349, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 2♣, K♣, 4♥
+Current trick: West: T♠
+Legal actions:
+  0: Play: 2♣
+  1: Play: K♣
+  2: Play: 4♥
+Action taken: 2 (Play: 4♥)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['TD', 'QH', '5S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'H', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [2]
+DEBUG - Legal cards: ['5S']
+
+Step 350, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♦, Q♥, 5♠
+Current trick: North: 4♥, West: T♠
+Legal actions:
+  2: Play: 5♠
+Action taken: 2 (Play: 5♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['JD', '6D', '2D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'D', 'D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['JD', '6D', '2D']
+
+Step 351, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: J♦, 6♦, 2♦
+Current trick: North: 4♥, East: 5♠, West: T♠
+Legal actions:
+  0: Play: J♦
+  1: Play: 6♦
+  2: Play: 2♦
+Action taken: 0 (Play: J♦)
+Trick 3: North: 4♥, East: 5♠, South: J♦, West: T♠
+Winner: East with 5♠
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['TD', 'QH']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'H']
+
+Step 352, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: T♦, Q♥
+Current trick: No cards played yet
+Legal actions:
+  0: Play: T♦
+  1: Play: Q♥
+Action taken: 0 (Play: T♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['6D', '2D']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'D']
+DEBUG - Lead suit cards indices: [0, 1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['6D', '2D']
+
+Step 353, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 6♦, 2♦
+Current trick: East: T♦
+Legal actions:
+  0: Play: 6♦
+  1: Play: 2♦
+Action taken: 0 (Play: 6♦)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['6C', '8S']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['C', 'S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['6C', '8S']
+
+Step 354, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 6♣, 8♠
+Current trick: East: T♦, South: 6♦
+Legal actions:
+  0: Play: 6♣
+  1: Play: 8♠
+Action taken: 0 (Play: 6♣)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['2C', 'KC']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['C', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0, 1]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['2C', 'KC']
+
+Step 355, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 2♣, K♣
+Current trick: East: T♦, South: 6♦, West: 6♣
+Legal actions:
+  0: Play: 2♣
+  1: Play: K♣
+Action taken: 0 (Play: 2♣)
+Trick 4: North: 2♣, East: T♦, South: 6♦, West: 6♣
+Winner: North with 2♣
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KC']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['C']
+
+Step 356, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: K♣
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♣
+Action taken: 0 (Play: K♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['QH']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 357, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: Q♥
+Current trick: North: K♣
+Legal actions:
+  0: Play: Q♥
+Action taken: 0 (Play: Q♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['2D']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['D']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 358, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 2♦
+Current trick: North: K♣, East: Q♥
+Legal actions:
+  0: Play: 2♦
+Action taken: 0 (Play: 2♦)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'C' (type: <class 'str'>)
+DEBUG - Lead suit: 'C' (type: <class 'str'>)
+DEBUG - Player hand: ['8S']
+DEBUG - Trick started by player: 0
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+
+Step 359, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: 8♠
+Current trick: North: K♣, East: Q♥, South: 2♦
+Legal actions:
+  0: Play: 8♠
+Action taken: 0 (Play: 8♠)
+Trick 5: North: K♣, East: Q♥, South: 2♦, West: 8♠
+Winner: North with K♣
+Trick points: North/South: 2 tricks = 10 points
+Trick points: East/West: 3 tricks = 15 points
+Highest trump bonus (+5) to East/West for playing AC
+Total points earned: North/South: 10, East/West: 20
+North/South bid 30
+North/South failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 10, East/West: 20
+Game points after penalties: N/S: -115, E/W: -15
+----------------------
+New hand starting. Dealer: North
+Kitty: 2C, 8S, TC
+
+----- Current Scores -----
+North/South (Players 0/2): -115 points
+East/West (Players 1/3): -15 points
+--------------------------
+
+
+Step 360, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: J♥, 2♠, 9♥, 7♣, 6♦
+Legal actions:
+  0: Pass
+  1: Bid 20
+  2: Bid 25
+  3: Bid 30
+Action taken: 1 (Bid 20)
+
+----- Current Scores -----
+North/South (Players 0/2): -115 points
+East/West (Players 1/3): -15 points
+--------------------------
+
+
+Step 361, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 9♠, 8♥, 5♠, 6♠, 3♦
+Legal actions:
+  0: Pass
+  2: Bid 25
+  3: Bid 30
+Action taken: 3 (Bid 30)
+
+----- Current Scores -----
+North/South (Players 0/2): -115 points
+East/West (Players 1/3): -15 points
+--------------------------
+
+
+Step 362, West (Player 3), Phase: 1
+Phase: Auction
+West's hand: 4♣, Q♦, 3♠, 5♥, 7♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -115 points
+East/West (Players 1/3): -15 points
+--------------------------
+
+
+
+====== HAND #12 COMPLETE ======
+
+Step 363, North (Player 0), Phase: 1
+Phase: Auction
+North's hand: A♣, J♠, 6♥, 5♣, Q♠
+Legal actions:
+  0: Pass
+  4: Hold
+Action taken: 4 (Hold)
+
+----- Current Scores -----
+North/South (Players 0/2): -115 points
+East/West (Players 1/3): -15 points
+--------------------------
+
+
+Step 364, East (Player 1), Phase: 1
+Phase: Auction
+East's hand: J♥, 2♠, 9♥, 7♣, 6♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+----- Current Scores -----
+North/South (Players 0/2): -115 points
+East/West (Players 1/3): -15 points
+--------------------------
+
+
+Step 365, South (Player 2), Phase: 1
+Phase: Auction
+South's hand: 9♠, 8♥, 5♠, 6♠, 3♦
+Legal actions:
+  0: Pass
+Action taken: 0 (Pass)
+
+Step 366, North (Player 0), Phase: 2
+Phase: Declaration
+North's hand: A♣, J♠, 6♥, 5♣, Q♠
+Legal actions:
+  0: Declare trump: Spades
+  1: Declare trump: Hearts
+  2: Declare trump: Diamonds
+  3: Declare trump: Clubs
+Action taken: 1 (Declare trump: Hearts)
+Trump suit declared: H
+North received kitty: 2♣, 8♠, T♣
+
+Step 367, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♥, 2♠, 9♥, 7♣, 6♦
+Legal actions:
+  0: Discard: J♥
+  1: Discard: 2♠
+  2: Discard: 9♥
+  3: Discard: 7♣
+  4: Discard: 6♦
+  16: Done discarding
+Action taken: 3 (Discard: 7♣)
+East discarded 7♣
+
+Step 368, East (Player 1), Phase: 3
+Phase: Discard
+East's hand: J♥, 2♠, 9♥, 6♦
+Legal actions:
+  0: Discard: J♥
+  1: Discard: 2♠
+  2: Discard: 9♥
+  3: Discard: 6♦
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 369, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 9♠, 8♥, 5♠, 6♠, 3♦
+Legal actions:
+  0: Discard: 9♠
+  1: Discard: 8♥
+  2: Discard: 5♠
+  3: Discard: 6♠
+  4: Discard: 3♦
+  16: Done discarding
+Action taken: 2 (Discard: 5♠)
+South discarded 5♠
+
+Step 370, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 9♠, 8♥, 6♠, 3♦
+Legal actions:
+  0: Discard: 9♠
+  1: Discard: 8♥
+  2: Discard: 6♠
+  3: Discard: 3♦
+  16: Done discarding
+Action taken: 2 (Discard: 6♠)
+South discarded 6♠
+
+Step 371, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 9♠, 8♥, 3♦
+Legal actions:
+  0: Discard: 9♠
+  1: Discard: 8♥
+  2: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: 9♠)
+South discarded 9♠
+
+Step 372, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 8♥, 3♦
+Legal actions:
+  0: Discard: 8♥
+  1: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: 8♥)
+South discarded 8♥
+
+Step 373, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: 3♦
+Legal actions:
+  0: Discard: 3♦
+  16: Done discarding
+Action taken: 0 (Discard: 3♦)
+South discarded 3♦
+
+Step 374, South (Player 2), Phase: 3
+Phase: Discard
+South's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 375, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 4♣, Q♦, 3♠, 5♥, 7♦
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: Q♦
+  2: Discard: 3♠
+  3: Discard: 5♥
+  4: Discard: 7♦
+  16: Done discarding
+Action taken: 1 (Discard: Q♦)
+West discarded Q♦
+
+Step 376, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 4♣, 3♠, 5♥, 7♦
+Legal actions:
+  0: Discard: 4♣
+  1: Discard: 3♠
+  2: Discard: 5♥
+  3: Discard: 7♦
+  16: Done discarding
+Action taken: 0 (Discard: 4♣)
+West discarded 4♣
+
+Step 377, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 3♠, 5♥, 7♦
+Legal actions:
+  0: Discard: 3♠
+  1: Discard: 5♥
+  2: Discard: 7♦
+  16: Done discarding
+Action taken: 0 (Discard: 3♠)
+West discarded 3♠
+
+Step 378, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♥, 7♦
+Legal actions:
+  0: Discard: 5♥
+  1: Discard: 7♦
+  16: Done discarding
+Action taken: 1 (Discard: 7♦)
+West discarded 7♦
+
+Step 379, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: 5♥
+Legal actions:
+  0: Discard: 5♥
+  16: Done discarding
+Action taken: 0 (Discard: 5♥)
+West discarded 5♥
+
+Step 380, West (Player 3), Phase: 3
+Phase: Discard
+West's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+
+Step 381, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: A♣, J♠, 6♥, 5♣, Q♠, 2♣, 8♠, T♣
+Legal actions:
+  0: Discard: A♣
+  1: Discard: J♠
+  2: Discard: 6♥
+  3: Discard: 5♣
+  4: Discard: Q♠
+  5: Discard: 2♣
+  6: Discard: 8♠
+  7: Discard: T♣
+Action taken: 3 (Discard: 5♣)
+North discarded 5♣
+
+Step 382, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: A♣, J♠, 6♥, Q♠, 2♣, 8♠, T♣
+Legal actions:
+  0: Discard: A♣
+  1: Discard: J♠
+  2: Discard: 6♥
+  3: Discard: Q♠
+  4: Discard: 2♣
+  5: Discard: 8♠
+  6: Discard: T♣
+Action taken: 6 (Discard: T♣)
+North discarded T♣
+
+Step 383, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: A♣, J♠, 6♥, Q♠, 2♣, 8♠
+Legal actions:
+  0: Discard: A♣
+  1: Discard: J♠
+  2: Discard: 6♥
+  3: Discard: Q♠
+  4: Discard: 2♣
+  5: Discard: 8♠
+Action taken: 3 (Discard: Q♠)
+North discarded Q♠
+
+Step 384, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: A♣, J♠, 6♥, 2♣, 8♠
+Legal actions:
+  0: Discard: A♣
+  1: Discard: J♠
+  2: Discard: 6♥
+  3: Discard: 2♣
+  4: Discard: 8♠
+  16: Done discarding
+Action taken: 1 (Discard: J♠)
+North discarded J♠
+
+Step 385, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: A♣, 6♥, 2♣, 8♠
+Legal actions:
+  0: Discard: A♣
+  1: Discard: 6♥
+  2: Discard: 2♣
+  3: Discard: 8♠
+  16: Done discarding
+Action taken: 3 (Discard: 8♠)
+North discarded 8♠
+
+Step 386, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: A♣, 6♥, 2♣
+Legal actions:
+  0: Discard: A♣
+  1: Discard: 6♥
+  2: Discard: 2♣
+  16: Done discarding
+Action taken: 0 (Discard: A♣)
+North discarded A♣
+
+Step 387, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♥, 2♣
+Legal actions:
+  0: Discard: 6♥
+  1: Discard: 2♣
+  16: Done discarding
+Action taken: 1 (Discard: 2♣)
+North discarded 2♣
+
+Step 388, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: 6♥
+Legal actions:
+  0: Discard: 6♥
+  16: Done discarding
+Action taken: 0 (Discard: 6♥)
+North discarded 6♥
+
+Step 389, North (Player 0), Phase: 3
+Phase: Discard
+North's hand: Empty hand
+Legal actions:
+  16: Done discarding
+Action taken: 16 (Done discarding)
+North received 5 card(s): 4♦, 9♦, 4♥, J♣, 8♣
+East received 1 card(s): A♠
+South received 5 card(s): 7♥, 6♣, J♦, 4♠, 3♣
+West received 5 card(s): K♠, A♥, Q♥, K♦, 8♦
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['JH', '2S', '9H', '6D', 'AS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'S', 'H', 'D', 'S']
+
+Step 390, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: J♥, 2♠, 9♥, 6♦, A♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: J♥
+  1: Play: 2♠
+  2: Play: 9♥
+  3: Play: 6♦
+  4: Play: A♠
+Action taken: 2 (Play: 9♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['7H', '6C', 'JD', '4S', '3C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'C', 'D', 'S', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [0]
+
+Step 391, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 7♥, 6♣, J♦, 4♠, 3♣
+Current trick: East: 9♥
+Legal actions:
+  0: Play: 7♥
+  1: Play: 6♣
+  2: Play: J♦
+  3: Play: 4♠
+  4: Play: 3♣
+Action taken: 3 (Play: 4♠)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['KS', 'AH', 'QH', 'KD', '8D']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'H', 'H', 'D', 'D']
+DEBUG - Lead suit cards indices: [1, 2]
+DEBUG - Trump cards indices: [1, 2]
+
+Step 392, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♠, A♥, Q♥, K♦, 8♦
+Current trick: East: 9♥, South: 4♠
+Legal actions:
+  0: Play: K♠
+  1: Play: A♥
+  2: Play: Q♥
+  3: Play: K♦
+  4: Play: 8♦
+Action taken: 2 (Play: Q♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'H' (type: <class 'str'>)
+DEBUG - Player hand: ['4D', '9D', '4H', 'JC', '8C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'D', 'H', 'C', 'C']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [2]
+
+Step 393, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 4♦, 9♦, 4♥, J♣, 8♣
+Current trick: East: 9♥, South: 4♠, West: Q♥
+Legal actions:
+  0: Play: 4♦
+  1: Play: 9♦
+  2: Play: 4♥
+  3: Play: J♣
+  4: Play: 8♣
+Action taken: 2 (Play: 4♥)
+Trick 1: North: 4♥, East: 9♥, South: 4♠, West: Q♥
+Winner: West with Q♥
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KS', 'AH', 'KD', '8D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'H', 'D', 'D']
+
+Step 394, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♠, A♥, K♦, 8♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♠
+  1: Play: A♥
+  2: Play: K♦
+  3: Play: 8♦
+Action taken: 3 (Play: 8♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['4D', '9D', 'JC', '8C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'D', 'C', 'C']
+DEBUG - Lead suit cards indices: [0, 1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['4D', '9D']
+
+Step 395, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 4♦, 9♦, J♣, 8♣
+Current trick: West: 8♦
+Legal actions:
+  0: Play: 4♦
+  1: Play: 9♦
+Action taken: 1 (Play: 9♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['JH', '2S', '6D', 'AS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'S', 'D', 'S']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 2]
+DEBUG - Legal cards: ['JH', '6D']
+
+Step 396, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: J♥, 2♠, 6♦, A♠
+Current trick: North: 9♦, West: 8♦
+Legal actions:
+  0: Play: J♥
+  2: Play: 6♦
+Action taken: 0 (Play: J♥)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['7H', '6C', 'JD', '3C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'C', 'D', 'C']
+DEBUG - Lead suit cards indices: [2]
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 2]
+DEBUG - Legal cards: ['7H', 'JD']
+
+Step 397, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 7♥, 6♣, J♦, 3♣
+Current trick: North: 9♦, East: J♥, West: 8♦
+Legal actions:
+  0: Play: 7♥
+  2: Play: J♦
+Action taken: 2 (Play: J♦)
+Trick 2: North: 9♦, East: J♥, South: J♦, West: 8♦
+Winner: East with J♥
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['2S', '6D', 'AS']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'D', 'S']
+
+Step 398, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♠, 6♦, A♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: 2♠
+  1: Play: 6♦
+  2: Play: A♠
+Action taken: 2 (Play: A♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['7H', '6C', '3C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['H', 'C', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['7H', '6C', '3C']
+
+Step 399, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 7♥, 6♣, 3♣
+Current trick: East: A♠
+Legal actions:
+  0: Play: 7♥
+  1: Play: 6♣
+  2: Play: 3♣
+Action taken: 1 (Play: 6♣)
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['KS', 'AH', 'KD']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['S', 'H', 'D']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: [1]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['KS', 'AH']
+
+Step 400, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♠, A♥, K♦
+Current trick: East: A♠, South: 6♣
+Legal actions:
+  0: Play: K♠
+  1: Play: A♥
+Action taken: 1 (Play: A♥)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['4D', 'JC', '8C']
+DEBUG - Trick started by player: 1
+DEBUG - Hand suits: ['D', 'C', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0, 1, 2]
+DEBUG - Legal cards: ['4D', 'JC', '8C']
+
+Step 401, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 4♦, J♣, 8♣
+Current trick: East: A♠, South: 6♣, West: A♥
+Legal actions:
+  0: Play: 4♦
+  1: Play: J♣
+  2: Play: 8♣
+Action taken: 2 (Play: 8♣)
+Trick 3: North: 8♣, East: A♠, South: 6♣, West: A♥
+Winner: West with A♥
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KS', 'KD']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'D']
+
+Step 402, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♠, K♦
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♠
+  1: Play: K♦
+Action taken: 1 (Play: K♦)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['4D', 'JC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['D', 'C']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['4D']
+
+Step 403, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: 4♦, J♣
+Current trick: West: K♦
+Legal actions:
+  0: Play: 4♦
+Action taken: 0 (Play: 4♦)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['2S', '6D']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S', 'D']
+DEBUG - Lead suit cards indices: [1]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [1]
+DEBUG - Legal cards: ['6D']
+
+Step 404, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♠, 6♦
+Current trick: North: 4♦, West: K♦
+Legal actions:
+  1: Play: 6♦
+Action taken: 1 (Play: 6♦)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'D' (type: <class 'str'>)
+DEBUG - Player hand: ['7H', '3C']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H', 'C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0, 1]
+DEBUG - Legal cards: ['7H', '3C']
+
+Step 405, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 7♥, 3♣
+Current trick: North: 4♦, East: 6♦, West: K♦
+Legal actions:
+  0: Play: 7♥
+  1: Play: 3♣
+Action taken: 1 (Play: 3♣)
+Trick 4: North: 4♦, East: 6♦, South: 3♣, West: K♦
+Winner: West with K♦
+DEBUG - Get legal plays for player 3
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: ['KS']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S']
+
+Step 406, West (Player 3), Phase: 4
+Phase: Gameplay
+West's hand: K♠
+Current trick: No cards played yet
+Legal actions:
+  0: Play: K♠
+Action taken: 0 (Play: K♠)
+DEBUG - Get legal plays for player 0
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['JC']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['C']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['JC']
+
+Step 407, North (Player 0), Phase: 4
+Phase: Gameplay
+North's hand: J♣
+Current trick: West: K♠
+Legal actions:
+  0: Play: J♣
+Action taken: 0 (Play: J♣)
+DEBUG - Get legal plays for player 1
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['2S']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['S']
+DEBUG - Lead suit cards indices: [0]
+DEBUG - Trump cards indices: []
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['2S']
+
+Step 408, East (Player 1), Phase: 4
+Phase: Gameplay
+East's hand: 2♠
+Current trick: North: J♣, West: K♠
+Legal actions:
+  0: Play: 2♠
+Action taken: 0 (Play: 2♠)
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'S' (type: <class 'str'>)
+DEBUG - Player hand: ['7H']
+DEBUG - Trick started by player: 3
+DEBUG - Hand suits: ['H']
+DEBUG - Lead suit cards indices: []
+DEBUG - Trump cards indices: [0]
+DEBUG - Final legal plays: [0]
+DEBUG - Legal cards: ['7H']
+
+Step 409, South (Player 2), Phase: 4
+Phase: Gameplay
+South's hand: 7♥
+Current trick: North: J♣, East: 2♠, West: K♠
+Legal actions:
+  0: Play: 7♥
+Action taken: 0 (Play: 7♥)
+Trick 5: North: J♣, East: 2♠, South: 7♥, West: K♠
+Winner: South with 7♥
+Trick points: North/South: 1 tricks = 5 points
+Trick points: East/West: 4 tricks = 20 points
+Highest trump bonus (+5) to East/West for playing JH
+Total points earned: North/South: 5, East/West: 25
+North/South bid 30
+North/South failed to make their bid (will lose 30 points in game score)
+Hand points (trick points + bonuses): North/South: 5, East/West: 25
+Game points after penalties: N/S: -145, E/W: 10
+----------------------
+DEBUG - Get legal plays for player 2
+DEBUG - Trump suit: 'H' (type: <class 'str'>)
+DEBUG - Lead suit: 'None' (type: <class 'NoneType'>)
+DEBUG - Player hand: []
+DEBUG - Trick started by player: 2
+DEBUG - Hand suits: []
+Game over after 410 steps and 12 hands
+Payoffs: [-1.16, 0.08, -1.16, 0.08]
+Final game scores: {0: -145, 1: 10, 2: -145, 3: 10}
+
+===== FINAL RESULTS =====
+Total hands played: 12
+Total steps: 410
+North/South (Players 0/2): -145 points
+East/West (Players 1/3): 10 points
+North/South team LOST by reaching -145 points (-125 or lower)
+East/West team would have won!
+========================
+
+
+Done!
