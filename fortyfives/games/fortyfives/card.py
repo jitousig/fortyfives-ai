@@ -125,7 +125,7 @@ def get_card_rank(card, trump_suit):
     '''
     # Special case: Ace of Hearts is always trump
     if card.rank == 'A' and card.suit == 'H':
-        return 1002  # Always third highest trump
+        return 1001  # Always third highest trump (changed from 1002)
     
     # Check if card is trump
     if card.suit == trump_suit:
@@ -133,9 +133,9 @@ def get_card_rank(card, trump_suit):
         rank_map = {
             '5': 1003,  # Highest trump
             'J': 1002,  # Second highest trump
-            'A': 1001,  # A of Hearts handled above, this is for the other A
-            'K': 1000,
-            'Q': 999
+            'A': 1000,  # A of Hearts handled above, this is for the other A
+            'K': 999,
+            'Q': 998
         }
         
         if card.rank in rank_map:
@@ -144,12 +144,12 @@ def get_card_rank(card, trump_suit):
         # For other trump cards
         if FortyfivesCard.is_red_suit(card.suit):
             # Red trump: 5, J, AH, A, K, Q, 10, 9, 8, 7, 6, 4, 3, 2
-            base = {'T': 998, '9': 997, '8': 996, '7': 995, '6': 994, '4': 993, '3': 992, '2': 991}
-            return base.get(card.rank, 990)  # Default low value if something is wrong
+            base = {'T': 997, '9': 996, '8': 995, '7': 994, '6': 993, '4': 992, '3': 991, '2': 990}
+            return base.get(card.rank, 989)  # Default low value if something is wrong
         else:
             # Black trump: 5, J, AH, A, K, Q, 2, 3, 4, 6, 7, 8, 9, 10
-            base = {'2': 998, '3': 997, '4': 996, '6': 995, '7': 994, '8': 993, '9': 992, 'T': 991}
-            return base.get(card.rank, 990)  # Default low value if something is wrong
+            base = {'2': 997, '3': 996, '4': 995, '6': 994, '7': 993, '8': 992, '9': 991, 'T': 990}
+            return base.get(card.rank, 989)  # Default low value if something is wrong
     
     # Non-trump cards
     if FortyfivesCard.is_red_suit(card.suit):
@@ -160,9 +160,9 @@ def get_card_rank(card, trump_suit):
         }
         return rank_map.get(card.rank, 0)
     else:
-        # Black non-trump: K, Q, J, A, 2, 3, 4, 6, 7, 8, 9, 10
+        # Black non-trump: K, Q, J, A, 2, 3, 4, 5, 6, 7, 8, 9, 10
         rank_map = {
             'K': 800, 'Q': 799, 'J': 798, 'A': 797, '2': 796, '3': 795,
-            '4': 794, '6': 793, '7': 792, '8': 791, '9': 790, 'T': 789
+            '4': 794, '5': 793, '6': 792, '7': 791, '8': 790, '9': 789, 'T': 788
         }
         return rank_map.get(card.rank, 0) 

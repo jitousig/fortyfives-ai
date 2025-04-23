@@ -10,9 +10,13 @@ from rlcard.agents import RandomAgent
 from fortyfives.games.fortyfives.game import FortyfivesGame
 from fortyfives.games.fortyfives.card import FortyfivesCard, get_card_rank, RANKS
 
-# Register the environment
+# Register the environment only if it's not already registered
 from rlcard.envs import register
-register('fortyfives', 'fortyfives.envs.fortyfives_env:FortyfivesEnv')
+try:
+    register('fortyfives', 'fortyfives.envs.fortyfives_env:FortyfivesEnv')
+except ValueError:
+    # Environment already registered, continue with tests
+    pass
 
 class TestFortyfives(unittest.TestCase):
     '''
@@ -69,34 +73,34 @@ class TestFortyfives(unittest.TestCase):
         '''
         game = FortyfivesGame()
         
-        # Player 0 bids 20
+        # Player 1 bids 20 (first player to bid in the game)
         game.step(1)  # BID_20
-        self.assertEqual(game.highest_bidder, 0)
+        self.assertEqual(game.highest_bidder, 1)
         self.assertEqual(game.highest_bid, 1)  # BID_20
         
-        # Player 1 passes
+        # Player 2 passes
         game.step(0)  # BID_PASS
-        self.assertEqual(game.highest_bidder, 0)
+        self.assertEqual(game.highest_bidder, 1)
         self.assertEqual(game.highest_bid, 1)
         
-        # Player 2 bids 25
+        # Player 3 bids 25
         game.step(2)  # BID_25
-        self.assertEqual(game.highest_bidder, 2)
-        self.assertEqual(game.highest_bid, 2)
-        
-        # Player 3 passes
-        game.step(0)  # BID_PASS
-        self.assertEqual(game.highest_bidder, 2)
+        self.assertEqual(game.highest_bidder, 3)
         self.assertEqual(game.highest_bid, 2)
         
         # Player 0 passes
         game.step(0)  # BID_PASS
-        self.assertEqual(game.highest_bidder, 2)
+        self.assertEqual(game.highest_bidder, 3)
+        self.assertEqual(game.highest_bid, 2)
+        
+        # Player 1 passes
+        game.step(0)  # BID_PASS
+        self.assertEqual(game.highest_bidder, 3)
         self.assertEqual(game.highest_bid, 2)
         
         # Check that bidding is over and we've moved to the declaration phase
         self.assertEqual(game.phase, 2)  # Declaration phase
-        self.assertEqual(game.current_player_id, 2)  # Highest bidder should be next
+        self.assertEqual(game.current_player_id, 3)  # Highest bidder should be next
     
     def test_environment(self):
         '''
