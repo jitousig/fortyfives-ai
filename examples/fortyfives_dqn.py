@@ -10,6 +10,7 @@ import argparse
 import numpy as np
 import torch
 import sys
+import csv
 
 import rlcard
 from rlcard.agents import DQNAgent
@@ -36,6 +37,27 @@ try:
 except Exception as e:
     print(f"Error registering environment: {e}")
     sys.exit(1)
+
+# Custom Logger class since RLCard's Logger might have issues
+class CustomLogger:
+    def __init__(self, log_dir):
+        self.log_dir = log_dir
+        self.data = {'episode': [], 'performance': []}
+        self.csv_path = os.path.join(log_dir, 'performance.csv')
+        
+        # Create CSV file with headers
+        with open(self.csv_path, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['episode', 'performance'])
+            writer.writeheader()
+    
+    def log_performance(self, episode, performance):
+        self.data['episode'].append(episode)
+        self.data['performance'].append(performance)
+        
+        # Also save to CSV
+        with open(self.csv_path, 'a', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['episode', 'performance'])
+            writer.writerow({'episode': episode, 'performance': performance})
 
 def train(args):
     # Check if cuda is available
@@ -76,57 +98,129 @@ def train(args):
     # Configure agents for evaluation
     eval_env = rlcard.make('fortyfives', config={'seed': args.seed})
     eval_random_agents = [
-        rlcard.agents.RandomAgent(num_actions=env.num_actions) 
-        for _ in range(env.num_players)
+        rlcard.agents.RandomAgent(num_actions=eval_env.num_actions) 
+        for _ in range(eval_env.num_players)
     ]
+    eval_env.set_agents([agent] + eval_random_agents[1:])
     
-    # Set up evaluator
-    def _eval_agent(agent, eval_env, random_agents):
-        # Use the first position for the learning agent
-        eval_env.set_agents([agent] + random_agents[1:])
+    # Set up evaluator function
+    def _eval_agent(agent, eval_env, num_games=1):
+        # Custom evaluation function
+        rewards = []
+        for _ in range(num_games):
+            # Reset the environment
+            state, player_id = eval_env.reset()
+            done = False
+            step_count = 0
+            
+            while not done and step_count < 1000:
+                step_count += 1
+                action = eval_env.agents[player_id].step(state)
+                next_state, next_player_id = eval_env.step(action)
+                
+                # Check if the game is done
+                if step_count >= 1000 or (hasattr(eval_env.game, 'is_over') and eval_env.game.is_over()):
+                    done = True
+                    payoffs = eval_env.get_payoffs()
+                    rewards.append(payoffs[0])  # Record reward for player 0 (the learning agent)
+                
+                # Move to the next state
+                state = next_state
+                player_id = next_player_id
         
-        # Generate trajectories
-        try:
-            payoffs = tournament(
-                env=eval_env,
-                num=args.eval_num,
-                is_training=False
-            )[0]
-            return float(payoffs)
-        except Exception as e:
-            print(f"Error in evaluation: {e}")
-            return 0.0
+        # Return average reward
+        return float(np.mean(rewards)) if rewards else 0.0
 
     # Set up logger
-    logger = Logger(args.log_dir)
+    logger = CustomLogger(args.log_dir)
     
     for episode in range(args.num_episodes):
         # Generate data from the environment
         try:
-            trajectories, _ = env.run(is_training=True)
-            
             # Print progress
             if episode % 10 == 0:
                 print(f"Episode {episode}/{args.num_episodes}")
             
-            # Reorganize the trajectories to player-specific view
-            trajectories = reorganize(trajectories, env.num_players)
+            # Reset the environment
+            state, player_id = env.reset()
             
-            # Feed transitions into agent memory and train
-            for ts in trajectories[0]:
-                agent.feed(ts)
+            # Collect trajectories manually
+            trajectories = [[] for _ in range(env.num_players)]
+            done = False
+            step_count = 0
+            
+            # Manual trajectory collection to avoid the int not subscriptable issue
+            while not done and step_count < 1000:  # Safety limit
+                step_count += 1
                 
+                # Get the action from the agent
+                action = env.agents[player_id].step(state)
+                
+                # Record the state and action for the current player
+                trajectories[player_id].append({
+                    'state': state,
+                    'action': action,
+                    'reward': 0,  # Will be updated later
+                    'next_state': None  # Will be updated later
+                })
+                
+                # Step the environment
+                next_state, next_player_id = env.step(action)
+                
+                # Check if the game is done
+                if step_count >= 1000 or (hasattr(env.game, 'is_over') and env.game.is_over()):
+                    done = True
+                    # Get payoffs for all players
+                    payoffs = env.get_payoffs()
+                    
+                    # Update rewards in all trajectories
+                    for player in range(env.num_players):
+                        for transition in trajectories[player]:
+                            transition['reward'] = payoffs[player]
+                
+                # Update the next state for the previous action
+                if len(trajectories[player_id]) > 0:
+                    trajectories[player_id][-1]['next_state'] = next_state
+                
+                # Move to the next state
+                state = next_state
+                player_id = next_player_id
+            
+            # Print trajectory information
+            if episode % 50 == 0:
+                print(f"Generated {step_count} steps across {len(trajectories)} players")
+                for p, traj in enumerate(trajectories):
+                    print(f"Player {p}: {len(traj)} transitions")
+            
+            # Feed transitions into agent memory directly using feed_memory instead of feed
+            for transition in trajectories[0]:
+                if transition['next_state'] is not None:  # Skip the last transition if next_state is None
+                    # Get the necessary components
+                    state_obs = transition['state']['obs']
+                    action = transition['action']
+                    reward = transition['reward']
+                    next_state_obs = transition['next_state']['obs']
+                    legal_actions = list(transition['next_state']['legal_actions'].keys())
+                    done_flag = done
+                    
+                    # Feed memory directly
+                    agent.feed_memory(state_obs, action, reward, next_state_obs, legal_actions, done_flag)
+            
             # Train the agent
-            agent.train()
+            loss = agent.train()
+            if episode % 10 == 0 and loss is not None:
+                print(f"Episode {episode}, Loss: {loss:.6f}")
             
             # Evaluate the agent
             if episode % args.evaluate_every == 0:
-                performance = _eval_agent(agent, eval_env, eval_random_agents)
+                performance = _eval_agent(agent, eval_env, num_games=args.eval_num)
                 logger.log_performance(episode, performance)
                 print(f"Episode {episode}, Performance: {performance:.4f}")
                 
         except Exception as e:
             print(f"Error in episode {episode}: {e}")
+            import traceback
+            traceback.print_exc()
             continue
             
     # Save final model
@@ -137,7 +231,7 @@ def train(args):
     # Plot learning curve using matplotlib directly
     try:
         import matplotlib.pyplot as plt
-        if hasattr(logger, 'data'):
+        if len(logger.data['episode']) > 0:
             xs = logger.data['episode']
             ys = logger.data['performance']
             plt.figure()
@@ -177,9 +271,28 @@ def evaluate(args):
     rewards = []
     print('Start evaluation')
     for episode in range(args.eval_num):
-        _, payoffs = env.run(is_training=False)
-        rewards.append(payoffs[0])
+        # Reset the environment
+        state, player_id = env.reset()
         
+        # Play until the game is done
+        done = False
+        step_count = 0
+        
+        while not done and step_count < 1000:
+            step_count += 1
+            action = env.agents[player_id].step(state)
+            next_state, next_player_id = env.step(action)
+            
+            # Check if the game is done
+            if step_count >= 1000 or (hasattr(env.game, 'is_over') and env.game.is_over()):
+                done = True
+                payoffs = env.get_payoffs()
+                rewards.append(payoffs[0])  # Record reward for player 0 (the DQN agent)
+            
+            # Move to the next state
+            state = next_state
+            player_id = next_player_id
+            
         if episode % 10 == 0:
             print(f'Episode {episode}, average reward: {np.mean(rewards):.4f}')
             
