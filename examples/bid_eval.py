@@ -137,7 +137,7 @@ def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed):
 
 def evaluate_bidding_paired(bid_agent, baseline=None, num_hands=200,
                             seed=0, name='bidder', silent=False,
-                            play_agent=None):
+                            play_agent=None, progress_every=250):
     """Paired bidding eval: bid_agent vs baseline on identical deals.
 
     Only NS phase-1/2 (bid + declaration) differs between the two runs;
@@ -165,6 +165,15 @@ def evaluate_bidding_paired(bid_agent, baseline=None, num_hands=200,
             continue
         diffs.append(pa - pb)
         agent_pts.append(pa)
+
+        # Interim progress (off during the silent canary so it stays
+        # noise-free). Running mean of the paired diff so far.
+        if (not silent and progress_every
+                and (i + 1) % progress_every == 0):
+            run = float(np.mean(diffs)) if diffs else 0.0
+            print(f"  [{name}] {i + 1}/{num_hands}  "
+                  f"running avg_diff={run:+.3f}  n={len(diffs)}",
+                  flush=True)
 
     # PairedResult expects (name, diffs, points, tricks); bidding eval
     # does not track NS tricks, pass zeros (tricks unused for bidding).
