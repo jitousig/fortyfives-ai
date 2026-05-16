@@ -58,6 +58,26 @@ from fortyfives_rule_based import RuleBasedAgent
 from play_eval import greedy, PairedResult
 
 
+class RandomBidder:
+    """Skill-free bidding baseline: uniform random over legal phase-1/2
+    actions. Own RandomState (seeded once) so a run is reproducible —
+    env.seed() only seeds the dealer, never global np.random (hard-won
+    invariant). Variance across hands is part of the headroom signal;
+    the paired CI accounts for it."""
+
+    def __init__(self, num_actions=18, seed=12345):
+        self.num_actions = num_actions
+        self.use_raw = True
+        self._rng = np.random.RandomState(seed)
+
+    def step(self, state):
+        keys = list(state['legal_actions'].keys())
+        return keys[self._rng.randint(len(keys))]
+
+    def eval_step(self, state):
+        return self.step(state), {}
+
+
 def _default_play_agent():
     """Default fixed play reference = canonical PIMC v3. Imported lazily
     so a missing torch/PIMC dep does not break canary-only use."""
@@ -80,6 +100,9 @@ def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed):
     env.seed(seed)
     if hasattr(play_agent, '_rng'):
         play_agent._rng = np.random.RandomState(seed)
+    # EV-style bidders need the live env to clone the true position.
+    if hasattr(bid_agent, 'set_env'):
+        bid_agent.set_env(env)
     state, player_id = env.reset()
 
     init_points = env.game.points.get(0, 0) if env.game.points else 0
