@@ -59,107 +59,65 @@ class RuleBasedAgent:
         # Default: deterministic fallback (see note on benchmark determinism)
         return min(state['legal_actions'].keys())
     
+    # Suit -> trump-declaration env action id.
+    _SUIT_TO_DECL = {'S': 5, 'H': 6, 'D': 7, 'C': 8}
+
+    def _supported_bid(self, hand):
+        '''
+        Top-trump bid model. For each suit S consider it as trump:
+          5_S + J_S + A♥  -> 30
+          5_S + J_S       -> 25
+          5_S             -> 20
+          (no 5 in any S) -> pass
+        A♥ is ALWAYS trump (any declared suit), so it counts for every S.
+        Returns (suit or None, level in {30,25,20,0}). Deterministic:
+        among suits reaching the top level, prefer the most effective
+        trumps (length wins tricks in this 5-pts/trick game), then a
+        fixed suit order.
+        '''
+        has_AH = any(c.rank == 'A' and c.suit == 'H' for c in hand)
+        best = None  # ((level, trump_count, -suit_idx), suit, level)
+        for s in SUITS:
+            if not any(c.rank == '5' and c.suit == s for c in hand):
+                continue
+            has_J = any(c.rank == 'J' and c.suit == s for c in hand)
+            level = 30 if (has_J and has_AH) else 25 if has_J else 20
+            tcount = sum(1 for c in hand
+                         if c.suit == s or (c.rank == 'A' and c.suit == 'H'))
+            key = (level, tcount, -SUITS.index(s))
+            if best is None or key > best[0]:
+                best = (key, s, level)
+        if best is None:
+            return None, 0
+        return best[1], best[2]
+
     def _bid_strategy(self, raw_obs, legal_actions):
-        '''
-        Strategy for bidding phase
-        '''
-        hand = raw_obs['hand']
-        
-        # Count high cards by suit
-        suit_counts = {suit: 0 for suit in SUITS}
-        for card in hand:
-            suit_counts[card.suit] += 1
-        
-        # Count high cards (5s, Js, Aces)
-        high_cards = [card for card in hand if card.rank in ['5', 'J', 'A']]
-        num_high_cards = len(high_cards)
-        
-        # Find best suit for trump
-        best_suit = max(suit_counts, key=suit_counts.get)
-        best_suit_count = suit_counts[best_suit]
-        
-        # Choose bid based on suit count and high cards
-        if best_suit_count >= 4 and num_high_cards >= 3:
-            # Bid 30 if we have a good hand
-            if 3 in legal_actions:  # Bid 30
-                return 3
-            elif 2 in legal_actions:  # Bid 25
-                return 2
-            elif 1 in legal_actions:  # Bid 20
-                return 1
-        elif best_suit_count >= 3 and num_high_cards >= 2:
-            # Bid 25 with decent hand
-            if 2 in legal_actions:  # Bid 25
-                return 2
-            elif 1 in legal_actions:  # Bid 20
-                return 1
-        elif best_suit_count >= 2 and num_high_cards >= 1:
-            # Bid 20 with mediocre hand
-            if 1 in legal_actions:  # Bid 20
-                return 1
-        
-        # Pass with a poor hand
-        if 0 in legal_actions:  # Pass
+        '''Bid exactly the level the hand's top trumps support; if that
+        level is unavailable (already outbid), pass.'''
+        _, level = self._supported_bid(raw_obs['hand'])
+        desired = {30: 3, 25: 2, 20: 1, 0: 0}[level]
+        if desired in legal_actions:
+            return desired
+        # Supported bid taken / illegal -> pass; hold only if forced;
+        # deterministic fallback (rule-based must stay reproducible).
+        if 0 in legal_actions:
             return 0
-        
-        # If bidding has gone around and we're forced to hold
-        if 4 in legal_actions:  # Hold
+        if 4 in legal_actions:
             return 4
-            
-        # If no suitable action found, take a random legal action
-        # Deterministic fallback: rule-based must be a reproducible
-        # benchmark for the paired eval (global np.random was never seeded).
         return min(legal_actions.keys())
-    
+
     def _choose_trump(self, raw_obs, legal_actions):
-        '''
-        Strategy for choosing trump
-        '''
+        '''Declare the suit the bid was based on (same model as the bid,
+        so they always agree). Fallback: longest suit, deterministic.'''
         hand = raw_obs['hand']
-        
-        # Count cards by suit
-        suit_counts = {suit: 0 for suit in SUITS}
-        suit_values = {suit: 0 for suit in SUITS}
-        
-        for card in hand:
-            suit = card.suit
-            suit_counts[suit] += 1
-            
-            # Assign values to high cards
-            if card.rank == '5':
-                suit_values[suit] += 5
-            elif card.rank == 'J':
-                suit_values[suit] += 3
-            elif card.rank == 'A':
-                suit_values[suit] += 4
-            elif card.rank == 'K':
-                suit_values[suit] += 2
-            elif card.rank == 'Q':
-                suit_values[suit] += 1
-        
-        # Find best suit based on count and high cards
-        best_suit = max(suit_values, key=suit_values.get)
-        
-        # Map suit to action
-        suit_to_action = {
-            'S': 5,  # Spades
-            'H': 6,  # Hearts
-            'D': 7,  # Diamonds
-            'C': 8,  # Clubs
-        }
-        
-        # Choose the best suit if legal
-        if suit_to_action[best_suit] in legal_actions:
-            return suit_to_action[best_suit]
-            
-        # Fall back to legal action with most cards
-        for suit, count in sorted(suit_counts.items(), key=lambda x: x[1], reverse=True):
-            if suit_to_action[suit] in legal_actions:
-                return suit_to_action[suit]
-                
-        # If no suitable action found, take a random legal action
-        # Deterministic fallback: rule-based must be a reproducible
-        # benchmark for the paired eval (global np.random was never seeded).
+        suit, _ = self._supported_bid(hand)
+        if suit is not None and self._SUIT_TO_DECL[suit] in legal_actions:
+            return self._SUIT_TO_DECL[suit]
+
+        counts = {s: sum(1 for c in hand if c.suit == s) for s in SUITS}
+        for s in sorted(SUITS, key=lambda x: (-counts[x], SUITS.index(x))):
+            if self._SUIT_TO_DECL[s] in legal_actions:
+                return self._SUIT_TO_DECL[s]
         return min(legal_actions.keys())
     
     def _discard_strategy(self, raw_obs, legal_actions):
