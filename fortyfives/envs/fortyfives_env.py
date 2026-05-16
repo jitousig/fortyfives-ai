@@ -35,9 +35,11 @@ class FortyfivesEnv(Env):
         super().__init__(config)
         
         # State shape and action shape
-        # One-hot encoded cards (52*4) + phase (5) + bids (4*4) + points (2) + tricks (2) + dealer/current_player (2)
-        # Update: increase space to 52*5 to accommodate all possible card indices
-        self.state_shape = [52 * 5 + 5 + 4 * 4 + 2 + 2 + 2]  
+        # One-hot cards (52*5) + phase (5) + bids (4*4) + points (2) + tricks (2)
+        # + dealer/current (2) + trump suit (4) + current-trick lead suit (4).
+        # Trump/lead are decisive for every play-phase decision in 45s and were
+        # previously absent — the policy was choosing cards blind to trump.
+        self.state_shape = [52 * 5 + 5 + 4 * 4 + 2 + 2 + 2 + 4 + 4]
         self.action_shape = []  # No additional action features
         
     def _extract_state(self, state):
@@ -78,8 +80,10 @@ class FortyfivesEnv(Env):
             if card is not None:
                 self._encode_cards(obs, [card], 52 * (i + 1))
         
-        # Encode phase
-        phase_idx = 52 * 4 + state['phase']
+        # Encode phase. Base is 52*5 (after all FIVE 52-card blocks: hand +
+        # 4 trick slots). Using 52*4 collided every non-card feature with the
+        # 4th trick card's one-hot — corrupting phase/trump during play.
+        phase_idx = 52 * 5 + state['phase']
         obs[phase_idx] = 1
         
         # Encode bids
@@ -87,24 +91,35 @@ class FortyfivesEnv(Env):
         if bid_info['bids'] is not None:
             for i, bid in enumerate(bid_info['bids']):
                 if bid is not None:
-                    obs[52 * 4 + 5 + i * 4 + bid] = 1
+                    obs[52 * 5 + 5 + i * 4 + bid] = 1
         
         # Encode points
         points = state['points']
         if points is not None:
-            obs[52 * 4 + 5 + 16] = points[0]
-            obs[52 * 4 + 5 + 17] = points[1]
+            obs[52 * 5 + 5 + 16] = points[0]
+            obs[52 * 5 + 5 + 17] = points[1]
         
         # Encode tricks won
         tricks_won = state['tricks_won']
         if tricks_won is not None:
-            obs[52 * 4 + 5 + 18] = tricks_won[0] + tricks_won[2]  # N/S tricks
-            obs[52 * 4 + 5 + 19] = tricks_won[1] + tricks_won[3]  # E/W tricks
+            obs[52 * 5 + 5 + 18] = tricks_won[0] + tricks_won[2]  # N/S tricks
+            obs[52 * 5 + 5 + 19] = tricks_won[1] + tricks_won[3]  # E/W tricks
         
         # Encode dealer and current player
-        obs[52 * 4 + 5 + 20] = state['dealer']
-        obs[52 * 4 + 5 + 21] = state['current_player']
-            
+        obs[52 * 5 + 5 + 20] = state['dealer']
+        obs[52 * 5 + 5 + 21] = state['current_player']
+
+        # Encode trump suit (one-hot over SUITS; all-zero until declared).
+        # Decisive for play-phase ranking/strategy and previously omitted.
+        trump = state.get('trump_suit')
+        if trump in SUITS:
+            obs[52 * 5 + 5 + 22 + SUITS.index(trump)] = 1
+
+        # Encode current-trick lead suit (one-hot; all-zero if no card led yet)
+        lead = state.get('trick_lead_suit')
+        if lead in SUITS:
+            obs[52 * 5 + 5 + 26 + SUITS.index(lead)] = 1
+
         return obs
     
     def _encode_cards(self, obs, cards, start_idx):

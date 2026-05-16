@@ -25,6 +25,13 @@ compare(
 
 import os
 import sys
+
+# See note in fortyfives_play_phase.py: ensure this repo's `fortyfives`
+# package wins over the sibling editable install in the shared venv.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if sys.path[0] != _REPO_ROOT:
+    sys.path.insert(0, _REPO_ROOT)
+
 import numpy as np
 import torch
 
@@ -52,19 +59,32 @@ def load_model(path):
 
 
 def greedy(agent):
-    """Context manager: set DQN epsilon to 0 for evaluation, then restore."""
+    """Context manager: force greedy (no-exploration) action selection
+    during evaluation, then restore.
+
+    Handles two cases:
+      - agents with a scalar ``epsilon`` attribute (set to 0)
+      - rlcard DQNAgent, whose step() reads ``self.epsilons[total_t]``
+        and ignores ``self.epsilon`` entirely; we swap in an all-zero
+        schedule so action selection is greedy regardless of total_t.
+    """
     import contextlib
 
     @contextlib.contextmanager
     def _ctx():
-        old = getattr(agent, 'epsilon', None)
-        if old is not None:
+        old_eps_attr = getattr(agent, 'epsilon', None)
+        old_schedule = getattr(agent, 'epsilons', None)
+        if old_eps_attr is not None:
             agent.epsilon = 0.0
+        if old_schedule is not None:
+            agent.epsilons = np.zeros_like(old_schedule)
         try:
             yield agent
         finally:
-            if old is not None:
-                agent.epsilon = old
+            if old_eps_attr is not None:
+                agent.epsilon = old_eps_attr
+            if old_schedule is not None:
+                agent.epsilons = old_schedule
 
     return _ctx()
 
@@ -75,8 +95,8 @@ def greedy(agent):
 
 def _run_hand(env, play_agent, seed):
     """
-    Play one hand with play_agent making phase-4 decisions for player 0.
-    Rule-based handles everything else.
+    Play one hand with play_agent making phase-4 decisions for BOTH NS
+    seats (players 0 and 2). Rule-based handles everything else.
 
     The game is multi-hand (runs to 125 pts), so we terminate at the phase
     transition 4→1 (play→new auction) which marks the end of one hand.
@@ -86,6 +106,7 @@ def _run_hand(env, play_agent, seed):
     team_tricks:   tricks won by players 0+2, excluding the final trick
                    (which is swallowed by the phase reset — see note in docs).
     """
+    NS_SEATS = (0, 2)
     env.seed(seed)
     state, player_id = env.reset()
     rule_agent = RuleBasedAgent(num_actions=env.num_actions)
@@ -102,7 +123,7 @@ def _run_hand(env, play_agent, seed):
         if prev_phase == 4:
             in_play = True
 
-        if prev_phase == 4 and player_id == 0:
+        if prev_phase == 4 and player_id in NS_SEATS:
             action = play_agent.step(state)
         else:
             action = rule_agent.step(state)
@@ -205,6 +226,112 @@ def evaluate(play_agent, num_hands=200, seed=0, name='agent', silent=False):
                 timeouts += 1
 
     result = EvalResult(name, payoffs, tricks)
+    if not silent:
+        print(result)
+        if timeouts:
+            print(f"  (Timeouts: {timeouts}/{num_hands})")
+    return result
+
+
+# ---------------------------------------------------------------------------
+# PairedResult + evaluate_paired — luck-controlled single-agent eval
+# ---------------------------------------------------------------------------
+
+class PairedResult:
+    """
+    diff:   per-hand (agent_points - baseline_points) on identical deals.
+            This is the luck-controlled learning signal — deal variance
+            cancels because both runs see the same cards and the same
+            rule-based opponents/partner; only player 0's phase-4 plays
+            differ.
+    points: agent's raw point delta per hand.
+    tricks: agent team tricks per hand (0-4; last trick not counted).
+    """
+    def __init__(self, name, diffs, points, tricks):
+        self.name = name
+        self.diff = np.array(diffs, dtype=float)
+        self.points = np.array(points, dtype=float)
+        self.tricks = np.array(tricks, dtype=float)
+
+    @property
+    def num_hands(self):
+        return len(self.diff)
+
+    @property
+    def avg_diff(self):
+        return self.diff.mean() if self.num_hands else 0.0
+
+    @property
+    def avg_points(self):
+        return self.points.mean() if self.num_hands else 0.0
+
+    @property
+    def avg_tricks(self):
+        return self.tricks.mean() if self.num_hands else 0.0
+
+    @property
+    def win_rate(self):
+        """Fraction of hands the agent outscored the baseline (same deal)."""
+        return (self.diff > 0).mean() if self.num_hands else 0.0
+
+    @property
+    def ci95(self):
+        """95% CI on the paired difference (tight: variance is paired)."""
+        if self.num_hands < 2:
+            return self.avg_diff, self.avg_diff
+        se = self.diff.std(ddof=1) / self.num_hands ** 0.5
+        return self.avg_diff - 1.96 * se, self.avg_diff + 1.96 * se
+
+    # Alias so training code that reads .avg_payoff keeps working — it now
+    # tracks the paired difference instead of a noisy unpaired mean.
+    @property
+    def avg_payoff(self):
+        return self.avg_diff
+
+    def __str__(self):
+        lo, hi = self.ci95
+        return (
+            f"Agent: {self.name}  (paired vs baseline)\n"
+            f"  Hands:      {self.num_hands}\n"
+            f"  Avg diff:   {self.avg_diff:+.3f}  (95% CI {lo:+.3f} to {hi:+.3f})\n"
+            f"  Beats base: {self.win_rate * 100:.1f}% of hands\n"
+            f"  Avg points: {self.avg_points:+.2f}\n"
+            f"  Avg tricks: {self.avg_tricks:.2f} / ~4 (last trick not counted)"
+        )
+
+
+def evaluate_paired(play_agent, baseline=None, num_hands=200, seed=0,
+                    name='agent', silent=False):
+    """
+    Paired evaluation: play_agent vs a baseline on identical deals.
+
+    Both runs use rule-based for everything except the NS (players 0 and
+    2) phase-4 plays, so the per-hand point difference isolates the NS
+    play-phase policy with deal luck cancelled out. The CI is on the paired
+    differences, so it is far tighter than the unpaired evaluate().
+    """
+    if baseline is None:
+        baseline = RuleBasedAgent(num_actions=18)
+
+    env_a = rlcard.make('fortyfives')
+    env_b = rlcard.make('fortyfives')
+    diffs, agent_pts, agent_tricks, wins, timeouts = [], [], [], 0, 0
+
+    for i in range(num_hands):
+        s = seed + i
+        with greedy(play_agent):
+            pa, ta = _run_hand(env_a, play_agent, s)
+        with greedy(baseline):
+            pb, _ = _run_hand(env_b, baseline, s)
+        if pa is None or pb is None:
+            timeouts += 1
+            continue
+        diffs.append(pa - pb)
+        agent_pts.append(pa)
+        agent_tricks.append(ta)
+        wins += 1 if pa > pb else 0
+
+    result = PairedResult(name, diffs, agent_pts, agent_tricks)
     if not silent:
         print(result)
         if timeouts:
