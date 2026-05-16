@@ -111,29 +111,37 @@ def run_episode(env, agent, rule_agent, cfg):
     """
     Play one hand. Returns transitions for player 0's phase-4 actions only.
     Each transition: dict with obs, action, reward, next_obs, legal_actions, done.
+
+    Hand termination: phase 4→1 transition (same logic as play_eval._run_hand).
+    is_hand_over() resets within the same env.step() call as the 5th trick and
+    cannot be observed here; is_over() requires 125 points across many hands.
     """
     state, player_id = env.reset()
+    init_points = env.game.points.get(0, 0) if env.game.points else 0
     prev_tricks_won = list(env.game.tricks_won)
     transitions = []
     pending = None   # (obs, action) awaiting trick resolution
-    done = False
+    in_play = False
     step = 0
 
-    while not done and step < 500:
+    while step < 500:
         step += 1
-        phase = state['raw_obs']['phase']
+        prev_phase = state['raw_obs']['phase']
+        if prev_phase == 4:
+            in_play = True
 
-        if phase == 4 and player_id == 0:
+        if prev_phase == 4 and player_id == 0:
             action = agent.step(state)
             pending = (state['obs'], action)
         else:
             action = rule_agent.step(state)
 
         next_state, next_player_id = env.step(action)
+        curr_phase = env.game.phase
 
-        # Detect trick completion
+        # Detect trick completion (tricks 1-4; trick 5 resets within env.step)
         curr_tricks = list(env.game.tricks_won)
-        if sum(curr_tricks) > sum(prev_tricks_won):
+        if prev_phase == 4 and sum(curr_tricks) > sum(prev_tricks_won):
             if pending is not None:
                 r = compute_trick_reward(prev_tricks_won, env.game, cfg)
                 transitions.append({
@@ -147,13 +155,11 @@ def run_episode(env, agent, rule_agent, cfg):
                 pending = None
             prev_tricks_won = curr_tricks
 
-        if env.game.is_hand_over():
-            done = True
-            hand_reward = env.get_payoffs()[0] * cfg.hand_reward_weight
-            if transitions:
-                transitions[-1]['reward'] += hand_reward
-                transitions[-1]['done'] = True
-            elif pending is not None:
+        # Hand ended: play phase → new auction (or game truly over at 125 pts)
+        if (in_play and prev_phase == 4 and curr_phase == 1) or env.game.is_over():
+            points_now = env.game.points.get(0, 0) if env.game.points else 0
+            hand_reward = (points_now - init_points) / 125 * cfg.hand_reward_weight
+            if pending is not None:
                 transitions.append({
                     'obs': pending[0],
                     'action': pending[1],
@@ -162,6 +168,10 @@ def run_episode(env, agent, rule_agent, cfg):
                     'legal_actions': list(next_state['legal_actions'].keys()),
                     'done': True,
                 })
+            elif transitions:
+                transitions[-1]['reward'] += hand_reward
+                transitions[-1]['done'] = True
+            break
 
         state = next_state
         player_id = next_player_id
