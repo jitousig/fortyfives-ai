@@ -38,11 +38,48 @@ if sys.path[0] != _REPO_ROOT:
     sys.path.insert(0, _REPO_ROOT)
 
 import numpy as np
+import rlcard
+from rlcard.envs.registration import register, registry
 
 from fortyfives.games.fortyfives.card import FortyfivesCard
 
+if 'fortyfives' not in registry.env_specs:
+    register(env_id='fortyfives',
+             entry_point='fortyfives.envs.fortyfives_env:FortyfivesEnv')
+
 sys.path.insert(0, os.path.dirname(__file__))
 from fortyfives_rule_based import RuleBasedAgent
+
+
+def _clone_game(game):
+    """Deep-copy a FortyfivesGame WITHOUT copying card objects.
+    FortyfivesCard instances are immutable value objects and are never
+    mutated during a hand (only moved between lists), so a clone may
+    safely share them with the original. We pre-seed deepcopy's memo so
+    every reachable card maps to itself: deepcopy still faithfully copies
+    every other field (no manual field enumeration -> no silent-divergence
+    risk), it just skips the ~1.6k-object-per-rollout card recursion that
+    profiling showed was 56% of runtime. Result-preserving: verified
+    byte-identical against a captured reference + the bidding canary."""
+    memo = {}
+    d = game.dealer
+    for c in d.deck:
+        memo[id(c)] = c
+    for c in d.pot:
+        memo[id(c)] = c
+    for h in game.hands:
+        for c in h:
+            memo[id(c)] = c
+    for c in (game.current_trick or []):
+        if c is not None:
+            memo[id(c)] = c
+    for tr in (game.trick_history or []):
+        for c in tr:
+            if c is not None:
+                memo[id(c)] = c
+    for c in getattr(game, 'discard_pile', None) or []:
+        memo[id(c)] = c
+    return copy.deepcopy(game, memo)
 
 _DECK_BY_RS = {(c.rank, c.suit): c for c in (FortyfivesCard(i) for i in range(52))}
 
@@ -58,6 +95,11 @@ class EVBidder:
         self._rb = RuleBasedAgent(num_actions)       # delegate + rollout policy
         self._rng = np.random.RandomState(seed)
         self._env = None
+        # One persistent shadow env reused for every rollout. Its
+        # translation helpers (_extract_state/_decode_action) only read
+        # self.game, so swapping in a cloned game is sufficient and
+        # avoids deep-copying the whole env object each rollout.
+        self._shadow = rlcard.make('fortyfives')
 
     # bid_eval injects the live env so we can clone the true position.
     def set_env(self, env):
@@ -89,9 +131,10 @@ class EVBidder:
         """Clone base_env, re-determinize, force our candidate bid, then
         drive the held-constant rule-based (incl. fast play) to the end
         of THIS hand. Returns NS (team 0/2) game-point delta."""
-        cenv = copy.deepcopy(base_env)
-        self._redeterminize(cenv.game, our_seat)
-        g = cenv.game
+        g = _clone_game(base_env.game)
+        cenv = self._shadow
+        cenv.game = g
+        self._redeterminize(g, our_seat)
         init_pts = g.points.get(0, 0) if g.points else 0
 
         # apply our forced action first (we are the current player)
