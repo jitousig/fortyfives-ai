@@ -57,7 +57,7 @@ class RuleBasedAgent:
             return self._play_strategy(raw_obs, state['legal_actions'])
         
         # Default: random action
-        return np.random.choice(state['legal_actions'])
+        return np.random.choice(list(state['legal_actions'].keys()))
     
     def _bid_strategy(self, raw_obs, legal_actions):
         '''
@@ -107,7 +107,7 @@ class RuleBasedAgent:
             return 4
             
         # If no suitable action found, take a random legal action
-        return np.random.choice(legal_actions)
+        return np.random.choice(list(legal_actions.keys()))
     
     def _choose_trump(self, raw_obs, legal_actions):
         '''
@@ -156,7 +156,7 @@ class RuleBasedAgent:
                 return suit_to_action[suit]
                 
         # If no suitable action found, take a random legal action
-        return np.random.choice(legal_actions)
+        return np.random.choice(list(legal_actions.keys()))
     
     def _discard_strategy(self, raw_obs, legal_actions):
         '''
@@ -203,12 +203,14 @@ class RuleBasedAgent:
             card_values[i] = value
         
         # Discard the lowest value card
+        if not card_values:
+            return np.random.choice(list(legal_actions.keys()))
         worst_card_idx = min(card_values, key=card_values.get)
         if worst_card_idx in legal_actions:
             return worst_card_idx
-            
+
         # If no suitable action found, take a random legal action
-        return np.random.choice(legal_actions)
+        return np.random.choice(list(legal_actions.keys()))
     
     def _play_strategy(self, raw_obs, legal_actions):
         '''

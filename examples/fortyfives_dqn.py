@@ -23,6 +23,9 @@ from rlcard.utils import (
     plot_curve
 )
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
+from fortyfives_rule_based import RuleBasedAgent
+
 # Try to register the Fortyfives environment
 from rlcard.envs.registration import register, registry
 try:
@@ -86,22 +89,42 @@ def train(args):
         device=device
     )
     
-    # Create random agents for other positions
-    random_agents = [
-        rlcard.agents.RandomAgent(num_actions=env.num_actions) 
-        for _ in range(env.num_players)
-    ]
-    
-    # Set DQN agent at position 0 and random agents at other positions
-    env.set_agents([agent] + random_agents[1:])
-    
-    # Configure agents for evaluation
+    # Player layout: 0=DQN, 1=opponent, 2=DQN's partner, 3=opponent
+    # Partner (player 2) is always rule-based.
+    # Curriculum stages (when --curriculum): random opps → one rule-based opp → both rule-based.
+    def make_env_agents(episode):
+        n = env.num_actions
+        partner = RuleBasedAgent(num_actions=n)
+        if args.curriculum:
+            stage2_start = args.num_episodes // 4   # 25%: introduce one rule-based opp
+            stage3_start = args.num_episodes // 2   # 50%: both opps rule-based
+            if episode < stage2_start:
+                opp1 = rlcard.agents.RandomAgent(num_actions=n)
+                opp3 = rlcard.agents.RandomAgent(num_actions=n)
+            elif episode < stage3_start:
+                opp1 = RuleBasedAgent(num_actions=n)
+                opp3 = rlcard.agents.RandomAgent(num_actions=n)
+            else:
+                opp1 = RuleBasedAgent(num_actions=n)
+                opp3 = RuleBasedAgent(num_actions=n)
+        elif args.opponent == 'rule_based':
+            opp1 = RuleBasedAgent(num_actions=n)
+            opp3 = RuleBasedAgent(num_actions=n)
+        else:
+            opp1 = rlcard.agents.RandomAgent(num_actions=n)
+            opp3 = rlcard.agents.RandomAgent(num_actions=n)
+        return [agent, opp1, partner, opp3]
+
+    env.set_agents(make_env_agents(0))
+
+    # Evaluation always uses rule-based opponents to measure true progress
     eval_env = rlcard.make('fortyfives', config={'seed': args.seed})
-    eval_random_agents = [
-        rlcard.agents.RandomAgent(num_actions=eval_env.num_actions) 
-        for _ in range(eval_env.num_players)
-    ]
-    eval_env.set_agents([agent] + eval_random_agents[1:])
+    eval_env.set_agents([
+        agent,
+        RuleBasedAgent(num_actions=eval_env.num_actions),
+        RuleBasedAgent(num_actions=eval_env.num_actions),
+        RuleBasedAgent(num_actions=eval_env.num_actions),
+    ])
     
     # Set up evaluator function
     def _eval_agent(agent, eval_env, num_games=1):
@@ -134,9 +157,17 @@ def train(args):
     # Set up logger
     logger = CustomLogger(args.log_dir)
     
+    curriculum_stages = [args.num_episodes // 4, args.num_episodes // 2] if args.curriculum else []
+
     for episode in range(args.num_episodes):
         # Generate data from the environment
         try:
+            # Update agents at curriculum transition points
+            if args.curriculum and episode in curriculum_stages:
+                env.set_agents(make_env_agents(episode))
+                stage_names = {curriculum_stages[0]: 'stage 2 (one rule-based opp)', curriculum_stages[1]: 'stage 3 (both rule-based opps)'}
+                print(f"Curriculum: advancing to {stage_names[episode]} at episode {episode}")
+
             # Print progress
             if episode % 10 == 0:
                 print(f"Episode {episode}/{args.num_episodes}")
@@ -307,6 +338,8 @@ if __name__ == '__main__':
     parser.add_argument('--eval_num', type=int, default=10, help='Number of games for evaluation')
     parser.add_argument('--log_dir', type=str, default='experiments/fortyfives_dqn', help='Directory for logs')
     parser.add_argument('--model_path', type=str, default='experiments/fortyfives_dqn/model.pth', help='Path to saved model for evaluation')
+    parser.add_argument('--opponent', choices=['random', 'rule_based'], default='random', help='Opponent type for training and evaluation')
+    parser.add_argument('--curriculum', action='store_true', help='Stage opponent difficulty: random → mixed → rule-based (partner always rule-based)')
     
     args = parser.parse_args()
     
