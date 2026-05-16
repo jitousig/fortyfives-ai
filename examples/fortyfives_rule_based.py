@@ -65,11 +65,15 @@ class RuleBasedAgent:
     def _supported_bid(self, hand):
         '''
         Top-trump bid model. For each suit S consider it as trump:
-          5_S + J_S + A♥  -> 30
-          5_S + J_S       -> 25
-          5_S             -> 20
-          (no 5 in any S) -> pass
-        A♥ is ALWAYS trump (any declared suit), so it counts for every S.
+          5_S + J_S + A♥          -> 30
+          5_S + J_S               -> 25
+          5_S                     -> 20
+          J_S + >=1 other S card  -> 20   (no-5 backup path)
+          (none of the above)     -> pass
+        A♥ is ALWAYS trump (any declared suit), so it counts for every S
+        in the 30 test. NOTE the J-path is literal "another card in the
+        SAME suit S" — J♠+A♥ (different suits) does not trigger it even
+        though both are trump if spades is declared.
         Returns (suit or None, level in {30,25,20,0}). Deterministic:
         among suits reaching the top level, prefer the most effective
         trumps (length wins tricks in this 5-pts/trick game), then a
@@ -78,10 +82,19 @@ class RuleBasedAgent:
         has_AH = any(c.rank == 'A' and c.suit == 'H' for c in hand)
         best = None  # ((level, trump_count, -suit_idx), suit, level)
         for s in SUITS:
-            if not any(c.rank == '5' and c.suit == s for c in hand):
-                continue
+            count_s = sum(1 for c in hand if c.suit == s)
+            has_5 = any(c.rank == '5' and c.suit == s for c in hand)
             has_J = any(c.rank == 'J' and c.suit == s for c in hand)
-            level = 30 if (has_J and has_AH) else 25 if has_J else 20
+            if has_5 and has_J and has_AH:
+                level = 30
+            elif has_5 and has_J:
+                level = 25
+            elif has_5:
+                level = 20
+            elif has_J and count_s >= 2:
+                level = 20
+            else:
+                continue
             tcount = sum(1 for c in hand
                          if c.suit == s or (c.rank == 'A' and c.suit == 'H'))
             key = (level, tcount, -SUITS.index(s))
