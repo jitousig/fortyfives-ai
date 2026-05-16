@@ -17,12 +17,18 @@ v1 scope / known approximations (measured empirically, not assumed):
     trump-always-legal); the AGENT's own top-level choice uses the
     engine's true legal_actions, so real renege rules are respected
     where it matters most.
-Both are deliberate v1 simplifications; tighten if v1 shows signal.
+v2 lever 1 (constrained determinization) and v3 lever 3 (rule-based
+playout) are now the CANONICAL defaults — v3 robustly beats the
+competent rule-based on independent seeds. Lever 2 (faithful
+renege/follow legality in rollouts) is still pending. constrained /
+rollout flags remain for ablation.
 
-Usage: it's a drop-in play agent for play_eval.
+Usage: it's a drop-in play agent for play_eval. PIMCAgent() == v3.
     from fortyfives_pimc import PIMCAgent
     from play_eval import evaluate_paired
-    evaluate_paired(PIMCAgent(num_actions=18, n_worlds=20), num_hands=300)
+    evaluate_paired(PIMCAgent(n_worlds=20), num_hands=2000)  # v3
+    PIMCAgent(rollout='cheap')                # v2 ablation
+    PIMCAgent(rollout='cheap', constrained=False)  # v1 ablation
 """
 
 import os
@@ -174,7 +180,12 @@ def _simulate(hands, leader, trump, our_parity, pick,
 
 class PIMCAgent:
     def __init__(self, num_actions=18, n_worlds=20, seed=0,
-                 constrained=True, rollout='cheap'):
+                 constrained=True, rollout='rulebased'):
+        # Canonical config = v3: constrained determinization +
+        # rule-based playout. It robustly beats the competent
+        # rule-based on independent seeds (memory: project-play-phase-
+        # ceiling). constrained/rollout remain overridable for ablation
+        # (rollout='cheap' = v1/v2; constrained=False = unconstrained).
         self.num_actions = num_actions
         self.n_worlds = n_worlds
         # v2 lever 1: constrain determinization by inferred opponent
