@@ -201,7 +201,7 @@ Card evaluation uses `get_card_rank()` in card.py—modify this for ranking chan
 
 ## Important Notes
 
-- **State Representation**: Game state is a fixed-size vector (`state_shape`, currently 295) built by `FortyfivesEnv._get_observation()`. Non-card features are based at `52*5` (after the 5 card blocks); see invariants below before changing it.
+- **State Representation**: Game state is a fixed-size vector (`state_shape`, currently **410**) built by `FortyfivesEnv._get_observation()`. Legacy non-card features are based at `52*5` (=260); enriched features (trick history, highest trump, trick standing, seat one-hots) are appended at index 295+. See invariants below before changing it.
 - **Action Space**: 18 actions total (5 bid + 4 trump + 8 card play + 1 done). Actions are phase-dependent; illegal actions are filtered by `_get_legal_actions()`.
 - **Random Seeding**: Use `env.seed()` for reproducible games; `game.np_random` controls shuffling.
 - **Partnership Structure**: Always players 0/2 (North/South) vs 1/3 (East/West); hardcoded in payoff calculation.
@@ -219,7 +219,7 @@ never happens again. Treat a violation as "stop everything," not "investigate la
 which points at the SIBLING repo `../fortyfives`, NOT this repo's package.
 - The trainer/eval scripts prepend this repo's root to `sys.path[0]` to fix this. Do **not** remove that shim.
 - Do **not** `pip install -e .` from this repo into the shared venv (breaks the sibling project).
-- Before trusting ANY engine/env edit: confirm `fortyfives.__file__` resolves under `.../fortyfives-rl-training/` (or check `env.state_shape == 295`).
+- Before trusting ANY engine/env edit: confirm `fortyfives.__file__` resolves under `.../fortyfives-rl-training/` (or check `env.state_shape == 410`).
 
 ### 2. Evaluation canary (run after every env/eval change)
 `play_eval.evaluate_paired(RuleBasedAgent(18))` (agent == baseline) MUST return
@@ -234,10 +234,13 @@ point means. Reference points: **random-legal ≈ −0.50, rule-based = 0.00.**
 "Better than rule-based" = `avg_diff` significantly > 0 (CI excludes 0).
 
 ### 4. Observation correctness
-Non-card features start at `52*5` (=260), AFTER hand + 4 trick-card blocks
-(0..259). Basing them at `52*4` collides with the 4th trick card and corrupts
-phase/trump. The observation MUST encode trump suit and lead suit (decisive for
-every play decision). New features go past 259; bump `state_shape` to match.
+Legacy non-card features start at `52*5` (=260), AFTER hand + 4 trick-card
+blocks (0..259). Basing them at `52*4` collides with the 4th trick card and
+corrupts phase/trump. The observation MUST encode trump suit and lead suit,
+and (since the 410-wide enrichment) trick history / highest trump / trick
+standing / seat one-hots — all decisive for play. Existing offsets 0..294 are
+load-bearing for prior reasoning; ALWAYS append new features past 294 and bump
+`state_shape` to match (never disturb 0..294, or the canary's meaning shifts).
 
 ### 5. Process
 One change at a time, `git commit` per change, **plan-first** for non-trivial
