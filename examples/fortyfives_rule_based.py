@@ -68,12 +68,12 @@ class RuleBasedAgent:
           5_S + J_S + A♥          -> 30
           5_S + J_S               -> 25
           5_S                     -> 20
-          J_S + >=1 other S card  -> 20   (no-5 backup path)
-          (none of the above)     -> pass
-        A♥ is ALWAYS trump (any declared suit), so it counts for every S
-        in the 30 test. NOTE the J-path is literal "another card in the
-        SAME suit S" — J♠+A♥ (different suits) does not trigger it even
-        though both are trump if spades is declared.
+          J_S + (>=1 other S card OR A♥) -> 20   (no-5 backup path)
+          (none of the above)            -> pass
+        A♥ is ALWAYS trump (any declared suit), so it counts for every S:
+        in the 30 test, and as the J-path "backup card" for any suit
+        (J♠ + A♥ with no other spades still bids 20 on spades, since
+        J♠+A♥ are the 2nd/3rd best trumps there).
         Returns (suit or None, level in {30,25,20,0}). Deterministic:
         among suits reaching the top level, prefer the most effective
         trumps (length wins tricks in this 5-pts/trick game), then a
@@ -91,7 +91,7 @@ class RuleBasedAgent:
                 level = 25
             elif has_5:
                 level = 20
-            elif has_J and count_s >= 2:
+            elif has_J and (count_s >= 2 or has_AH):
                 level = 20
             else:
                 continue
