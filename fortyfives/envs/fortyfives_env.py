@@ -5,14 +5,18 @@ Fortyfives environment
 import numpy as np
 
 from rlcard.envs import Env
-from fortyfives.games.fortyfives.game import FortyfivesGame
+from fortyfives.games.fortyfives.game import (
+    FortyfivesGame,
+    PHASE_AUCTION, PHASE_DECLARATION, PHASE_DISCARD, PHASE_GAMEPLAY,
+    DISCARD_DONE,
+)
 from fortyfives.games.fortyfives.card import SUITS, RANKS
 
-# Define action mappings
-# Actions: [bid actions] + [trump declaration] + [play card]
-# Bid actions: Pass (0), Bid 20 (1), Bid 25 (2), Bid 30 (3), Hold (4)
-# Trump declaration: Spades (5), Hearts (6), Diamonds (7), Clubs (8)
-# Play card: 9 (first card in hand) to 9+n (last card in hand)
+# Env action ID layout (18 total, non-overlapping across all phases):
+# Bid actions:        0=PASS, 1=BID_20, 2=BID_25, 3=BID_30, 4=HOLD
+# Trump declaration:  5=SPADES, 6=HEARTS, 7=DIAMONDS, 8=CLUBS
+# Card play/discard:  9=card0 … 16=card7
+# Discard done:       17
 
 class FortyfivesEnv(Env):
     '''
@@ -116,21 +120,34 @@ class FortyfivesEnv(Env):
             card_idx = RANKS.index(card.rank) + 13 * SUITS.index(card.suit)
             obs[start_idx + card_idx] = 1
     
+    def _game_to_env_action(self, game_action, phase):
+        '''Map a game-internal action ID to its env action ID.'''
+        if phase == PHASE_AUCTION:
+            return game_action          # 0-4 → 0-4
+        elif phase == PHASE_DECLARATION:
+            return game_action + 5      # 0-3 → 5-8
+        elif phase == PHASE_DISCARD:
+            if game_action == DISCARD_DONE:
+                return 17
+            return game_action + 9      # 0-7 → 9-16
+        elif phase == PHASE_GAMEPLAY:
+            return game_action + 9      # 0-7 → 9-16
+        return game_action
+
     def _get_legal_actions(self, state):
         '''
-        Get legal actions in a format usable by the RL agent
-        
-        Args:
-            state (dict): State from the game
+        Get legal actions in a format usable by the RL agent.
+        Game action IDs are remapped to non-overlapping env action IDs so
+        the same integer always means the same thing to the network.
 
         Returns:
-            (dict): Legal actions
+            (dict): {env_action_id: None}
         '''
         legal_actions = {}
-        
-        for action in state['legal_actions']:
-            legal_actions[action] = None
-            
+        phase = state['phase']
+        for game_action in state['legal_actions']:
+            env_action = self._game_to_env_action(game_action, phase)
+            legal_actions[env_action] = None
         return legal_actions
     
     def _get_raw_legal_actions(self, state):
@@ -152,11 +169,11 @@ class FortyfivesEnv(Env):
         Returns:
             (list): Payoffs for all players
         '''
-        winners = [p for p, score in enumerate(self.game.points) if score >= 125]
+        winners = [p for p, score in self.game.points.items() if score >= 125]
+        payoffs = [0, 0, 0, 0]
         
         # If the game is over, the winning partnership gets 1, the losing gets -1
         if winners:
-            payoffs = [0, 0, 0, 0]
             if 0 in winners:  # N/S won
                 payoffs[0] = 1
                 payoffs[2] = 1
@@ -168,27 +185,96 @@ class FortyfivesEnv(Env):
                 payoffs[1] = 1
                 payoffs[3] = 1
         else:
-            # Game isn't over yet, so normalize current scores
-            payoffs = [0, 0, 0, 0]
+            # Game isn't over yet - provide intermediate rewards
+            
+            # Get partnership scores from the game (normalized to [0, 1])
             ns_score = self.game.points[0] / 125  # Normalize to [0, 1]
             ew_score = self.game.points[1] / 125  # Normalize to [0, 1]
-            payoffs[0] = ns_score
-            payoffs[2] = ns_score
-            payoffs[1] = ew_score
-            payoffs[3] = ew_score
             
+            # Reward current score progress
+            payoffs[0] = ns_score * 0.2  # Scale down to avoid overwhelming bid rewards
+            payoffs[2] = ns_score * 0.2
+            payoffs[1] = ew_score * 0.2
+            payoffs[3] = ew_score * 0.2
+            
+            # Check if a bid was just made or lost
+            if hasattr(self.game, 'bid_made') and self.game.highest_bidder is not None:
+                bid_team = self.game.highest_bidder % 2  # 0 for NS, 1 for EW
+                bid_value = 0
+                if self.game.highest_bid is not None:
+                    bid_value = self.game.highest_bid  # Use the bid index directly for reward scaling
+                
+                if hasattr(self.game, 'bid_made'):
+                    # Add intermediate reward for making/losing a bid
+                    if bid_team == 0:  # NS bid
+                        if self.game.bid_made:
+                            # NS made their bid - give positive reward
+                            reward_value = 0.3 + (bid_value * 0.1)  # Higher bids give higher rewards
+                            payoffs[0] += reward_value
+                            payoffs[2] += reward_value
+                            # Slight penalty to opponents when bid succeeds
+                            payoffs[1] -= 0.1
+                            payoffs[3] -= 0.1
+                        else:
+                            # NS failed their bid - give negative reward
+                            reward_value = -0.3 - (bid_value * 0.1)  # Higher failed bids give larger penalties
+                            payoffs[0] += reward_value
+                            payoffs[2] += reward_value
+                            # Reward opponents when bid fails
+                            payoffs[1] += 0.2
+                            payoffs[3] += 0.2
+                    else:  # EW bid
+                        if self.game.bid_made:
+                            # EW made their bid - give positive reward
+                            reward_value = 0.3 + (bid_value * 0.1)  # Higher bids give higher rewards
+                            payoffs[1] += reward_value
+                            payoffs[3] += reward_value
+                            # Slight penalty to opponents when bid succeeds
+                            payoffs[0] -= 0.1
+                            payoffs[2] -= 0.1
+                        else:
+                            # EW failed their bid - give negative reward
+                            reward_value = -0.3 - (bid_value * 0.1)  # Higher failed bids give larger penalties
+                            payoffs[1] += reward_value
+                            payoffs[3] += reward_value
+                            # Reward opponents when bid fails
+                            payoffs[0] += 0.2
+                            payoffs[2] += 0.2
+                
+            # Add a small reward for winning tricks in the current hand
+            if self.game.tricks_won and sum(self.game.tricks_won) > 0:
+                ns_tricks = self.game.tricks_won[0] + self.game.tricks_won[2]
+                ew_tricks = self.game.tricks_won[1] + self.game.tricks_won[3]
+                total_tricks = ns_tricks + ew_tricks
+                
+                if total_tricks > 0:
+                    # Small intermediate reward for winning tricks proportional to % of tricks won
+                    ns_trick_reward = 0.1 * (ns_tricks / total_tricks)
+                    ew_trick_reward = 0.1 * (ew_tricks / total_tricks)
+                    
+                    payoffs[0] += ns_trick_reward
+                    payoffs[2] += ns_trick_reward
+                    payoffs[1] += ew_trick_reward
+                    payoffs[3] += ew_trick_reward
+        
         return payoffs
     
     def _decode_action(self, action_id):
         '''
-        Decode action id to a game action
-        
-        Args:
-            action_id (int): Action id
-
-        Returns:
-            (int or tuple): Game action
+        Convert an env action ID back to the game-internal action expected by
+        game.step().  Inverse of _game_to_env_action().
         '''
+        phase = self.game.phase
+        if phase == PHASE_AUCTION:
+            return action_id            # 0-4 → 0-4
+        elif phase == PHASE_DECLARATION:
+            return action_id - 5        # 5-8 → 0-3
+        elif phase == PHASE_DISCARD:
+            if action_id == 17:
+                return DISCARD_DONE     # → 16
+            return action_id - 9        # 9-16 → 0-7
+        elif phase == PHASE_GAMEPLAY:
+            return action_id - 9        # 9-16 → 0-7
         return action_id
     
     def _get_action_num(self):
