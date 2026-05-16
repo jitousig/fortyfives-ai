@@ -10,7 +10,7 @@ import argparse
 import numpy as np
 import rlcard
 from rlcard.agents.random_agent import RandomAgent
-from fortyfives.games.fortyfives.card import SUITS, RANKS
+from fortyfives.games.fortyfives.card import SUITS, RANKS, get_card_rank
 
 class RuleBasedAgent:
     '''
@@ -164,58 +164,48 @@ class RuleBasedAgent:
     
     def _discard_strategy(self, raw_obs, legal_actions):
         '''
-        Strategy for discarding
+        Strategy for discarding.
+
+        Throw EVERY non-trump card (draw fresh in the replenish step) and,
+        if more than 5 trump remain, keep only the 5 highest-ranked trump.
+        Ace of Hearts is always trump in this game (get_card_rank == 1001),
+        so it is treated as trump here — discarding it would be a blunder.
+
+        One card is discarded per call; DISCARD_DONE (16) ends the phase.
+        Ordering uses the engine's authoritative get_card_rank so "lowest
+        non-trump" / "5 highest trump" match real play, not a hand-rolled
+        order. Deterministic (no np.random) — rule-based must stay a
+        reproducible paired-eval benchmark.
         '''
         hand = raw_obs['hand']
         trump_suit = raw_obs['trump_suit']
-        
-        # If done discarding is an option and we have 5 cards, we're done
-        if 16 in legal_actions and len(hand) == 5:
-            return 16
-        
-        # Assign values to cards
-        card_values = {}
-        for i, card in enumerate(hand):
-            value = 0
-            
-            # Keep trump cards
-            if card.suit == trump_suit:
-                value += 10
-                
-                # High trump cards are valuable
-                if card.rank == '5':
-                    value += 10
-                elif card.rank == 'J':
-                    value += 8
-                elif card.rank == 'A':
-                    value += 6
-                elif card.rank == 'K':
-                    value += 4
-                elif card.rank == 'Q':
-                    value += 2
-            else:
-                # Non-trump high cards
-                if card.rank == '5':
-                    value += 5
-                elif card.rank == 'A':
-                    value += 4
-                elif card.rank == 'K':
-                    value += 2
-                elif card.rank == 'Q':
-                    value += 1
-                    
-            card_values[i] = value
-        
-        # Discard the lowest value card
-        if not card_values:
-            return min(legal_actions.keys())
-        worst_card_idx = min(card_values, key=card_values.get)
-        if worst_card_idx in legal_actions:
-            return worst_card_idx
 
-        # If no suitable action found, take a random legal action
-        # Deterministic fallback: rule-based must be a reproducible
-        # benchmark for the paired eval (global np.random was never seeded).
+        def is_trump(card):
+            return card.suit == trump_suit or (card.rank == 'A' and card.suit == 'H')
+
+        non_trump = [i for i, c in enumerate(hand) if not is_trump(c)]
+        trump = [i for i, c in enumerate(hand) if is_trump(c)]
+
+        # 1. Discard the weakest non-trump still in hand.
+        if non_trump:
+            non_trump.sort(key=lambda i: (get_card_rank(hand[i], trump_suit), i))
+            for i in non_trump:
+                if i in legal_actions:
+                    return i
+
+        # 2. Only trump left: if holding more than 5, shed the weakest
+        #    until exactly the 5 highest-ranked remain.
+        elif len(trump) > 5:
+            trump.sort(key=lambda i: (get_card_rank(hand[i], trump_suit), i))
+            for i in trump:  # weakest first
+                if i in legal_actions:
+                    return i
+
+        # 3. Nothing to throw (<=5 trump, no non-trump): done.
+        if 16 in legal_actions:
+            return 16
+
+        # Deterministic fallback (e.g. an index became illegal): never random.
         return min(legal_actions.keys())
     
     def _play_strategy(self, raw_obs, legal_actions):
