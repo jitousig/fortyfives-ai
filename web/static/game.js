@@ -108,7 +108,8 @@ function toggleDiscardSelection(index) {
 
 function startTrickAnimation(winnerIdx) {
   const slotIds = ['trick-south', 'trick-west', 'trick-north', 'trick-east'];
-  const winnerEl = document.getElementById(slotIds[winnerIdx]);
+  const handIds = ['south-hand', 'west-hand', 'north-hand', 'east-hand'];
+  const winnerEl = document.getElementById(handIds[winnerIdx]);
   if (!winnerEl) return;
 
   const wr = winnerEl.getBoundingClientRect();

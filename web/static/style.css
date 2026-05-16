@@ -35,7 +35,7 @@ body {
 }
 
 .side-zone {
-  max-width: 110px;
+  max-width: 138px;
 }
 
 .player-label {
@@ -87,13 +87,13 @@ body {
 }
 
 .human-hand {
-  min-height: 90px;
+  min-height: 148px;
 }
 
 /* ── Middle row ── */
 #middle-row {
   display: grid;
-  grid-template-columns: 110px 1fr 110px;
+  grid-template-columns: 138px 1fr 138px;
   align-items: center;
   gap: 8px;
 }
@@ -121,8 +121,8 @@ body {
 }
 
 .trick-slot {
-  min-width: 58px;
-  min-height: 84px;
+  min-width: 96px;
+  min-height: 138px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,8 +158,8 @@ body {
 
 /* ══════════════════ CARDS ══════════════════ */
 .card {
-  width: 58px;
-  height: 84px;
+  width: 96px;
+  height: 138px;
   background: #fff;
   border-radius: 6px;
   border: 1px solid #bbb;
@@ -181,16 +181,16 @@ body {
 
 .card-corner {
   position: absolute;
-  font-size: 11px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.1;
   text-align: left;
 }
-.card-corner.tl { top: 3px; left: 5px; }
-.card-corner.br { bottom: 3px; right: 5px; transform: rotate(180deg); }
+.card-corner.tl { top: 4px; left: 6px; }
+.card-corner.br { bottom: 4px; right: 6px; transform: rotate(180deg); }
 
 .card-mid {
-  font-size: 24px;
+  font-size: 40px;
   line-height: 1;
 }
 
@@ -204,6 +204,14 @@ body {
     );
   border: 2px solid #7986cb;
   color: transparent;
+}
+
+/* Opponent hands — face-down cards don't need to be large */
+#north-hand .card,
+#west-hand .card,
+#east-hand .card {
+  width: 52px;
+  height: 72px;
 }
 
 /* Playable (human can click) */
@@ -230,8 +238,8 @@ body {
 
 /* Empty trick slot */
 .trick-slot-empty {
-  width: 58px;
-  height: 84px;
+  width: 96px;
+  height: 138px;
   border: 2px dashed rgba(255,255,255,0.18);
   border-radius: 6px;
 }
