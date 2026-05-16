@@ -10,6 +10,7 @@ const PLAYER_NAMES = ['You', 'West', 'North', 'East'];
 
 let ws = null;
 let state = null;
+let discardSelections = new Set();
 
 // ── Connection ──
 
@@ -23,6 +24,9 @@ function connect() {
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
     if (data.type === 'state') {
+      if (!state || state.phase !== data.phase || data.game_over) {
+        discardSelections.clear();
+      }
       state = data;
       render();
     } else if (data.type === 'error') {
@@ -44,6 +48,7 @@ function sendAction(action) {
 }
 
 function newGame() {
+  discardSelections.clear();
   document.getElementById('overlay').classList.remove('visible');
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: 'new_game' }));
@@ -76,6 +81,28 @@ function cardBackHTML() {
 
 function emptySlotHTML() {
   return '<div class="trick-slot-empty"></div>';
+}
+
+function toggleDiscardSelection(index) {
+  if (discardSelections.has(index)) {
+    discardSelections.delete(index);
+  } else {
+    discardSelections.add(index);
+  }
+  renderHands();
+  renderActions();
+}
+
+function confirmDiscards() {
+  const sorted = [...discardSelections].sort((a, b) => b - a);
+  const willHave = state.hand.length - sorted.length;
+  discardSelections.clear();
+  for (const idx of sorted) {
+    sendAction(idx);
+  }
+  if (willHave <= 5) {
+    sendAction(16); // DISCARD_DONE
+  }
 }
 
 // ── Main render ──
@@ -140,9 +167,19 @@ function renderHands() {
   const myTurn = state.is_human_turn;
 
   state.hand.forEach((cs, i) => {
-    const isCardAction = (ph === PHASE.GAMEPLAY || ph === PHASE.DISCARD);
-    const playable = myTurn && isCardAction && legal.includes(i);
-    el.innerHTML += cardHTML(cs, playable, i);
+    if (ph === PHASE.DISCARD && myTurn && legal.includes(i)) {
+      const selected = discardSelections.has(i);
+      const { rank, sym, red } = cardStr(cs);
+      const cls = ['card', red ? 'red' : '', 'playable', selected ? 'selected-discard' : ''].filter(Boolean).join(' ');
+      el.innerHTML += `<div class="${cls}" onclick="toggleDiscardSelection(${i})" title="${rank}${sym}">
+        <div class="card-corner tl">${rank}<br>${sym}</div>
+        <div class="card-mid">${sym}</div>
+        <div class="card-corner br">${rank}<br>${sym}</div>
+      </div>`;
+    } else {
+      const playable = myTurn && ph === PHASE.GAMEPLAY && legal.includes(i);
+      el.innerHTML += cardHTML(cs, playable, i);
+    }
   });
 }
 
@@ -298,13 +335,17 @@ function renderActions() {
       ).join('');
 
   } else if (state.phase === PHASE.DISCARD) {
-    const parts = [];
-    if (legal.includes(16)) {
-      parts.push(`<button class="action-btn btn-done" onclick="sendAction(16)">Done Discarding</button>`);
+    if (discardSelections.size > 0) {
+      const willHave = state.hand.length - discardSelections.size;
+      const label = willHave <= 5
+        ? `Discard ${discardSelections.size} & Done`
+        : `Discard ${discardSelections.size} Selected`;
+      el.innerHTML = `<button class="action-btn btn-discard-confirm" onclick="confirmDiscards()">${label}</button>`;
+    } else if (legal.includes(16)) {
+      el.innerHTML = `<button class="action-btn btn-done" onclick="sendAction(16)">Done Discarding</button>`;
     } else {
-      parts.push('<span class="phase-prompt">Click cards to discard</span>');
+      el.innerHTML = '<span class="phase-prompt">Select cards to discard</span>';
     }
-    el.innerHTML = parts.join('');
 
   } else if (state.phase === PHASE.GAMEPLAY) {
     el.innerHTML = '<span class="phase-prompt">Click a highlighted card to play</span>';

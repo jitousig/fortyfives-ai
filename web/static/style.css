@@ -218,6 +218,16 @@ body {
   box-shadow: 0 0 18px rgba(253,216,53,0.95);
 }
 
+.card.selected-discard {
+  border: 2px solid #ef5350;
+  box-shadow: 0 0 14px rgba(239,83,80,0.9);
+  transform: translateY(-14px);
+}
+.card.selected-discard:hover {
+  transform: translateY(-18px);
+  box-shadow: 0 0 22px rgba(239,83,80,1);
+}
+
 /* Empty trick slot */
 .trick-slot-empty {
   width: 58px;
@@ -244,7 +254,8 @@ body {
 .btn-pass     { background: #616161; color: #fff; }
 .btn-bid      { background: #1565c0; color: #fff; }
 .btn-hold     { background: #2e7d32; color: #fff; }
-.btn-done     { background: #e65100; color: #fff; }
+.btn-done             { background: #e65100; color: #fff; }
+.btn-discard-confirm  { background: #c62828; color: #fff; }
 .btn-spades   { background: #212121; color: #fff; }
 .btn-hearts   { background: #c62828; color: #fff; }
 .btn-diamonds { background: #b71c1c; color: #fff; }

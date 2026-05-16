@@ -25,6 +25,17 @@ pip install -e .
 
 The project requires Python 3.6+, RLCard (>=1.0.7), NumPy, and Matplotlib.
 
+## Running the Web GUI
+
+The web GUI requires FastAPI and uvicorn. These live in the shared venv at `../fortyfives/fortyfives_env/`. `uvicorn` is not on the system PATH, so activate the venv first:
+
+```bash
+source ../fortyfives/fortyfives_env/bin/activate
+uvicorn web.server:app --reload --port 8000
+```
+
+Then open http://localhost:8000 in a browser.
+
 ## Testing
 
 Run all tests:
