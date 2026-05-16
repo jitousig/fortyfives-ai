@@ -48,14 +48,21 @@ class RuleBasedAgent:
         elif phase == 2:
             return self._choose_trump(raw_obs, state['legal_actions'])
         
-        # Phase 3: Discarding
+        # Phase 3/4: strategy works in GAME id / hand-index space (that is
+        # what raw_legal_actions and raw_obs['hand'] use). env.step expects
+        # ENV ids, so convert: play/discard card k -> k+9, DISCARD_DONE
+        # (game 16) -> env 17. Passing state['legal_actions'] (ENV ids 9..)
+        # here made every membership test fail and silently fell back to
+        # min-legal — the play/discard heuristics never ran. See memory
+        # project-action-space-bug.
         elif phase == 3:
-            return self._discard_strategy(raw_obs, state['legal_actions'])
-        
-        # Phase 4: Gameplay
+            g = self._discard_strategy(raw_obs, state['raw_legal_actions'])
+            return 17 if g == 16 else g + 9
+
         elif phase == 4:
-            return self._play_strategy(raw_obs, state['legal_actions'])
-        
+            g = self._play_strategy(raw_obs, state['raw_legal_actions'])
+            return g + 9
+
         # Default: deterministic fallback (see note on benchmark determinism)
         return min(state['legal_actions'].keys())
     
@@ -176,8 +183,9 @@ class RuleBasedAgent:
         if 16 in legal_actions:
             return 16
 
-        # Deterministic fallback (e.g. an index became illegal): never random.
-        return min(legal_actions.keys())
+        # Deterministic fallback (e.g. an index became illegal): never
+        # random. raw_legal_actions is a list of game ids.
+        return min(legal_actions)
     
     def _play_strategy(self, raw_obs, legal_actions):
         '''

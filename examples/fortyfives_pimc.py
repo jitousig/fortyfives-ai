@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""
+Perfect-Information Monte Carlo (PIMC) play agent for Fortyfives.
+
+Categorically different from the DQN line (no training): at each phase-4
+decision it samples N consistent worlds for the hidden hands, plays each
+legal card to the end of the hand under a fast heuristic playout, and
+picks the card with the best mean (our-team minus opp-team) points under
+this engine's scoring (5/trick + 5/high). This is the standard strong
+approach for trick-taking card games and sidesteps the rule-based
+plateau entirely.
+
+v1 scope / known approximations (measured empirically, not assumed):
+  - Determinization is unconstrained (does not yet infer opponent voids
+    from earlier "couldn't follow suit" information).
+  - The deep playout uses an approximate legality model (must-follow +
+    trump-always-legal); the AGENT's own top-level choice uses the
+    engine's true legal_actions, so real renege rules are respected
+    where it matters most.
+Both are deliberate v1 simplifications; tighten if v1 shows signal.
+
+Usage: it's a drop-in play agent for play_eval.
+    from fortyfives_pimc import PIMCAgent
+    from play_eval import evaluate_paired
+    evaluate_paired(PIMCAgent(num_actions=18, n_worlds=20), num_hands=300)
+"""
+
+import os
+import sys
+
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if sys.path[0] != _REPO_ROOT:
+    sys.path.insert(0, _REPO_ROOT)
+
+import numpy as np
+
+from fortyfives.games.fortyfives.card import (
+    SUITS, RANKS, FortyfivesCard, get_card_rank,
+)
+
+# All 52 cards, indexable by (rank, suit). FortyfivesCard(card_id) with
+# card_id = suit_index*13 + rank_index.
+_DECK = [FortyfivesCard(i) for i in range(52)]
+_BY_RS = {(c.rank, c.suit): c for c in _DECK}
+
+
+def _is_trump(card, trump):
+    """A♥ is always trump in this game, regardless of declared suit."""
+    return card.suit == trump or (card.rank == 'A' and card.suit == 'H')
+
+
+def _trick_winner(plays, lead_suit, trump):
+    """plays: {seat: card} for the 4 cards of a completed trick.
+    Trump (incl. A♥) beats all; else only lead-suit cards can win;
+    ties impossible (unique cards). Returns the winning seat."""
+    trumps = {s: c for s, c in plays.items() if _is_trump(c, trump)}
+    pool = trumps if trumps else {
+        s: c for s, c in plays.items() if c.suit == lead_suit
+    }
+    return max(pool, key=lambda s: get_card_rank(pool[s], trump))
+
+
+def _rollout_legal(hand, lead_suit, trump):
+    """Approx legality for the deep playout: must follow the lead suit if
+    able, but trump is always allowed (this game permits reneging). When
+    leading, anything goes."""
+    if lead_suit is None:
+        return list(hand)
+    follow = [c for c in hand if c.suit == lead_suit]
+    if not follow:
+        return list(hand)
+    trumps = [c for c in hand if _is_trump(c, trump)]
+    # follow ∪ trump, de-duplicated, stable order
+    seen, legal = set(), []
+    for c in follow + trumps:
+        key = (c.rank, c.suit)
+        if key not in seen:
+            seen.add(key)
+            legal.append(c)
+    return legal
+
+
+def _rollout_pick(hand, trick, lead_suit, trump):
+    """Fast competent policy: play the cheapest card that currently wins
+    the trick; if none can win, dump the lowest card."""
+    legal = _rollout_legal(hand, lead_suit, trump)
+    legal.sort(key=lambda c: get_card_rank(c, trump))  # low -> high
+    if not trick:
+        return legal[0]  # leading: lead the lowest (simple v1)
+    # current best in the partial trick
+    best_seat = _trick_winner(trick, lead_suit, trump) if len(trick) else None
+    best_rank = get_card_rank(trick[best_seat], trump) if best_seat is not None else -1
+    for c in legal:  # cheapest first
+        beats = _is_trump(c, trump) or c.suit == lead_suit
+        if beats and get_card_rank(c, trump) > best_rank:
+            return c
+    return legal[0]  # cannot win -> dump lowest
+
+
+def _simulate(hands, leader, trump, our_parity, partial=None, partial_lead=None):
+    """Play out the rest of the hand. hands: {seat:[cards]}. leader leads
+    the next (or current) trick. partial: {seat:card} cards already in the
+    current trick (in play order from `leader`); partial_lead its lead
+    suit. Returns our_team_points - opp_team_points (5/trick + 5/high)."""
+    tricks = [0, 0, 0, 0]
+    best_trump_seat, best_trump_val = None, -1
+
+    cur_lead = leader
+    while any(hands.values()):
+        trick = dict(partial) if partial else {}
+        lead_suit = partial_lead
+        # play order: lead, lead+1, lead+2, lead+3, skipping seats that
+        # already contributed to a carried-in partial trick
+        order = [(cur_lead + i) % 4 for i in range(4)]
+        for seat in order:
+            if seat in trick:
+                continue
+            if not hands[seat]:
+                continue
+            if lead_suit is None and not trick:
+                card = _rollout_pick(hands[seat], {}, None, trump)
+                lead_suit = card.suit
+            else:
+                card = _rollout_pick(hands[seat], trick, lead_suit, trump)
+            hands[seat].remove(card)
+            trick[seat] = card
+            tv = get_card_rank(card, trump)
+            if _is_trump(card, trump) and tv > best_trump_val:
+                best_trump_val, best_trump_seat = tv, seat
+        partial, partial_lead = None, None  # consumed
+        w = _trick_winner(trick, lead_suit, trump)
+        tricks[w] += 1
+        cur_lead = w
+
+    our = sum(tricks[s] for s in range(4) if s % 2 == our_parity)
+    opp = sum(tricks[s] for s in range(4) if s % 2 != our_parity)
+    our_pts = 5 * our + (5 if (best_trump_seat is not None and
+                               best_trump_seat % 2 == our_parity) else 0)
+    opp_pts = 5 * opp + (5 if (best_trump_seat is not None and
+                               best_trump_seat % 2 != our_parity) else 0)
+    return our_pts - opp_pts
+
+
+class PIMCAgent:
+    def __init__(self, num_actions=18, n_worlds=20, seed=0):
+        self.num_actions = num_actions
+        self.n_worlds = n_worlds
+        self.use_raw = True
+        self._rng = np.random.RandomState(seed)
+
+    # --- helpers ---------------------------------------------------------
+    def _seen(self, hand, current_trick, trick_history):
+        seen = {(c.rank, c.suit) for c in hand}
+        for c in current_trick:
+            if c is not None:
+                seen.add((c.rank, c.suit))
+        for tr in (trick_history or []):
+            for c in tr:
+                if c is not None:
+                    seen.add((c.rank, c.suit))
+        return seen
+
+    def _determinize(self, seen, sizes):
+        """sizes: {seat: n}. Deal unseen cards to those seats."""
+        unseen = [_BY_RS[k] for k in _BY_RS if k not in seen]
+        self._rng.shuffle(unseen)
+        out, i = {}, 0
+        for seat, n in sizes.items():
+            out[seat] = unseen[i:i + n]
+            i += n
+        return out
+
+    # --- agent API -------------------------------------------------------
+    def step(self, state):
+        raw = state['raw_obs']
+        # Work in GAME id / hand-index space; env.step expects ENV ids
+        # (play card k -> k+9). Using state['legal_actions'] (ENV ids)
+        # here was the same bug that made rule-based fall back to
+        # min-legal. See memory project-action-space-bug.
+        raw_legal = list(state.get('raw_legal_actions') or [])
+        if raw.get('phase') != 4 or not raw_legal:
+            env_legal = list(state['legal_actions'].keys())
+            return min(env_legal) if env_legal else 0
+
+        hand = raw['hand']
+        trump = raw['trump_suit']
+        our = raw['current_player']
+        our_parity = our % 2
+        ct = raw['current_trick']
+        played = {s: c for s, c in enumerate(ct) if c is not None}
+        k = len(played)
+        leader = (our - k) % 4
+        lead_suit = ct[leader].suit if k > 0 else None
+        t = len(raw.get('trick_history') or [])
+
+        sizes = {}
+        for s in range(4):
+            if s == our:
+                continue
+            sizes[s] = (5 - t) - (1 if ct[s] is not None else 0)
+
+        # raw_legal entries are game card indices into the hand. Evaluate
+        # each by PIMC; return the ENV id (game index + 9).
+        best_action, best_score = sorted(raw_legal)[0], -1e9
+        for a in sorted(raw_legal):
+            if not (0 <= a < len(hand)):
+                continue
+            cand = hand[a]
+            total = 0.0
+            for _ in range(self.n_worlds):
+                opp = self._determinize(self._seen(hand, ct, raw.get('trick_history')),
+                                        sizes)
+                hands = {our: [c for c in hand if (c.rank, c.suit) != (cand.rank, cand.suit)]}
+                hands.update({s: list(cs) for s, cs in opp.items()})
+                # carry the in-progress trick + our just-played card
+                partial = dict(played)
+                partial[our] = cand
+                p_lead = lead_suit if lead_suit is not None else cand.suit
+                # after we play, the trick continues from our+1; once it
+                # completes _simulate computes the winner and continues.
+                total += _simulate(hands, leader, trump, our_parity,
+                                   partial=partial, partial_lead=p_lead)
+            score = total / self.n_worlds
+            if score > best_score:
+                best_score, best_action = score, a
+        return best_action + 9  # game card index -> env play id
+
+    def eval_step(self, state):
+        return self.step(state), {}
