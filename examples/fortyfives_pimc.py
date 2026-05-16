@@ -38,6 +38,9 @@ from fortyfives.games.fortyfives.card import (
     SUITS, RANKS, FortyfivesCard, get_card_rank,
 )
 
+sys.path.insert(0, os.path.dirname(__file__))
+from fortyfives_rule_based import RuleBasedAgent  # rollout policy (lever 3)
+
 # All 52 cards, indexable by (rank, suit). FortyfivesCard(card_id) with
 # card_id = suit_index*13 + rank_index.
 _DECK = [FortyfivesCard(i) for i in range(52)]
@@ -80,14 +83,13 @@ def _rollout_legal(hand, lead_suit, trump):
     return legal
 
 
-def _rollout_pick(hand, trick, lead_suit, trump):
-    """Fast competent policy: play the cheapest card that currently wins
-    the trick; if none can win, dump the lowest card."""
+def _cheap_pick(hand, trick, order_cards, lead_suit, trump):
+    """v1/v2 fast policy: cheapest card that currently wins the trick;
+    else dump the lowest. (order_cards unused; uniform signature.)"""
     legal = _rollout_legal(hand, lead_suit, trump)
     legal.sort(key=lambda c: get_card_rank(c, trump))  # low -> high
     if not trick:
         return legal[0]  # leading: lead the lowest (simple v1)
-    # current best in the partial trick
     best_seat = _trick_winner(trick, lead_suit, trump) if len(trick) else None
     best_rank = get_card_rank(trick[best_seat], trump) if best_seat is not None else -1
     for c in legal:  # cheapest first
@@ -97,11 +99,39 @@ def _rollout_pick(hand, trick, lead_suit, trump):
     return legal[0]  # cannot win -> dump lowest
 
 
-def _simulate(hands, leader, trump, our_parity, partial=None, partial_lead=None):
-    """Play out the rest of the hand. hands: {seat:[cards]}. leader leads
-    the next (or current) trick. partial: {seat:card} cards already in the
-    current trick (in play order from `leader`); partial_lead its lead
-    suit. Returns our_team_points - opp_team_points (5/trick + 5/high)."""
+def _rb_pick_factory(rb):
+    """Lever 3: use the (fixed, competent) rule-based play strategy as
+    the playout policy. _play_strategy infers led suit from the FIRST
+    entry of current_trick, so pass cards in PLAY ORDER (leader first),
+    NOT seat-indexed — then empty => leading, else first = leader's
+    card => correct led suit. Returns a closure with the uniform
+    pick signature."""
+    def pick(hand, trick, order_cards, lead_suit, trump):
+        legal = _rollout_legal(hand, lead_suit, trump)
+        legal_keys = {(c.rank, c.suit) for c in legal}
+        legal_idx = {i for i, c in enumerate(hand)
+                     if (c.rank, c.suit) in legal_keys}
+        raw_obs = {'hand': hand,
+                   'current_trick': list(order_cards),
+                   'trump_suit': trump}
+        try:
+            choice = rb._play_strategy(raw_obs, legal_idx)
+        except Exception:
+            choice = None
+        if choice is None or not (0 <= choice < len(hand)) or choice not in legal_idx:
+            legal.sort(key=lambda c: get_card_rank(c, trump))
+            return legal[0]
+        return hand[choice]
+    return pick
+
+
+def _simulate(hands, leader, trump, our_parity, pick,
+              partial=None, partial_lead=None):
+    """Play out the rest of the hand with playout policy `pick`
+    (signature: hand, trick_by_seat, order_cards, lead_suit, trump ->
+    card). hands: {seat:[cards]}. partial: {seat:card} already in the
+    current trick; partial_lead its lead suit. Returns our_team_points
+    - opp_team_points (5/trick + 5/high)."""
     tricks = [0, 0, 0, 0]
     best_trump_seat, best_trump_val = None, -1
 
@@ -109,21 +139,22 @@ def _simulate(hands, leader, trump, our_parity, partial=None, partial_lead=None)
     while any(hands.values()):
         trick = dict(partial) if partial else {}
         lead_suit = partial_lead
-        # play order: lead, lead+1, lead+2, lead+3, skipping seats that
-        # already contributed to a carried-in partial trick
         order = [(cur_lead + i) % 4 for i in range(4)]
+        # cards already in the carried partial, in play order (leader first)
+        order_cards = [partial[s] for s in order if partial and s in partial]
         for seat in order:
             if seat in trick:
                 continue
             if not hands[seat]:
                 continue
             if lead_suit is None and not trick:
-                card = _rollout_pick(hands[seat], {}, None, trump)
+                card = pick(hands[seat], {}, [], None, trump)
                 lead_suit = card.suit
             else:
-                card = _rollout_pick(hands[seat], trick, lead_suit, trump)
+                card = pick(hands[seat], trick, order_cards, lead_suit, trump)
             hands[seat].remove(card)
             trick[seat] = card
+            order_cards.append(card)
             tv = get_card_rank(card, trump)
             if _is_trump(card, trump) and tv > best_trump_val:
                 best_trump_val, best_trump_seat = tv, seat
@@ -142,7 +173,8 @@ def _simulate(hands, leader, trump, our_parity, partial=None, partial_lead=None)
 
 
 class PIMCAgent:
-    def __init__(self, num_actions=18, n_worlds=20, seed=0, constrained=True):
+    def __init__(self, num_actions=18, n_worlds=20, seed=0,
+                 constrained=True, rollout='cheap'):
         self.num_actions = num_actions
         self.n_worlds = n_worlds
         # v2 lever 1: constrain determinization by inferred opponent
@@ -151,6 +183,14 @@ class PIMCAgent:
         # this game, so an off-suit sluff is a hard void). constrained=
         # False reproduces v1 exactly for a single-variable A/B.
         self.constrained = constrained
+        # v2 lever 3: playout policy. 'cheap' = v1/v2 win-or-dump
+        # heuristic; 'rulebased' = the fixed competent rule-based play
+        # strategy as the rollout policy (single-variable vs v2).
+        self.rollout = rollout
+        if rollout == 'rulebased':
+            self._pick = _rb_pick_factory(RuleBasedAgent(num_actions))
+        else:
+            self._pick = _cheap_pick
         self.use_raw = True
         self._rng = np.random.RandomState(seed)
 
@@ -281,6 +321,7 @@ class PIMCAgent:
                 # after we play, the trick continues from our+1; once it
                 # completes _simulate computes the winner and continues.
                 total += _simulate(hands, leader, trump, our_parity,
+                                   self._pick,
                                    partial=partial, partial_lead=p_lead)
             score = total / self.n_worlds
             if score > best_score:
