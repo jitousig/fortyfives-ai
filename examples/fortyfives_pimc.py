@@ -142,9 +142,15 @@ def _simulate(hands, leader, trump, our_parity, partial=None, partial_lead=None)
 
 
 class PIMCAgent:
-    def __init__(self, num_actions=18, n_worlds=20, seed=0):
+    def __init__(self, num_actions=18, n_worlds=20, seed=0, constrained=True):
         self.num_actions = num_actions
         self.n_worlds = n_worlds
+        # v2 lever 1: constrain determinization by inferred opponent
+        # voids (a seat that played a non-lead, non-trump card had no
+        # card of the lead suit — reneging is only legal via trump in
+        # this game, so an off-suit sluff is a hard void). constrained=
+        # False reproduces v1 exactly for a single-variable A/B.
+        self.constrained = constrained
         self.use_raw = True
         self._rng = np.random.RandomState(seed)
 
@@ -160,9 +166,63 @@ class PIMCAgent:
                     seen.add((c.rank, c.suit))
         return seen
 
-    def _determinize(self, seen, sizes):
-        """sizes: {seat: n}. Deal unseen cards to those seats."""
+    def _voids(self, raw, trump, cur_leader):
+        """Infer hard suit voids. A seat that played a card that is
+        neither the lead suit nor trump (A♥ counts as trump) had no
+        lead-suit card — a real void from that trick onward. Trump plays
+        are inconclusive (always legal). Reconstruct each completed
+        trick's leader from highest_bidder (trick 0) then trick_winners.
+        Returns {seat: set(void_suits)}."""
+        voids = {s: set() for s in range(4)}
+
+        def scan(trick, leader):
+            if leader is None or leader >= len(trick) or trick[leader] is None:
+                return
+            lead = trick[leader].suit
+            for s, c in enumerate(trick):
+                if c is None or s == leader:
+                    continue
+                if c.suit != lead and not _is_trump(c, trump):
+                    voids[s].add(lead)
+
+        hb = raw.get('highest_bidder')
+        winners = list(raw.get('trick_winners') or [])
+        history = list(raw.get('trick_history') or [])
+        lead0 = (hb + 1) % 4 if hb is not None else None
+        for ti, tr in enumerate(history):
+            leader = lead0 if ti == 0 else (
+                winners[ti - 1] if ti - 1 < len(winners) else None)
+            scan(tr, leader)
+        # in-progress trick (leader reconstructed locally in step())
+        cur = raw.get('current_trick')
+        if cur and any(c is not None for c in cur):
+            scan(cur, cur_leader)
+        return voids
+
+    def _determinize(self, seen, sizes, voids=None):
+        """sizes: {seat: n}. Deal unseen cards to those seats. If voids
+        given, never deal a seat a card of a suit it is void in. Greedy
+        with reshuffled retries; falls back to unconstrained if the
+        sample is over-constrained (rare)."""
         unseen = [_BY_RS[k] for k in _BY_RS if k not in seen]
+        if voids:
+            for _ in range(8):
+                self._rng.shuffle(unseen)
+                pool, out, ok = list(unseen), {}, True
+                for seat, n in sizes.items():
+                    vs = voids.get(seat, ())
+                    picked, rest = [], []
+                    for c in pool:
+                        if len(picked) < n and c.suit not in vs:
+                            picked.append(c)
+                        else:
+                            rest.append(c)
+                    if len(picked) < n:
+                        ok = False
+                        break
+                    out[seat], pool = picked, rest
+                if ok:
+                    return out
         self._rng.shuffle(unseen)
         out, i = {}, 0
         for seat, n in sizes.items():
@@ -199,6 +259,9 @@ class PIMCAgent:
                 continue
             sizes[s] = (5 - t) - (1 if ct[s] is not None else 0)
 
+        voids = self._voids(raw, trump, leader) if self.constrained else None
+        seen = self._seen(hand, ct, raw.get('trick_history'))
+
         # raw_legal entries are game card indices into the hand. Evaluate
         # each by PIMC; return the ENV id (game index + 9).
         best_action, best_score = sorted(raw_legal)[0], -1e9
@@ -208,8 +271,7 @@ class PIMCAgent:
             cand = hand[a]
             total = 0.0
             for _ in range(self.n_worlds):
-                opp = self._determinize(self._seen(hand, ct, raw.get('trick_history')),
-                                        sizes)
+                opp = self._determinize(seen, sizes, voids)
                 hands = {our: [c for c in hand if (c.rank, c.suit) != (cand.rank, cand.suit)]}
                 hands.update({s: list(cs) for s, cs in opp.items()})
                 # carry the in-progress trick + our just-played card
