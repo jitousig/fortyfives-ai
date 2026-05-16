@@ -201,9 +201,46 @@ Card evaluation uses `get_card_rank()` in card.py—modify this for ranking chan
 
 ## Important Notes
 
-- **State Representation**: Game state is converted to fixed-size vectors for RL (267 features). Changing state representation requires updates to `FortyfivesEnv._get_observation()`.
+- **State Representation**: Game state is a fixed-size vector (`state_shape`, currently 295) built by `FortyfivesEnv._get_observation()`. Non-card features are based at `52*5` (after the 5 card blocks); see invariants below before changing it.
 - **Action Space**: 18 actions total (5 bid + 4 trump + 8 card play + 1 done). Actions are phase-dependent; illegal actions are filtered by `_get_legal_actions()`.
 - **Random Seeding**: Use `env.seed()` for reproducible games; `game.np_random` controls shuffling.
 - **Partnership Structure**: Always players 0/2 (North/South) vs 1/3 (East/West); hardcoded in payoff calculation.
 - **Kitty Management**: 3 cards dealt to kitty; highest bidder gets them and must discard back to ≤5 cards.
+
+## Hard-Won Invariants — READ BEFORE TOUCHING `fortyfives/` OR `examples/play_eval.py`
+
+A long debugging session produced confident but **completely false** conclusions
+because the measurement was silently broken. These invariants exist so that
+never happens again. Treat a violation as "stop everything," not "investigate later."
+
+### 1. Import shadowing (silent and severe)
+`python examples/<script>.py` puts `examples/` on `sys.path[0]`, so bare
+`import fortyfives` resolves to the **editable install in the shared venv**,
+which points at the SIBLING repo `../fortyfives`, NOT this repo's package.
+- The trainer/eval scripts prepend this repo's root to `sys.path[0]` to fix this. Do **not** remove that shim.
+- Do **not** `pip install -e .` from this repo into the shared venv (breaks the sibling project).
+- Before trusting ANY engine/env edit: confirm `fortyfives.__file__` resolves under `.../fortyfives-rl-training/` (or check `env.state_shape == 295`).
+
+### 2. Evaluation canary (run after every env/eval change)
+`play_eval.evaluate_paired(RuleBasedAgent(18))` (agent == baseline) MUST return
+**diff 0.0000 / win 0.0%** — pure ties. If not, the eval is not actually paired
+and every number it produces is noise. The rule-based agent MUST stay
+deterministic (no `np.random`; use `min(legal_actions)` tie-break) because
+`env.seed()` only seeds the dealer, never the global RNG.
+
+### 3. Yardstick (how to judge an agent)
+Trust `avg_diff` from `evaluate_paired` with its paired CI; ignore raw/unpaired
+point means. Reference points: **random-legal ≈ −0.50, rule-based = 0.00.**
+"Better than rule-based" = `avg_diff` significantly > 0 (CI excludes 0).
+
+### 4. Observation correctness
+Non-card features start at `52*5` (=260), AFTER hand + 4 trick-card blocks
+(0..259). Basing them at `52*4` collides with the 4th trick card and corrupts
+phase/trump. The observation MUST encode trump suit and lead suit (decisive for
+every play decision). New features go past 259; bump `state_shape` to match.
+
+### 5. Process
+One change at a time, `git commit` per change, **plan-first** for non-trivial
+work, and re-run invariant #2 after any `env`/`eval` edit. A result you cannot
+trust is worse than no result.
 
