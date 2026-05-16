@@ -83,17 +83,27 @@ class TrainConfig:
     epsilon_end: float = 0.05
     epsilon_decay_steps: int = 30000
 
-    # Reward shaping. The dominant signal is the bid OUTCOME: in 45s the
-    # bidding team must reach its bid or get "set" — grabbing tricks is not
-    # the objective. So bid make/miss is the largest term, raw point delta a
-    # secondary gradient, and per-trick shaping only a small dense aux to
-    # help early credit assignment.
+    # Reward shaping. NOTE the engine scores flat 5 points/trick + 5 for
+    # "high" (single highest trump in the hand), NOT real 45s card-capture
+    # (see memory project-scoring-rule). So winning tricks IS the objective
+    # and every trick is worth an equal 1/6 of a 30 bid.
+    #   reward_mode='legacy'      : original (flat per-trick + trump-5/J/A
+    #                               honor bonuses that the engine never
+    #                               actually scores) — kept for baseline
+    #                               reproducibility (sp_v1/sp_v2).
+    #   reward_mode='points_true' : drop the misaligned honor bonuses; the
+    #                               per-trick term is the only dense signal
+    #                               and should be sized to its true ~1/6
+    #                               share so credit assignment over the
+    #                               5-trick hand is not drowned by the
+    #                               ±bid_outcome terminal.
+    reward_mode: str = 'legacy'
     bid_outcome_reward: float = 1.0   # +/- when our team makes/misses its bid
     point_reward_weight: float = 0.02 # scale on NS game-point delta this hand
     trick_reward: float = 0.02     # per trick won (+) or lost (-)
-    trump5_bonus: float = 0.03     # 5 of trump in completed trick
-    trumpJ_bonus: float = 0.02     # J of trump
-    trumpA_bonus: float = 0.01     # A of trump
+    trump5_bonus: float = 0.03     # 5 of trump in completed trick (legacy only)
+    trumpJ_bonus: float = 0.02     # J of trump (legacy only)
+    trumpA_bonus: float = 0.01     # A of trump (legacy only)
 
     @property
     def log_dir(self):
@@ -110,6 +120,12 @@ def compute_trick_reward(prev_tricks_won, game, cfg):
     winner = next(i for i in range(4) if curr[i] > prev_tricks_won[i])
     sign = 1.0 if winner in (0, 2) else -1.0
     reward = sign * cfg.trick_reward
+
+    # points_true: every trick is worth an equal 5 engine points; the
+    # trump-5/J/A "honor" bonuses reward cards the engine does not score,
+    # so they are pure misaligned noise here — omit them.
+    if getattr(cfg, 'reward_mode', 'legacy') == 'points_true':
+        return reward
 
     trump = game.trump_suit
     if trump and game.trick_history:
@@ -371,6 +387,8 @@ if __name__ == '__main__':
     parser.add_argument('--epsilon_start',    type=float, default=1.0)
     parser.add_argument('--epsilon_end',      type=float, default=0.05)
     parser.add_argument('--epsilon_decay_steps', type=int, default=30000)
+    parser.add_argument('--reward_mode', type=str, default='legacy',
+                        choices=['legacy', 'points_true'])
     parser.add_argument('--bid_outcome_reward',   type=float, default=1.0)
     parser.add_argument('--point_reward_weight',  type=float, default=0.02)
     parser.add_argument('--trick_reward',     type=float, default=0.02)

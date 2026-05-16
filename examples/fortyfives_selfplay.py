@@ -84,6 +84,9 @@ class SelfPlayConfig:
 
     # Trusted reward (mirrors fortyfives_play_phase defaults; the reward
     # FUNCTIONS themselves are imported, only the knobs live here).
+    # reward_mode: 'legacy' (sp_v1/sp_v2 baseline) | 'points_true' (drop
+    # the misaligned trump honor bonuses — see project-scoring-rule).
+    reward_mode: str = 'legacy'
     bid_outcome_reward: float = 1.0
     point_reward_weight: float = 0.02
     trick_reward: float = 0.02
@@ -374,6 +377,8 @@ if __name__ == '__main__':
     p.add_argument('--epsilon_start',   type=float, default=1.0)
     p.add_argument('--epsilon_end',     type=float, default=0.05)
     p.add_argument('--epsilon_decay_steps', type=int, default=30000)
+    p.add_argument('--reward_mode', type=str, default='legacy',
+                   choices=['legacy', 'points_true'])
     p.add_argument('--bid_outcome_reward',  type=float, default=1.0)
     p.add_argument('--point_reward_weight', type=float, default=0.02)
     p.add_argument('--trick_reward',    type=float, default=0.02)
