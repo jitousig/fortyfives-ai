@@ -11,6 +11,7 @@ const PLAYER_NAMES = ['You', 'West', 'North', 'East'];
 let ws = null;
 let state = null;
 let discardSelections = new Set();
+let trickAnimTimer = null;
 
 // ── Connection ──
 
@@ -27,8 +28,20 @@ function connect() {
       if (!state || state.phase !== data.phase || data.game_over) {
         discardSelections.clear();
       }
+      // Cancel any pending animation when a non-animating state arrives
+      if (!data.trick_animating && trickAnimTimer !== null) {
+        clearTimeout(trickAnimTimer);
+        trickAnimTimer = null;
+      }
       state = data;
       render();
+      if (data.trick_animating && data.last_trick_winner != null) {
+        const winner = data.last_trick_winner;
+        trickAnimTimer = setTimeout(() => {
+          trickAnimTimer = null;
+          startTrickAnimation(winner);
+        }, 2500);
+      }
     } else if (data.type === 'error') {
       console.warn('Server error:', data.error);
     }
@@ -91,6 +104,35 @@ function toggleDiscardSelection(index) {
   }
   renderHands();
   renderActions();
+}
+
+function startTrickAnimation(winnerIdx) {
+  const slotIds = ['trick-south', 'trick-west', 'trick-north', 'trick-east'];
+  const winnerEl = document.getElementById(slotIds[winnerIdx]);
+  if (!winnerEl) return;
+
+  const wr = winnerEl.getBoundingClientRect();
+  const targetX = wr.left + wr.width / 2;
+  const targetY = wr.top + wr.height / 2;
+
+  slotIds.forEach(slotId => {
+    const slot = document.getElementById(slotId);
+    if (!slot) return;
+    const card = slot.querySelector('.card');
+    if (!card) return;
+
+    const cr = card.getBoundingClientRect();
+    const dx = targetX - (cr.left + cr.width / 2);
+    const dy = targetY - (cr.top + cr.height / 2);
+
+    card.animate(
+      [
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${dx}px,${dy}px) scale(0.25)`, opacity: 0 },
+      ],
+      { duration: 1200, easing: 'ease-in', fill: 'forwards' }
+    );
+  });
 }
 
 function confirmDiscards() {

@@ -100,6 +100,9 @@ class FortyfivesGame:
         self.highest_trump_player = None  # Player who played the highest trump
         self.trick_history = None  # Keep track of completed tricks
         self.trick_winners = None  # Keep track of trick winners
+        self.last_completed_trick = None  # Last trick's cards by player index (persists across hands)
+        self.last_completed_trick_winner = None  # Winner of the last completed trick (persists across hands)
+        self.total_tricks_completed = 0  # Monotonic counter — never reset
         self.points = None  # Game points (partnerships: N/S and E/W)
         self.hand_points = None  # Points for current hand (partnerships: N/S and E/W)
         self.history = None  # History of actions
@@ -503,21 +506,19 @@ class FortyfivesGame:
                             # Only have high trumps, can play any card
                             return list(range(len(hand)))
                 else:
-                    # In normal play mode
-                    is_high_trump_led = (lead_card.suit == self.trump_suit and 
-                                         lead_card.rank in ['5', 'J']) or \
-                                        (lead_card.rank == 'A' and lead_card.suit == 'H')
-                    is_low_trump_led = (lead_card.suit == self.trump_suit and 
-                                        lead_card.rank not in ['5', 'J']) and \
-                                       not (lead_card.rank == 'A' and lead_card.suit == 'H')
-                    
-                    if is_high_trump_led:
-                        # If high trump was led, all trump cards must be played
-                        return trump_cards
-                    else:
-                        # In Nova Scotia 45s, when a low trump is led, any card can be played
-                        # This allows players to renege their high trumps
-                        return list(range(len(hand)))
+                    # Rank-based renege rule: a trump card may be held back only if it is
+                    # one of the top-3 trumps (rank ≥ 1001: 5, J, A♥) AND its rank
+                    # exceeds the rank of the led trump card.
+                    led_rank = get_card_rank(lead_card, self.trump_suit)
+                    must_play = [
+                        i for i in trump_cards
+                        if not (get_card_rank(hand[i], self.trump_suit) >= 1001 and
+                                get_card_rank(hand[i], self.trump_suit) > led_rank)
+                    ]
+                    if must_play:
+                        return must_play
+                    # All trump in hand are renegeable — can play any card
+                    return list(range(len(hand)))
             else:
                 # No trumps, can play any card
                 return list(range(len(hand)))
@@ -795,6 +796,11 @@ class FortyfivesGame:
             else:
                 print(f"Warning: Trick winner {player_names[self.trick_winner]} has no card! This is unexpected.")
         
+        # Persist last trick for UI display before clearing (survives hand resets)
+        self.last_completed_trick = self.current_trick.copy()
+        self.last_completed_trick_winner = self.trick_winner
+        self.total_tricks_completed += 1
+
         # Prepare for the next trick
         self.trick_count += 1
         self.trick_starter = self.trick_winner
