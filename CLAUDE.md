@@ -27,10 +27,10 @@ The project requires Python 3.6+, RLCard (>=1.0.7), NumPy, and Matplotlib.
 
 ## Running the Web GUI
 
-The web GUI requires FastAPI and uvicorn. These live in the shared venv at `../fortyfives/fortyfives_env/`. `uvicorn` is not on the system PATH, so activate the venv first:
+The web GUI requires FastAPI and uvicorn. These live in the shared venv at `../fortyfives-venv/` (a standalone venv, NOT inside any git worktree — Python 3.9.6). `uvicorn` is not on the system PATH, so activate the venv first:
 
 ```bash
-source ../fortyfives/fortyfives_env/bin/activate
+source ../fortyfives-venv/bin/activate
 uvicorn web.server:app --reload --port 8000
 ```
 
@@ -262,7 +262,7 @@ Environments map to **positions on the trunk, NOT to long-lived
 branches**. A persistent "dev"/UI branch deployed as an environment
 re-creates the divergence failure mode above — do not do it.
 - **Local**: `uvicorn web.server:app --reload` (venv:
-  `../fortyfives/fortyfives_env`). Primary UI dev loop — test most
+  `../fortyfives-venv`). Primary UI dev loop — test most
   changes here. Needing a deploy to see a change is a smell.
 - **Staging** = `main` HEAD. Render service `fortyfives-web-staging`,
   `autoDeploy: true` (deploys every merge to `main`). Integration
