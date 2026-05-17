@@ -35,8 +35,8 @@ ephemeral web-session container via git. Update the checkboxes as milestones lan
 - [x] **M1 Foundation** — viewport/meta, `dvh`+safe-area, touch tweaks,
   CSS-variable card-size refactor, breakpoint scaffold. Desktop unchanged;
   phone stops clipping. *(done)*
-- [ ] **M2 Portrait layout** — opponents strip, trick center, fanned hand,
-  bottom action bar.
+- [x] **M2 Portrait layout** — fixed top status bar, opponents as overlapped
+  strips, trick center, fanned hand, sticky bottom action bar. *(done)*
 - [ ] **M3 Log/score drawer** + status-bar polish.
 - [ ] **M4 PWA** — manifest, icons, service worker, iOS meta; FastAPI route so
   `sw.js` is served at root scope.
