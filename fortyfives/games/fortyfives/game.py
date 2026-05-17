@@ -340,8 +340,10 @@ class FortyfivesGame:
         # Always provide at least one action to avoid errors
         # This is a fallback for edge cases
         if not actions and self.phase == PHASE_AUCTION:
-            # In auction phase, we can always pass
-            actions = [BID_PASS]
+            # Fallback only for a player still in the auction; a player
+            # who has already passed is out and must not be re-prompted.
+            if not self.passed[self.current_player_id]:
+                actions = [BID_PASS]
         elif not actions and self.phase == PHASE_DISCARD:
             # In discard phase, if no legal discards, consider it done
             return [0]  # Return a dummy action
@@ -594,8 +596,12 @@ class FortyfivesGame:
             self.phase = PHASE_DECLARATION
             self.current_player_id = self.highest_bidder
         else:
-            # Move to the next player
-            self.current_player_id = (self.current_player_id + 1) % self.num_players
+            # Advance to the next player who has NOT already passed
+            # (a passed player is out of the auction and is skipped).
+            next_player = (self.current_player_id + 1) % self.num_players
+            while self.passed[next_player]:
+                next_player = (next_player + 1) % self.num_players
+            self.current_player_id = next_player
     
     def process_declaration(self, action):
         '''
