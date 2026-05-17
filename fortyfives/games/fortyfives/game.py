@@ -506,18 +506,23 @@ class FortyfivesGame:
                             # Only have high trumps, can play any card
                             return list(range(len(hand)))
                 else:
-                    # Rank-based renege rule: a trump card may be held back only if it is
-                    # one of the top-3 trumps (rank ≥ 1001: 5, J, A♥) AND its rank
-                    # exceeds the rank of the led trump card.
+                    # Rank-based renege rule: a top-3 trump (rank ≥ 1001:
+                    # 5, J, A♥) whose rank exceeds the led trump's MAY be
+                    # withheld — the player is not *obliged* to play it.
+                    # It is never *forbidden*: the player may always choose
+                    # to play any trump in hand (incl. the privileged ones).
                     led_rank = get_card_rank(lead_card, self.trump_suit)
-                    must_play = [
+                    obligated = [
                         i for i in trump_cards
                         if not (get_card_rank(hand[i], self.trump_suit) >= 1001 and
                                 get_card_rank(hand[i], self.trump_suit) > led_rank)
                     ]
-                    if must_play:
-                        return must_play
-                    # All trump in hand are renegeable — can play any card
+                    if obligated:
+                        # Must follow suit, but ANY trump is legal — only the
+                        # obligation to follow is relaxed for privileged cards,
+                        # not the right to play them.
+                        return trump_cards
+                    # Every trump is renege-eligible — may play any card
                     return list(range(len(hand)))
             else:
                 # No trumps, can play any card
