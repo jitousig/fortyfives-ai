@@ -85,13 +85,22 @@ def _default_play_agent():
     return PIMCAgent(num_actions=18)
 
 
-def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed):
+def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed,
+                  metric='net'):
     """Play one hand. NS (0,2) phase-1/2 = bid_agent; everything else
     fixed (see module docstring). Multi-hand game runs to 125 pts, so we
     stop at the phase 4->1 transition that marks one hand's end.
 
-    Returns NS (team 0/2) raw game-point delta for the hand, or None on
-    timeout. The delta already encodes made/miss payoff.
+    metric:
+      'net' (primary) -> (ΔNS_game_points) − (ΔEW_game_points): the
+            competitive signal — an EW made/missed contract is now
+            visible to NS, so denying/conceding opponent contracts is
+            scored. Single-hand from env.reset() so cumulative points
+            ≈ 0 and the 100+/pegging nonlinearity never fires.
+      'ns'  (back-reference) -> ΔNS only = the prior metric, returned
+            BYTE-IDENTICALLY so the change is provably scoped.
+    points[0]/[2] = NS, points[1]/[3] = EW. Returns the chosen scalar,
+    or None on timeout.
 
     play_agent / rule_agent / bid_agent are reused across hands; if
     play_agent carries an _rng we reseed it per hand so the eval itself
@@ -105,7 +114,8 @@ def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed):
         bid_agent.set_env(env)
     state, player_id = env.reset()
 
-    init_points = env.game.points.get(0, 0) if env.game.points else 0
+    init_ns = env.game.points.get(0, 0) if env.game.points else 0
+    init_ew = env.game.points.get(1, 0) if env.game.points else 0
     in_play = False
     step = 0
 
@@ -126,8 +136,12 @@ def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed):
         curr_phase = env.game.phase
 
         if (in_play and phase == 4 and curr_phase == 1) or env.game.is_over():
-            points_now = env.game.points.get(0, 0) if env.game.points else 0
-            return points_now - init_points
+            ns_now = env.game.points.get(0, 0) if env.game.points else 0
+            d_ns = ns_now - init_ns
+            if metric == 'ns':
+                return d_ns
+            ew_now = env.game.points.get(1, 0) if env.game.points else 0
+            return d_ns - (ew_now - init_ew)
 
         state = next_state
         player_id = next_player_id
@@ -137,13 +151,18 @@ def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed):
 
 def evaluate_bidding_paired(bid_agent, baseline=None, num_hands=200,
                             seed=0, name='bidder', silent=False,
-                            play_agent=None, progress_every=250):
+                            play_agent=None, progress_every=250,
+                            metric='net'):
     """Paired bidding eval: bid_agent vs baseline on identical deals.
 
     Only NS phase-1/2 (bid + declaration) differs between the two runs;
     play (PIMC v3 by default), discard, and EW bidding are identical, so
     the per-hand point difference isolates NS bidding quality with deal
-    luck cancelled. CI is on the paired differences (tight)."""
+    luck cancelled. CI is on the paired differences (tight).
+
+    metric: 'net' (primary, NS−EW competitive delta) or 'ns'
+    (prior NS-only metric; numbers across metrics are NOT comparable —
+    re-baseline the yardstick per metric)."""
     if baseline is None:
         baseline = RuleBasedAgent(num_actions=18)
     if play_agent is None:
@@ -157,9 +176,11 @@ def evaluate_bidding_paired(bid_agent, baseline=None, num_hands=200,
     for i in range(num_hands):
         s = seed + i
         with greedy(bid_agent):
-            pa = _run_hand_bid(env_a, bid_agent, play_agent, rule_agent, s)
+            pa = _run_hand_bid(env_a, bid_agent, play_agent, rule_agent, s,
+                               metric=metric)
         with greedy(baseline):
-            pb = _run_hand_bid(env_b, baseline, play_agent, rule_agent, s)
+            pb = _run_hand_bid(env_b, baseline, play_agent, rule_agent, s,
+                               metric=metric)
         if pa is None or pb is None:
             timeouts += 1
             continue
@@ -185,14 +206,16 @@ def evaluate_bidding_paired(bid_agent, baseline=None, num_hands=200,
     return result
 
 
-def bidding_canary(num_hands=300, seed=0, play_agent=None):
+def bidding_canary(num_hands=300, seed=0, play_agent=None, metric='net'):
     """Regression canary: a rule-based bidder vs itself MUST be
-    diff 0.0000 / 0.0% beats. Non-zero => the eval is not actually
+    diff 0.0000 / 0.0% beats on ANY metric (paired runs identical when
+    NS bidding is the same). Non-zero => the eval is not actually
     paired or the bidder is non-deterministic; every number it
     produces is then noise. Run after any rule-based / eval edit."""
     res = evaluate_bidding_paired(
         RuleBasedAgent(num_actions=18), num_hands=num_hands, seed=seed,
-        name='bidding-canary', silent=True, play_agent=play_agent)
+        name='bidding-canary', silent=True, play_agent=play_agent,
+        metric=metric)
     ok = abs(res.avg_diff) < 1e-9 and res.win_rate == 0.0
     print(f"BIDDING CANARY: avg_diff={res.avg_diff:+.4f} "
           f"beats={res.win_rate*100:.1f}% n={res.num_hands} "
@@ -208,9 +231,10 @@ if __name__ == '__main__':
     ap.add_argument('--seed', type=int, default=0)
     ap.add_argument('--fast_play', action='store_true',
                     help='use rule-based play instead of PIMC (fast smoke)')
+    ap.add_argument('--metric', choices=['net', 'ns'], default='net')
     args = ap.parse_args()
 
     pa = RuleBasedAgent(num_actions=18) if args.fast_play else None
     if args.canary:
         bidding_canary(num_hands=args.num_hands, seed=args.seed,
-                       play_agent=pa)
+                       play_agent=pa, metric=args.metric)
