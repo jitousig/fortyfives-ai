@@ -89,14 +89,16 @@ class EVBidder:
     RuleBasedAgent; everything else delegates to it."""
 
     def __init__(self, num_actions=18, n_worlds=20, seed=0,
-                 ev_declare=True):
+                 ev_declare=False):
         self.num_actions = num_actions
         self.n_worlds = n_worlds
-        # ev_declare=True: also EV-choose the phase-2 trump declaration
-        # (single-variable lever vs the level-only agent). ev_declare=
-        # False reproduces the prior committed bid-level-only EVBidder
-        # byte-for-byte (phase-2 delegates to rule-based) for a clean
-        # A/B ablation.
+        # ev_declare=True ALSO EV-chooses the phase-2 trump declaration.
+        # FALSIFIED 2026-05-16 (n=2000): vs rule-bidder it scored
+        # seed2024 +0.050 CI[-0.60,+0.70] — strictly WORSE than the
+        # level-only +0.527 on the same seed (the rule-based discard
+        # nuke+redeal drowns the trump-choice signal). Default reverts
+        # to False = level-only (best-known config, byte-identical to
+        # the original committed EVBidder). Flag kept for ablation only.
         self.ev_declare = ev_declare
         self.use_raw = True
         self._rb = RuleBasedAgent(num_actions)       # delegate + rollout policy
