@@ -32,8 +32,9 @@ ephemeral web-session container via git. Update the checkboxes as milestones lan
 
 ## Milestones
 
-- [ ] **M1 Foundation** — viewport/meta, `dvh`+safe-area, touch tweaks,
-  breakpoint scaffold. Desktop unchanged; phone stops clipping.
+- [x] **M1 Foundation** — viewport/meta, `dvh`+safe-area, touch tweaks,
+  CSS-variable card-size refactor, breakpoint scaffold. Desktop unchanged;
+  phone stops clipping. *(done)*
 - [ ] **M2 Portrait layout** — opponents strip, trick center, fanned hand,
   bottom action bar.
 - [ ] **M3 Log/score drawer** + status-bar polish.

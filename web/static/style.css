@@ -1,11 +1,26 @@
 /* ── Reset & base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+:root {
+  /* Card sizing is driven by these so the mobile breakpoint can rescale
+     every card/slot in one place. Desktop values match the original px. */
+  --card-w: 96px;
+  --card-h: 138px;
+  --back-w: 52px;
+  --back-h: 72px;
+}
+
+html, body {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 body {
   background: #2d6a4f;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #fff;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   font-size: 14px;
 }
@@ -15,6 +30,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 270px;
   height: 100vh;
+  height: 100dvh;
 }
 
 /* ══════════════════ TABLE AREA ══════════════════ */
@@ -87,7 +103,7 @@ body {
 }
 
 .human-hand {
-  min-height: 148px;
+  min-height: calc(var(--card-h) + 10px);
 }
 
 /* ── Middle row ── */
@@ -121,8 +137,8 @@ body {
 }
 
 .trick-slot {
-  min-width: 96px;
-  min-height: 138px;
+  min-width: var(--card-w);
+  min-height: var(--card-h);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,8 +174,8 @@ body {
 
 /* ══════════════════ CARDS ══════════════════ */
 .card {
-  width: 96px;
-  height: 138px;
+  width: var(--card-w);
+  height: var(--card-h);
   background: #fff;
   border-radius: 6px;
   border: 1px solid #bbb;
@@ -210,8 +226,8 @@ body {
 #north-hand .card,
 #west-hand .card,
 #east-hand .card {
-  width: 52px;
-  height: 72px;
+  width: var(--back-w);
+  height: var(--back-h);
 }
 
 /* Playable (human can click) */
@@ -238,8 +254,8 @@ body {
 
 /* Empty trick slot */
 .trick-slot-empty {
-  width: 96px;
-  height: 138px;
+  width: var(--card-w);
+  height: var(--card-h);
   border: 2px dashed rgba(255,255,255,0.18);
   border-radius: 6px;
 }
@@ -476,3 +492,66 @@ body {
 
 /* ── Misc ── */
 .red-text { color: #ef5350; }
+
+/* Touch press feedback (hover doesn't exist on touch) */
+.card.playable:active { transform: translateY(-12px); }
+.card.selected-discard:active { transform: translateY(-18px); }
+
+/* ══════════════════ MOBILE (interim fit — M1) ══════════════════ */
+/* Stops clipping and makes the page scrollable on phones. The full
+   portrait redesign replaces this block in Milestone 2. */
+@media (max-width: 820px) {
+  :root {
+    --card-w: 58px;
+    --card-h: 84px;
+    --back-w: 30px;
+    --back-h: 42px;
+  }
+
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  #app {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100dvh;
+    padding:
+      env(safe-area-inset-top)
+      env(safe-area-inset-right)
+      env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+  }
+
+  #table-area {
+    height: auto;
+    overflow: visible;
+    padding: 10px;
+  }
+
+  #middle-row {
+    grid-template-columns: auto 1fr auto;
+    gap: 4px;
+  }
+
+  .side-zone { max-width: 76px; }
+
+  #right-panel {
+    border-left: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    height: auto;
+    overflow: visible;
+  }
+
+  #log-wrap { max-height: 170px; }
+
+  .card-corner { font-size: 11px; }
+  .card-corner.tl { top: 3px; left: 4px; }
+  .card-corner.br { bottom: 3px; right: 4px; }
+  .card-mid { font-size: 26px; }
+
+  .action-btn { padding: 10px 16px; font-size: 14px; }
+}
