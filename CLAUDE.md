@@ -281,6 +281,13 @@ NEVER point a Render service at a feature/working branch (e.g. a
 `claude/*` cloud branch). Production tracks `main`/tags only. The
 Blueprint (`render.yaml`) lives on `main` and is connected to `main`.
 
+Static-asset caching: any change to `web/static/game.js` or
+`style.css` MUST bump the `?v=N` query on its `<link>`/`<script>` in
+`index.html` (and the cache version in `sw.js` if a service worker
+exists), or returning users keep serving the cached old asset and the
+change never reaches them. A frontend change without the bump is an
+incomplete change.
+
 ### This document
 This guidance is repo-wide and MUST live on `main` so every branch/worktree
 inherits it. If you edited it on a feature or research branch, explicitly
