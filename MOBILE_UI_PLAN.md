@@ -66,3 +66,23 @@ the physical phone via the Render URL after each milestone's push.
 
 Each milestone: commit -> push to `claude/mobile-web-development-DkFI3` ->
 Render auto-deploys -> verify on phone.
+
+## Rollback / safety net
+
+Solo, phone-driven project — no PR/CI gate by design. Safety net instead:
+
+- **Revert-on-request convention:** the user can say "roll back the last
+  change" (or name a commit) at any time. Response: `git revert` the bad
+  commit(s) and push; Render auto-redeploys the good state. No dashboard
+  needed. This is the primary, day-to-day undo.
+- **Render deploy history:** dashboard -> service -> Events/Deploys tab ->
+  "Rollback to this deploy" on a prior good deploy. Backup to the above;
+  on the free plan it rebuilds (a few minutes), not instant.
+- Keep commits small and individually working so every push is a clean
+  rollback point.
+
+## New-session note
+
+Containers are ephemeral; only git persists. A fresh session should read
+this file first to recover full context and current milestone state.
+
