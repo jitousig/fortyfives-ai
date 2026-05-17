@@ -17,7 +17,22 @@ app.mount("/static", StaticFiles(directory=_static), name="static")
 
 @app.get("/")
 async def index():
-    return FileResponse(_static / "index.html")
+    # Never cache the HTML shell so the ?v= asset references can't be
+    # pinned to an old build by the browser or service worker.
+    return FileResponse(
+        _static / "index.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
+
+
+@app.get("/sw.js")
+async def service_worker():
+    # Served from root so the worker's scope is the whole origin.
+    return FileResponse(
+        _static / "sw.js",
+        media_type="application/javascript",
+        headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"},
+    )
 
 
 def _trick_complete_state(session: GameSession) -> dict:
@@ -64,6 +79,17 @@ async def game_ws(websocket: WebSocket):
                     # Normal card play or non-gameplay action
                     await websocket.send_json(session.serialize_state())
 
+                # The human's own card may have ended the hand — pause for
+                # the summary popup before any next-hand AI turns.
+                if session.hand_over:
+                    await websocket.send_json(session.serialize_state())
+                    continue
+
+                await _run_ai_turns(websocket, session, delay=0.5)
+                await websocket.send_json(session.serialize_state())
+
+            elif msg_type == "continue_hand":
+                session.continue_after_hand()
                 await _run_ai_turns(websocket, session, delay=0.5)
                 await websocket.send_json(session.serialize_state())
 
