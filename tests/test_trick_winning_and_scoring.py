@@ -484,6 +484,34 @@ class TestTrickWinningAndScoring(unittest.TestCase):
         self.assertEqual(game.points[0], 20, "N/S game points should be 20 (made their bid)")
         self.assertEqual(game.points[1], 10, "E/W game points should be 10")
 
+    def test_made_bid_keeps_overtricks(self):
+        """A made 20/25 bid banks the points actually taken, not a flat bid value.
+
+        Regression: end_hand() used to replace a made bid's game points with
+        BID_SUCCESS_VALUES[bid] (a flat 20/25), discarding overtricks and the
+        high-trump bonus earned beyond the bid.
+        """
+        # N/S bid 20 but take 4 tricks (20) + highest trump (5) = 25 raw.
+        game = FortyfivesGame()
+        game.trump_suit = 'H'
+        game.tricks_won = [2, 0, 2, 1]  # N/S: 4 tricks, E/W: 1 trick
+        game.highest_trump_player = 0   # North played the highest trump
+        game.highest_trump_played = create_card('5', 'H')
+        game.highest_bidder = 0         # North bid
+        game.highest_bid = BID_20
+
+        game.score_hand()
+        self.assertTrue(game.bid_made, "20 raw points clears a 20 bid")
+        self.assertEqual(game.hand_points[0], 25, "N/S raw: 4 tricks (20) + high (5)")
+        self.assertEqual(game.hand_points[1], 5, "E/W raw: 1 trick (5)")
+
+        game.end_hand()
+        self.assertEqual(game.points[0], 25,
+                         "N/S keep all 25 taken, not a flat 20 for the bid")
+        self.assertEqual(game.points[1], 5, "E/W keep their 5")
+        # Per-hand game total conserves to 30 for a made 20/25 bid.
+        self.assertEqual(game.points[0] + game.points[1], 30)
+
     def test_thirty_for_sixty_rule(self):
         """Test that the 30 for 60 rule is correctly applied in scoring."""
         # 1. Test successful 30 bid gets 60 points
