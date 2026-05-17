@@ -496,6 +496,9 @@ body {
 /* Drawer is mobile-only; hidden entirely on desktop. */
 #drawer, #drawer-toggle, #drawer-backdrop { display: none; }
 
+/* Per-seat bid pills are mobile-only; desktop uses the right-panel list. */
+.bid-chip { display: none; }
+
 /* Touch press feedback (hover doesn't exist on touch) */
 .card.playable:active { transform: translateY(-12px); }
 .card.selected-discard:active { transform: translateY(-18px); }
@@ -668,18 +671,26 @@ body {
   .trick-slot { min-width: var(--card-w); min-height: var(--card-h); }
   #trump-badge { font-size: 17px; padding: 2px 6px; }
 
-  /* Bid status relocated into the table centre (visible during auction) */
-  #trick-center #bid-block {
-    margin-top: 6px;
-    background: rgba(0,0,0,0.45);
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 13px;
-    line-height: 1.7;
-    text-align: center;
-    white-space: nowrap;
+  /* Per-seat bid pills (visible during auction/declaration) */
+  .bid-chip {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.16);
+    color: #fff;
   }
-  #trick-center #bid-block:empty { display: none; }
+  .bid-chip:empty { display: none; }
+  .bid-chip.active {
+    background: #fdd835;
+    color: #1a1a1a;
+  }
+  .bid-chip.pass {
+    background: rgba(0,0,0,0.35);
+    opacity: 0.6;
+  }
 
   /* Game-over overlay sized for phone */
   #overlay-box { padding: 28px 24px; }

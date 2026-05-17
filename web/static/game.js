@@ -157,6 +157,7 @@ function render() {
   renderTrick();
   renderTrumpBadge();
   renderInfo();
+  renderSeatBids();
   renderActions();
   renderLog();
 
@@ -329,6 +330,29 @@ function renderBidBlock() {
   el.innerHTML = lines.join('<br>');
 }
 
+// Per-seat bid pill shown next to each player during the auction.
+function renderSeatBids() {
+  const show = state.phase === PHASE.AUCTION || state.phase === PHASE.DECLARATION;
+  const bids = state.bids || {};
+  const passed = state.passed || [];
+  for (let p = 0; p < 4; p++) {
+    const el = document.getElementById(`bid-chip-${p}`);
+    if (!el) continue;
+    if (!show) { el.textContent = ''; el.className = 'bid-chip'; continue; }
+    const bid = bids[String(p)];
+    if (passed[p]) {
+      el.textContent = 'Pass';
+      el.className = 'bid-chip pass';
+    } else if (bid && BID_LABEL[bid]) {
+      el.textContent = bid === 4 ? 'Hold' : BID_LABEL[bid];
+      el.className = 'bid-chip active';
+    } else {
+      el.textContent = '';
+      el.className = 'bid-chip';
+    }
+  }
+}
+
 function renderTricksBlock() {
   const el = document.getElementById('tricks-block');
   if (state.phase !== PHASE.GAMEPLAY) { el.innerHTML = ''; return; }
@@ -444,24 +468,14 @@ function syncResponsiveLayout() {
     document.getElementById('log-wrap'),
     document.getElementById('new-game-btn'),
   ];
-  // Bid status is needed during the auction; on mobile it can't live in
-  // the compact top bar, so it goes into the centre of the table.
-  const bid = document.getElementById('bid-block');
-  const trickCenter = document.getElementById('trick-center');
-  const status = document.getElementById('status-block');
-  const tricks = document.getElementById('tricks-block');
-
   if (_mq.matches) {
     for (const el of drawerItems) {
       if (el && el.parentElement !== body) body.appendChild(el);
     }
-    if (bid && bid.parentElement !== trickCenter) trickCenter.appendChild(bid);
   } else {
     for (const el of drawerItems) {
       if (el && el.parentElement === body) panel.appendChild(el);
     }
-    // Restore bid-block to its original spot (before tricks-block).
-    if (bid && bid.parentElement !== status) status.insertBefore(bid, tricks);
     closeDrawer();
   }
 }
