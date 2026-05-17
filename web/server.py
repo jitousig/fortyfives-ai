@@ -17,7 +17,12 @@ app.mount("/static", StaticFiles(directory=_static), name="static")
 
 @app.get("/")
 async def index():
-    return FileResponse(_static / "index.html")
+    # Never cache the HTML shell so the ?v= asset references can't be
+    # pinned to an old build by the browser or service worker.
+    return FileResponse(
+        _static / "index.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 @app.get("/sw.js")
