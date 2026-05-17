@@ -490,6 +490,52 @@ body {
 }
 #overlay-box button:hover { background: #ffee58; }
 
+/* ── Hand-summary overlay ── */
+#hand-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 190;
+  align-items: center;
+  justify-content: center;
+}
+#hand-overlay.visible { display: flex; }
+
+#hand-overlay-box {
+  background: #1b5e20;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 14px;
+  padding: 30px 40px;
+  text-align: center;
+  max-width: 380px;
+  width: 86%;
+}
+#hand-overlay-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+#hand-overlay-msg {
+  font-size: 16px;
+  opacity: 0.92;
+  margin-bottom: 24px;
+  line-height: 1.7;
+}
+#hand-overlay-msg .ho-totals { font-size: 13px; opacity: 0.7; }
+#hand-overlay-box button {
+  padding: 12px 34px;
+  background: #fdd835;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+#hand-overlay-box button:hover { background: #ffee58; }
+
 /* ── Misc ── */
 .red-text { color: #ef5350; }
 

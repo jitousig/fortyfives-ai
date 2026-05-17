@@ -74,6 +74,17 @@ async def game_ws(websocket: WebSocket):
                     # Normal card play or non-gameplay action
                     await websocket.send_json(session.serialize_state())
 
+                # The human's own card may have ended the hand — pause for
+                # the summary popup before any next-hand AI turns.
+                if session.hand_over:
+                    await websocket.send_json(session.serialize_state())
+                    continue
+
+                await _run_ai_turns(websocket, session, delay=0.5)
+                await websocket.send_json(session.serialize_state())
+
+            elif msg_type == "continue_hand":
+                session.continue_after_hand()
                 await _run_ai_turns(websocket, session, delay=0.5)
                 await websocket.send_json(session.serialize_state())
 

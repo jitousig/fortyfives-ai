@@ -80,6 +80,8 @@ class GameSession:
         self.human_player = human_player
         self.log = []
         self.game_over = False
+        self.hand_over = False
+        self.last_hand_summary = None
 
         # Composite SOTA opponent. PIMC n_worlds=10: documented as
         # statistically indistinguishable from 20 and ~2x faster — picked
@@ -169,6 +171,8 @@ class GameSession:
             "points": {"ns": ns_points, "ew": ew_points},
             "hand_counts": hand_counts,
             "game_over": self.game_over,
+            "hand_over": self.hand_over and not self.game_over,
+            "hand_summary": self.last_hand_summary,
             "log": self.log[-40:],
         }
 
@@ -221,6 +225,10 @@ class GameSession:
             d_ns = ns - pre_points.get(0, 0)
             d_ew = ew - pre_points.get(1, 0)
             self.log.append(f"Hand over — NS: {ns} ({d_ns:+d}), EW: {ew} ({d_ew:+d})")
+            self.hand_over = True
+            self.last_hand_summary = {
+                "ns": ns, "ew": ew, "d_ns": d_ns, "d_ew": d_ew,
+            }
 
         if game.check_game_over():
             ns = game.points.get(0, 0)
@@ -228,9 +236,18 @@ class GameSession:
             winner = "NS (You & North)" if ns >= 125 else "EW (West & East)"
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
+            self.hand_over = False  # game-over overlay takes precedence
             return False
 
+        if self.hand_over:
+            return False  # pause for the hand-summary popup
+
         return game.current_player_id != self.human_player
+
+    def continue_after_hand(self):
+        """Dismiss the hand-summary popup and resume play."""
+        self.hand_over = False
+        self.last_hand_summary = None
 
     def take_human_action(self, action):
         """Process human action. Returns error dict or None on success."""
@@ -263,6 +280,10 @@ class GameSession:
             d_ns = ns - pre_points.get(0, 0)
             d_ew = ew - pre_points.get(1, 0)
             self.log.append(f"Hand over — NS: {ns} ({d_ns:+d}), EW: {ew} ({d_ew:+d})")
+            self.hand_over = True
+            self.last_hand_summary = {
+                "ns": ns, "ew": ew, "d_ns": d_ns, "d_ew": d_ew,
+            }
 
         if game.check_game_over():
             ns = game.points.get(0, 0)
@@ -270,6 +291,7 @@ class GameSession:
             winner = "NS (You & North)" if ns >= 125 else "EW (West & East)"
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
+            self.hand_over = False  # game-over overlay takes precedence
 
         return None
 

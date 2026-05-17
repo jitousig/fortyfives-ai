@@ -163,6 +163,29 @@ function render() {
 
   if (state.game_over) {
     showGameOver();
+  } else if (state.hand_over) {
+    showHandOver();
+  } else {
+    document.getElementById('hand-overlay').classList.remove('visible');
+  }
+}
+
+function showHandOver() {
+  const s = state.hand_summary || {};
+  const fmt = (n) => (n > 0 ? `+${n}` : `${n}`);
+  const msg = document.getElementById('hand-overlay-msg');
+  msg.innerHTML =
+    `This hand &nbsp;—&nbsp; <strong>N/S ${fmt(s.d_ns ?? 0)}</strong>` +
+    ` &nbsp;·&nbsp; <strong>E/W ${fmt(s.d_ew ?? 0)}</strong><br>` +
+    `<span class="ho-totals">Totals &nbsp; N/S ${s.ns ?? 0} &nbsp;·&nbsp; ` +
+    `E/W ${s.ew ?? 0} &nbsp;<small>(first to 125)</small></span>`;
+  document.getElementById('hand-overlay').classList.add('visible');
+}
+
+function continueHand() {
+  document.getElementById('hand-overlay').classList.remove('visible');
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'continue_hand' }));
   }
 }
 
