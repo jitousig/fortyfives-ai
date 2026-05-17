@@ -153,10 +153,11 @@ def get_card_rank(card, trump_suit):
     
     # Non-trump cards
     if FortyfivesCard.is_red_suit(card.suit):
-        # Red non-trump: K, Q, J, 10, 9, 8, 7, 6, 4, 3, 2, A
+        # Red non-trump: K, Q, J, 10, 9, 8, 7, 6, 5, 4, 3, 2, A
         rank_map = {
             'K': 900, 'Q': 899, 'J': 898, 'T': 897, '9': 896, '8': 895,
-            '7': 894, '6': 893, '4': 892, '3': 891, '2': 890, 'A': 889
+            '7': 894, '6': 893, '5': 892, '4': 891, '3': 890, '2': 889,
+            'A': 888
         }
         return rank_map.get(card.rank, 0)
     else:
