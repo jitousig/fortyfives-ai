@@ -257,6 +257,30 @@ UIs atomically) — the failure mode is branch divergence, not repo structure.
    Never branch-switch or reset a worktree that has a dirty tree or a
    running experiment.
 
+### Environments & deployment
+Environments map to **positions on the trunk, NOT to long-lived
+branches**. A persistent "dev"/UI branch deployed as an environment
+re-creates the divergence failure mode above — do not do it.
+- **Local**: `uvicorn web.server:app --reload` (venv:
+  `../fortyfives/fortyfives_env`). Primary UI dev loop — test most
+  changes here. Needing a deploy to see a change is a smell.
+- **Staging** = `main` HEAD. Render service `fortyfives-web-staging`,
+  `autoDeploy: true` (deploys every merge to `main`). Integration
+  testing + shareable dev URL.
+- **Production** = a release tag (`vN`) off `main`. Render service
+  `fortyfives-web`, `autoDeploy: false`; deploy manually at the tagged
+  commit from the Render dashboard. Stable URL for users/demos.
+- **PR preview** (optional): ephemeral, attached to a PR's short-lived
+  branch (Render Preview Environments, paid). Never a persistent branch.
+
+Release procedure: merge to `main` → verify on staging → `git tag vN &&
+git push origin vN` → trigger a manual deploy of `fortyfives-web` at
+`vN` in the Render dashboard. Roll back = redeploy the previous tag.
+
+NEVER point a Render service at a feature/working branch (e.g. a
+`claude/*` cloud branch). Production tracks `main`/tags only. The
+Blueprint (`render.yaml`) lives on `main` and is connected to `main`.
+
 ### This document
 This guidance is repo-wide and MUST live on `main` so every branch/worktree
 inherits it. If you edited it on a feature or research branch, explicitly
