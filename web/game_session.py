@@ -1,9 +1,37 @@
+import os
 import random
+import sys
+
+import rlcard
+from rlcard.envs.registration import register, registry
+
 from fortyfives.games.fortyfives.game import (
     FortyfivesGame,
     PHASE_AUCTION, PHASE_DECLARATION, PHASE_DISCARD, PHASE_GAMEPLAY,
     BID_VALUES, BID_PASS, BID_20, BID_25, BID_30, BID_HOLD, DISCARD_DONE,
 )
+
+# ── SOTA opponent (composite, wired exactly like play_eval._run_hand) ──
+# Phases 1/2/3 (bid/declare/discard) -> RuleBasedAgent
+# Phase  4     (card play)           -> PIMCAgent  (v3: constrained +
+#                                       rule-based rollout, defaults)
+# Both agents are use_raw=True, consume the rlcard env's extracted state
+# and return ENV action ids fed straight to env.step(). The agents and
+# this branch's fortyfives engine come from agent-sota (commit 8345df7).
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_EXAMPLES = os.path.join(_REPO_ROOT, "examples")
+for _p in (_REPO_ROOT, _EXAMPLES):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+from fortyfives_rule_based import RuleBasedAgent  # noqa: E402
+from fortyfives_pimc import PIMCAgent  # noqa: E402
+
+if 'fortyfives' not in registry.env_specs:
+    register(
+        env_id='fortyfives',
+        entry_point='fortyfives.envs.fortyfives_env:FortyfivesEnv',
+    )
 
 PLAYER_NAMES = ["You (South)", "West", "North", "East"]
 SUIT_SYMBOLS = {'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣'}
@@ -44,12 +72,27 @@ def _bids_to_dict(bids, num_players):
 
 class GameSession:
     def __init__(self, human_player=0):
-        self.game = FortyfivesGame()
+        self.env = rlcard.make('fortyfives')
+        self._state, self._pid = self.env.reset()
+        # serialize_state and server.py read the raw game off .game; the
+        # env wraps the same FortyfivesGame instance.
+        self.game = self.env.game
         self.human_player = human_player
         self.log = []
         self.game_over = False
+
+        # Composite SOTA opponent. PIMC n_worlds=10: documented as
+        # statistically indistinguishable from 20 and ~2x faster — picked
+        # for interactive latency. PIMCAgent() defaults = v3 (constrained,
+        # rule-based rollout); do not override.
+        self._rule_agent = RuleBasedAgent(num_actions=18)
+        self._pimc_agent = PIMCAgent(num_actions=18, n_worlds=10)
+
         self.log.append("Game started! You are South (partner: North).")
         self._log_phase()
+
+    def _agent_for_phase(self, phase):
+        return self._pimc_agent if phase == PHASE_GAMEPLAY else self._rule_agent
 
     def _log_phase(self):
         game = self.game
@@ -144,12 +187,28 @@ class GameSession:
         if not legal:
             return False
 
-        action = random.choice(legal)
+        agent = self._agent_for_phase(pre_phase)
+        env_action = agent.step(self._state)
+        raw_action = self.env._decode_action(env_action)
+
+        # Defensive: a correctly-wired agent always returns a legal env id.
+        # If decode lands outside the legal set, surface it and fall back
+        # rather than crash the live game.
+        if raw_action not in legal:
+            print(
+                f"[game_session] agent returned illegal action "
+                f"env={env_action} raw={raw_action} phase={pre_phase} "
+                f"legal={legal}; falling back to random",
+                file=sys.stderr,
+            )
+            raw_action = random.choice(legal)
+            env_action = self.env._game_to_env_action(raw_action, pre_phase)
+
         player_id = game.current_player_id
-        action_desc = self._describe_action(action, game.phase, player_id)
+        action_desc = self._describe_action(raw_action, game.phase, player_id)
         name = PLAYER_NAMES[player_id]
 
-        game.step(action)
+        self._state, self._pid = self.env.step(env_action)
         self.log.append(f"{name}: {action_desc}")
 
         post_phase = game.phase
@@ -189,7 +248,9 @@ class GameSession:
         pre_points = dict(game.points) if isinstance(game.points, dict) else {}
         action_desc = self._describe_action(action, game.phase, self.human_player)
 
-        game.step(action)
+        # Frontend speaks raw game ids; the env expects env ids.
+        env_action = self.env._game_to_env_action(action, pre_phase)
+        self._state, self._pid = self.env.step(env_action)
         self.log.append(f"You: {action_desc}")
 
         post_phase = game.phase
