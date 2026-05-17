@@ -961,9 +961,13 @@ class FortyfivesGame:
             
             if bid_team == 0:  # NS bid
                 if self.bid_made:  # NS made their bid
-                    # Apply special scoring for successful bids (like 30 for 60)
-                    ns_game_points = BID_SUCCESS_VALUES[self.highest_bid]
-                    
+                    # Made bid: bank the points actually earned (ns_game_points
+                    # already holds the raw hand points, so a team that takes
+                    # more than its bid keeps the extra). The 30-for-60 rule is
+                    # the only override: a successful 30 bid is worth a flat 60.
+                    if self.highest_bid == BID_30:
+                        ns_game_points = BID_SUCCESS_VALUES[BID_30]
+
                     # EW can't peg if they have 100+ points and NS made their bid
                     if ew_has_100_plus:
                         ew_game_points = 0
@@ -972,9 +976,13 @@ class FortyfivesGame:
                     # EW can peg regardless of points (no restriction when declaring team fails)
             else:  # EW bid
                 if self.bid_made:  # EW made their bid
-                    # Apply special scoring for successful bids (like 30 for 60)
-                    ew_game_points = BID_SUCCESS_VALUES[self.highest_bid]
-                    
+                    # Made bid: bank the points actually earned (ew_game_points
+                    # already holds the raw hand points, so a team that takes
+                    # more than its bid keeps the extra). The 30-for-60 rule is
+                    # the only override: a successful 30 bid is worth a flat 60.
+                    if self.highest_bid == BID_30:
+                        ew_game_points = BID_SUCCESS_VALUES[BID_30]
+
                     # NS can't peg if they have 100+ points and EW made their bid
                     if ns_has_100_plus:
                         ns_game_points = 0
