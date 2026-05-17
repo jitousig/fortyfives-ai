@@ -27,10 +27,10 @@ The project requires Python 3.6+, RLCard (>=1.0.7), NumPy, and Matplotlib.
 
 ## Running the Web GUI
 
-The web GUI requires FastAPI and uvicorn. These live in the shared venv at `../fortyfives/fortyfives_env/`. `uvicorn` is not on the system PATH, so activate the venv first:
+The web GUI requires FastAPI and uvicorn. These live in the shared venv at `../fortyfives-venv/`. `uvicorn` is not on the system PATH, so activate the venv first:
 
 ```bash
-source ../fortyfives/fortyfives_env/bin/activate
+source ../fortyfives-venv/bin/activate
 uvicorn web.server:app --reload --port 8000
 ```
 
@@ -247,6 +247,7 @@ One change at a time, `git commit` per change, **plan-first** for non-trivial
 work, and re-run invariant #2 after any `env`/`eval` edit. A result you cannot
 trust is worse than no result.
 
+
 ## Repository Workflow & Branching Discipline — READ BEFORE ANY GIT OP
 
 This is a **monorepo** with three components over one shared core. A
@@ -296,6 +297,37 @@ UIs atomically) — the failure mode is branch divergence, not repo structure.
 6. Prefer git worktrees (already in use) to run components in parallel.
    Never branch-switch or reset a worktree that has a dirty tree or a
    running experiment.
+
+### Environments & deployment
+Environments map to **positions on the trunk, NOT to long-lived
+branches**. A persistent "dev"/UI branch deployed as an environment
+re-creates the divergence failure mode above — do not do it.
+- **Local**: `uvicorn web.server:app --reload` (venv:
+  `../fortyfives-venv`). Primary UI dev loop — test most
+  changes here. Needing a deploy to see a change is a smell.
+- **Staging** = `main` HEAD. Render service `fortyfives-web-staging`,
+  `autoDeploy: true` (deploys every merge to `main`). Integration
+  testing + shareable dev URL.
+- **Production** = a release tag (`vN`) off `main`. Render service
+  `fortyfives-web`, `autoDeploy: false`; deploy manually at the tagged
+  commit from the Render dashboard. Stable URL for users/demos.
+- **PR preview** (optional): ephemeral, attached to a PR's short-lived
+  branch (Render Preview Environments, paid). Never a persistent branch.
+
+Release procedure: merge to `main` → verify on staging → `git tag vN &&
+git push origin vN` → trigger a manual deploy of `fortyfives-web` at
+`vN` in the Render dashboard. Roll back = redeploy the previous tag.
+
+NEVER point a Render service at a feature/working branch (e.g. a
+`claude/*` cloud branch). Production tracks `main`/tags only. The
+Blueprint (`render.yaml`) lives on `main` and is connected to `main`.
+
+Static-asset caching: any change to `web/static/game.js` or
+`style.css` MUST bump the `?v=N` query on its `<link>`/`<script>` in
+`index.html` (and the cache version in `sw.js` if a service worker
+exists), or returning users keep serving the cached old asset and the
+change never reaches them. A frontend change without the bump is an
+incomplete change.
 
 ### This document
 This guidance is repo-wide and MUST live on `main` so every branch/worktree

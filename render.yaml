@@ -1,0 +1,39 @@
+# Render Blueprint. Connect the Blueprint to the `main` branch in Render.
+#
+# Environment model (see CLAUDE.md "Environments & deployment"):
+#   - staging: auto-deploys every merge to `main` — integration/test URL
+#   - prod:    built from `main` but autoDeploy OFF; you trigger a manual
+#              deploy at a release tag (vN) from the Render dashboard.
+#
+# NEVER point a service at a feature/working branch (e.g. a claude/*
+# cloud branch). Production tracks `main` / tags only.
+
+services:
+  # ---- Staging: latest integrated truth -------------------------------
+  - type: web
+    name: fortyfives-web-staging
+    runtime: python
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt && pip install -e .
+    startCommand: uvicorn web.server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.15"
+
+  # ---- Production: stable, manually released at a tag -----------------
+  # autoDeploy:false => merges to main do NOT go live automatically.
+  # Release: git tag vN && git push origin vN, then in the Render
+  # dashboard trigger a deploy of this service at the vN commit.
+  - type: web
+    name: fortyfives-web
+    runtime: python
+    plan: free
+    branch: main
+    autoDeploy: false
+    buildCommand: pip install -r requirements.txt && pip install -e .
+    startCommand: uvicorn web.server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.15"

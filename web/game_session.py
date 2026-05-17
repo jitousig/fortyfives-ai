@@ -1,9 +1,38 @@
+import os
 import random
+import sys
+
+import rlcard
+from rlcard.envs.registration import register, registry
+
 from fortyfives.games.fortyfives.game import (
     FortyfivesGame,
     PHASE_AUCTION, PHASE_DECLARATION, PHASE_DISCARD, PHASE_GAMEPLAY,
-    BID_VALUES, BID_PASS, BID_20, BID_25, BID_30, BID_HOLD, DISCARD_DONE,
+    BID_VALUES, BID_SUCCESS_VALUES,
+    BID_PASS, BID_20, BID_25, BID_30, BID_HOLD, DISCARD_DONE,
 )
+
+# ── SOTA opponent (composite, wired exactly like play_eval._run_hand) ──
+# Phases 1/2/3 (bid/declare/discard) -> RuleBasedAgent
+# Phase  4     (card play)           -> PIMCAgent  (v3: constrained +
+#                                       rule-based rollout, defaults)
+# Both agents are use_raw=True, consume the rlcard env's extracted state
+# and return ENV action ids fed straight to env.step(). The agents and
+# this branch's fortyfives engine come from agent-sota (commit 8345df7).
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_EXAMPLES = os.path.join(_REPO_ROOT, "examples")
+for _p in (_REPO_ROOT, _EXAMPLES):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+from fortyfives_rule_based import RuleBasedAgent  # noqa: E402
+from fortyfives_pimc import PIMCAgent  # noqa: E402
+
+if 'fortyfives' not in registry.env_specs:
+    register(
+        env_id='fortyfives',
+        entry_point='fortyfives.envs.fortyfives_env:FortyfivesEnv',
+    )
 
 PLAYER_NAMES = ["You (South)", "West", "North", "East"]
 SUIT_SYMBOLS = {'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣'}
@@ -44,12 +73,67 @@ def _bids_to_dict(bids, num_players):
 
 class GameSession:
     def __init__(self, human_player=0):
-        self.game = FortyfivesGame()
+        self.env = rlcard.make('fortyfives')
+        self._state, self._pid = self.env.reset()
+        # serialize_state and server.py read the raw game off .game; the
+        # env wraps the same FortyfivesGame instance.
+        self.game = self.env.game
         self.human_player = human_player
         self.log = []
         self.game_over = False
+        self.hand_over = False
+        self.last_hand_summary = None
+        # Rich per-hand breakdown for the hand-summary popup. tricks /
+        # high-trump / bid_made are reset by FortyfivesGame.end_hand(),
+        # so capture them at that boundary (instance wrapper — keeps the
+        # rlcard env's own game instance; main's pause/dismiss flow is
+        # untouched, only the popup payload is enriched).
+        self._last_hand_result = None
+        _orig_end_hand = self.game.end_hand
+
+        def _capturing_end_hand():
+            g = self.game
+            pre_ns = g.points.get(0, 0) if isinstance(g.points, dict) else 0
+            pre_ew = g.points.get(1, 0) if isinstance(g.points, dict) else 0
+            tricks = list(g.tricks_won) if g.tricks_won else [0, 0, 0, 0]
+            ht_player = g.highest_trump_player
+            ht_card = (str(g.highest_trump_played)
+                       if g.highest_trump_played else None)
+            _orig_end_hand()  # scores, updates points, resets trump fields
+            bid_team_idx = (g.highest_bidder % 2
+                            if g.highest_bidder is not None else None)
+            self._last_hand_result = {
+                "bid_team": ("ns" if bid_team_idx == 0
+                             else "ew" if bid_team_idx == 1 else None),
+                "bid_value": BID_VALUES.get(g.highest_bid),
+                "bid_made": bool(getattr(g, "bid_made", False)),
+                "bid_success_val": BID_SUCCESS_VALUES.get(g.highest_bid),
+                "ns_tricks": tricks[0] + tricks[2],
+                "ew_tricks": tricks[1] + tricks[3],
+                "ns_raw": int(g.hand_points[0]) if g.hand_points else 0,
+                "ew_raw": int(g.hand_points[1]) if g.hand_points else 0,
+                "high_trump_team": ("ns" if (ht_player is not None
+                                             and ht_player % 2 == 0)
+                                    else "ew" if ht_player is not None
+                                    else None),
+                "high_trump_card": ht_card,
+                "trump_suit": g.trump_suit,
+            }
+
+        self.game.end_hand = _capturing_end_hand
+
+        # Composite SOTA opponent. PIMC n_worlds=10: documented as
+        # statistically indistinguishable from 20 and ~2x faster — picked
+        # for interactive latency. PIMCAgent() defaults = v3 (constrained,
+        # rule-based rollout); do not override.
+        self._rule_agent = RuleBasedAgent(num_actions=18)
+        self._pimc_agent = PIMCAgent(num_actions=18, n_worlds=10)
+
         self.log.append("Game started! You are South (partner: North).")
         self._log_phase()
+
+    def _agent_for_phase(self, phase):
+        return self._pimc_agent if phase == PHASE_GAMEPLAY else self._rule_agent
 
     def _log_phase(self):
         game = self.game
@@ -126,6 +210,8 @@ class GameSession:
             "points": {"ns": ns_points, "ew": ew_points},
             "hand_counts": hand_counts,
             "game_over": self.game_over,
+            "hand_over": self.hand_over and not self.game_over,
+            "hand_summary": self.last_hand_summary,
             "log": self.log[-40:],
         }
 
@@ -144,12 +230,28 @@ class GameSession:
         if not legal:
             return False
 
-        action = random.choice(legal)
+        agent = self._agent_for_phase(pre_phase)
+        env_action = agent.step(self._state)
+        raw_action = self.env._decode_action(env_action)
+
+        # Defensive: a correctly-wired agent always returns a legal env id.
+        # If decode lands outside the legal set, surface it and fall back
+        # rather than crash the live game.
+        if raw_action not in legal:
+            print(
+                f"[game_session] agent returned illegal action "
+                f"env={env_action} raw={raw_action} phase={pre_phase} "
+                f"legal={legal}; falling back to random",
+                file=sys.stderr,
+            )
+            raw_action = random.choice(legal)
+            env_action = self.env._game_to_env_action(raw_action, pre_phase)
+
         player_id = game.current_player_id
-        action_desc = self._describe_action(action, game.phase, player_id)
+        action_desc = self._describe_action(raw_action, game.phase, player_id)
         name = PLAYER_NAMES[player_id]
 
-        game.step(action)
+        self._state, self._pid = self.env.step(env_action)
         self.log.append(f"{name}: {action_desc}")
 
         post_phase = game.phase
@@ -162,6 +264,9 @@ class GameSession:
             d_ns = ns - pre_points.get(0, 0)
             d_ew = ew - pre_points.get(1, 0)
             self.log.append(f"Hand over — NS: {ns} ({d_ns:+d}), EW: {ew} ({d_ew:+d})")
+            self.hand_over = True
+            self.last_hand_summary = self._compose_hand_summary(
+                ns, ew, d_ns, d_ew)
 
         if game.check_game_over():
             ns = game.points.get(0, 0)
@@ -169,9 +274,30 @@ class GameSession:
             winner = "NS (You & North)" if ns >= 125 else "EW (West & East)"
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
+            self.hand_over = False  # game-over overlay takes precedence
             return False
 
+        if self.hand_over:
+            return False  # pause for the hand-summary popup
+
         return game.current_player_id != self.human_player
+
+    def _compose_hand_summary(self, ns, ew, d_ns, d_ew):
+        """Main's score line ({ns,ew,d_ns,d_ew}) plus the rich
+        per-hand breakdown captured at the end_hand() boundary. The
+        legacy keys are kept so any older client still works; the
+        frontend renders the detailed view when the rich keys exist."""
+        summary = {"ns": ns, "ew": ew, "d_ns": d_ns, "d_ew": d_ew}
+        if self._last_hand_result:
+            summary.update(self._last_hand_result)
+        self._last_hand_result = None
+        return summary
+
+    def continue_after_hand(self):
+        """Dismiss the hand-summary popup and resume play."""
+        self.hand_over = False
+        self.last_hand_summary = None
+        self._last_hand_result = None
 
     def take_human_action(self, action):
         """Process human action. Returns error dict or None on success."""
@@ -189,7 +315,9 @@ class GameSession:
         pre_points = dict(game.points) if isinstance(game.points, dict) else {}
         action_desc = self._describe_action(action, game.phase, self.human_player)
 
-        game.step(action)
+        # Frontend speaks raw game ids; the env expects env ids.
+        env_action = self.env._game_to_env_action(action, pre_phase)
+        self._state, self._pid = self.env.step(env_action)
         self.log.append(f"You: {action_desc}")
 
         post_phase = game.phase
@@ -202,6 +330,9 @@ class GameSession:
             d_ns = ns - pre_points.get(0, 0)
             d_ew = ew - pre_points.get(1, 0)
             self.log.append(f"Hand over — NS: {ns} ({d_ns:+d}), EW: {ew} ({d_ew:+d})")
+            self.hand_over = True
+            self.last_hand_summary = self._compose_hand_summary(
+                ns, ew, d_ns, d_ew)
 
         if game.check_game_over():
             ns = game.points.get(0, 0)
@@ -209,6 +340,7 @@ class GameSession:
             winner = "NS (You & North)" if ns >= 125 else "EW (West & East)"
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
+            self.hand_over = False  # game-over overlay takes precedence
 
         return None
 
