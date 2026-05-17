@@ -37,7 +37,8 @@ ephemeral web-session container via git. Update the checkboxes as milestones lan
   phone stops clipping. *(done)*
 - [x] **M2 Portrait layout** — fixed top status bar, opponents as overlapped
   strips, trick center, fanned hand, sticky bottom action bar. *(done)*
-- [ ] **M3 Log/score drawer** + status-bar polish.
+- [x] **M3 Log/score drawer** — slide-up bottom sheet holding the game log
+  and New Game button (JS relocates them on mobile; side tab to open). *(done)*
 - [ ] **M4 PWA** — manifest, icons, service worker, iOS meta; FastAPI route so
   `sw.js` is served at root scope.
 - [ ] **M5 Polish & test pass** — tap targets, animations, edge cases (discard

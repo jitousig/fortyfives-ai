@@ -90,6 +90,15 @@
 
   </div>
 
+  <!-- Mobile log/info drawer -->
+  <button id="drawer-toggle" onclick="toggleDrawer()" aria-label="Open game log">&#9776;<span>Log</span></button>
+  <div id="drawer-backdrop" onclick="closeDrawer()"></div>
+  <aside id="drawer">
+    <div id="drawer-handle" onclick="closeDrawer()"></div>
+    <div id="drawer-title">Game Log</div>
+    <div id="drawer-body"></div>
+  </aside>
+
   <!-- Game-over overlay -->
   <div id="overlay">
     <div id="overlay-box">

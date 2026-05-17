@@ -430,5 +430,46 @@ function escHtml(str) {
     .replace(/>/g, '&gt;');
 }
 
+// ── Mobile drawer ──
+// The log + New Game button live in the right panel on desktop. On mobile
+// they're relocated into a slide-up drawer (DOM moved, IDs preserved so
+// render() is unaffected).
+
+const _mq = window.matchMedia('(max-width: 820px)');
+
+function syncDrawerContents() {
+  const body = document.getElementById('drawer-body');
+  const panel = document.getElementById('right-panel');
+  const items = [
+    document.getElementById('log-wrap'),
+    document.getElementById('new-game-btn'),
+  ];
+  if (_mq.matches) {
+    for (const el of items) {
+      if (el && el.parentElement !== body) body.appendChild(el);
+    }
+  } else {
+    for (const el of items) {
+      if (el && el.parentElement === body) panel.appendChild(el);
+    }
+    closeDrawer();
+  }
+}
+
+function toggleDrawer() {
+  const open = document.getElementById('drawer').classList.toggle('open');
+  document.getElementById('drawer-backdrop').classList.toggle('visible', open);
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('visible');
+}
+
+_mq.addEventListener('change', syncDrawerContents);
+
 // ── Boot ──
-window.addEventListener('load', connect);
+window.addEventListener('load', () => {
+  syncDrawerContents();
+  connect();
+});

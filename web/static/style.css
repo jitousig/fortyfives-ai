@@ -493,6 +493,9 @@ body {
 /* ── Misc ── */
 .red-text { color: #ef5350; }
 
+/* Drawer is mobile-only; hidden entirely on desktop. */
+#drawer, #drawer-toggle, #drawer-backdrop { display: none; }
+
 /* Touch press feedback (hover doesn't exist on touch) */
 .card.playable:active { transform: translateY(-12px); }
 .card.selected-discard:active { transform: translateY(-18px); }
@@ -568,9 +571,7 @@ body {
   #status-block #tricks-block { display: none; }
   #turn-display { font-size: 12px; }
 
-  /* Log + new-game move into the M3 drawer; hidden in the bar for now. */
-  #log-wrap,
-  #new-game-btn { display: none; }
+  /* Log + new-game are relocated by JS into #drawer (below). */
 
   /* ── Table fills the viewport below the bar ── */
   #table-area {
@@ -666,4 +667,87 @@ body {
   #overlay-box { padding: 28px 24px; }
   #overlay-title { font-size: 24px; }
   #overlay-msg { font-size: 14px; }
+
+  /* ── Log / info drawer ── */
+  #drawer-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    position: fixed;
+    right: 0;
+    top: 44%;
+    z-index: 95;
+    padding: 9px 7px;
+    border: none;
+    border-radius: 10px 0 0 10px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #drawer-toggle span { font-size: 9px; letter-spacing: 0.5px; opacity: 0.8; }
+
+  #drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  #drawer-backdrop.visible { opacity: 1; pointer-events: auto; }
+
+  #drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 151;
+    max-height: 72dvh;
+    background: #1b3a2a;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px 16px 0 0;
+    padding: 8px 16px calc(env(safe-area-inset-bottom) + 16px);
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+  }
+  #drawer.open { transform: translateY(0); }
+
+  #drawer-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.3);
+    margin: 4px auto 10px;
+    cursor: pointer;
+  }
+  #drawer-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    opacity: 0.55;
+    margin-bottom: 8px;
+  }
+  #drawer-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+    min-height: 0;
+  }
+  /* Relocated log fills the drawer; New Game sits below it. */
+  #drawer-body #log-wrap {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    max-height: 52dvh;
+  }
+  #drawer-body #new-game-btn { display: block; }
 }
