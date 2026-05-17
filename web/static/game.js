@@ -472,4 +472,7 @@ _mq.addEventListener('change', syncDrawerContents);
 window.addEventListener('load', () => {
   syncDrawerContents();
   connect();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 });

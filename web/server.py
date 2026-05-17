@@ -20,6 +20,16 @@ async def index():
     return FileResponse(_static / "index.html")
 
 
+@app.get("/sw.js")
+async def service_worker():
+    # Served from root so the worker's scope is the whole origin.
+    return FileResponse(
+        _static / "sw.js",
+        media_type="application/javascript",
+        headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"},
+    )
+
+
 def _trick_complete_state(session: GameSession) -> dict:
     """Return a state dict with the last completed trick frozen in place for animation."""
     state = session.serialize_state()

@@ -39,8 +39,9 @@ ephemeral web-session container via git. Update the checkboxes as milestones lan
   strips, trick center, fanned hand, sticky bottom action bar. *(done)*
 - [x] **M3 Log/score drawer** — slide-up bottom sheet holding the game log
   and New Game button (JS relocates them on mobile; side tab to open). *(done)*
-- [ ] **M4 PWA** — manifest, icons, service worker, iOS meta; FastAPI route so
-  `sw.js` is served at root scope.
+- [x] **M4 PWA** — manifest, app icons (incl. maskable + apple-touch),
+  iOS meta, network-first service worker, FastAPI `/sw.js` root-scope
+  route with `Service-Worker-Allowed`. *(done)*
 - [ ] **M5 Polish & test pass** — tap targets, animations, edge cases (discard
   hand of 6+, long log, game-over, reconnect after Render redeploy).
 
