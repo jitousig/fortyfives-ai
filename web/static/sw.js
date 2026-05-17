@@ -3,12 +3,12 @@
  * pin stale assets; cache is purely an offline fallback. WebSocket and
  * non-GET requests are left untouched. */
 
-const CACHE = 'fortyfives-v3';
+const CACHE = 'fortyfives-v4';
 const SHELL = [
   '/',
   '/static/index.html',
-  '/static/style.css?v=3',
-  '/static/game.js?v=3',
+  '/static/style.css?v=4',
+  '/static/game.js?v=4',
   '/static/manifest.webmanifest',
   '/static/icons/icon-192.png',
   '/static/icons/icon-512.png',

@@ -237,9 +237,13 @@ body {
   cursor: pointer;
   transform: translateY(-6px);
 }
-.card.playable:hover {
-  transform: translateY(-12px);
-  box-shadow: 0 0 18px rgba(253,216,53,0.95);
+/* Hover lift only where hover truly exists — on touch, :hover sticks
+   after a tap and leaves one card raised above the rest. */
+@media (hover: hover) and (pointer: fine) {
+  .card.playable:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 0 18px rgba(253,216,53,0.95);
+  }
 }
 
 .card.selected-discard {
@@ -247,9 +251,11 @@ body {
   box-shadow: 0 0 14px rgba(239,83,80,0.9);
   transform: translateY(-14px);
 }
-.card.selected-discard:hover {
-  transform: translateY(-18px);
-  box-shadow: 0 0 22px rgba(239,83,80,1);
+@media (hover: hover) and (pointer: fine) {
+  .card.selected-discard:hover {
+    transform: translateY(-18px);
+    box-shadow: 0 0 22px rgba(239,83,80,1);
+  }
 }
 
 /* Empty trick slot */
