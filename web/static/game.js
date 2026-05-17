@@ -170,15 +170,75 @@ function render() {
   }
 }
 
+function fmtTrumpCard(cs) {
+  if (!cs) return '';
+  const sym = { S: '♠', H: '♥', D: '♦', C: '♣' };
+  const rank = cs.slice(0, -1).replace('T', '10');
+  return rank + (sym[cs.slice(-1)] || cs.slice(-1));
+}
+
+function handTeamSection(label, tricks, raw, delta, isBidTeam,
+                         bidValue, bidMade, bidSuccessVal, highTrumpCard) {
+  const fmt = (n) => (n > 0 ? `+${n}` : `${n}`);
+  const rows = [
+    `<div class="hr-row"><span>${tricks} trick` +
+    `${tricks !== 1 ? 's' : ''} × 5</span><span>+${tricks * 5} pts</span></div>`,
+  ];
+  if (highTrumpCard) {
+    rows.push(
+      `<div class="hr-row highlight"><span>High trump ` +
+      `${fmtTrumpCard(highTrumpCard)}</span><span>+5 pts</span></div>`);
+  }
+  rows.push(
+    `<div class="hr-row total"><span>Earned</span><span>${raw} pts</span></div>`);
+  let verdict = '';
+  if (isBidTeam) {
+    if (bidMade) {
+      const bonus = (bidSuccessVal && bidSuccessVal !== bidValue)
+        ? ` <small>(${bidValue}-for-${bidSuccessVal})</small>` : '';
+      verdict = `<div class="hr-verdict made">✓ Made bid of ${bidValue}` +
+        ` → ${fmt(delta)} pts${bonus}</div>`;
+    } else {
+      verdict = `<div class="hr-verdict fail">✗ Missed bid of ${bidValue}` +
+        ` → ${fmt(delta)} pts</div>`;
+    }
+  } else {
+    verdict = `<div class="hr-verdict">${fmt(delta)} pts this hand</div>`;
+  }
+  return `<div class="hr-team"><div class="hr-team-label">${label}</div>` +
+    `<div class="hr-rows">${rows.join('')}</div>${verdict}</div>`;
+}
+
 function showHandOver() {
   const s = state.hand_summary || {};
   const fmt = (n) => (n > 0 ? `+${n}` : `${n}`);
   const msg = document.getElementById('hand-overlay-msg');
-  msg.innerHTML =
-    `This hand &nbsp;—&nbsp; <strong>N/S ${fmt(s.d_ns ?? 0)}</strong>` +
-    ` &nbsp;·&nbsp; <strong>E/W ${fmt(s.d_ew ?? 0)}</strong><br>` +
-    `<span class="ho-totals">Totals &nbsp; N/S ${s.ns ?? 0} &nbsp;·&nbsp; ` +
-    `E/W ${s.ew ?? 0} &nbsp;<small>(first to 125)</small></span>`;
+
+  // Rich breakdown when the enriched payload is present; otherwise
+  // fall back to the legacy one-line summary.
+  if (s.ns_tricks !== undefined && s.bid_team) {
+    const nsBid = s.bid_team === 'ns';
+    const nsSec = handTeamSection(
+      'North / South', s.ns_tricks ?? 0, s.ns_raw ?? 0, s.d_ns ?? 0,
+      nsBid, s.bid_value, s.bid_made, s.bid_success_val,
+      s.high_trump_team === 'ns' ? s.high_trump_card : null);
+    const ewSec = handTeamSection(
+      'East / West', s.ew_tricks ?? 0, s.ew_raw ?? 0, s.d_ew ?? 0,
+      !nsBid, s.bid_value, s.bid_made, s.bid_success_val,
+      s.high_trump_team === 'ew' ? s.high_trump_card : null);
+    msg.innerHTML =
+      `<div class="hr-grid">${nsSec}${ewSec}</div>` +
+      `<div class="ho-totals">Totals &nbsp; N/S ${s.ns ?? 0} ` +
+      `&nbsp;·&nbsp; E/W ${s.ew ?? 0} &nbsp;<small>(first to 125)` +
+      `</small></div>`;
+  } else {
+    msg.innerHTML =
+      `This hand &nbsp;—&nbsp; <strong>N/S ${fmt(s.d_ns ?? 0)}</strong>` +
+      ` &nbsp;·&nbsp; <strong>E/W ${fmt(s.d_ew ?? 0)}</strong><br>` +
+      `<span class="ho-totals">Totals &nbsp; N/S ${s.ns ?? 0} ` +
+      `&nbsp;·&nbsp; E/W ${s.ew ?? 0} &nbsp;<small>(first to 125)` +
+      `</small></span>`;
+  }
   document.getElementById('hand-overlay').classList.add('visible');
 }
 
