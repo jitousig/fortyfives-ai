@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Fortyfives">
   <title>Fortyfives</title>
-  <link rel="stylesheet" href="/static/style.css?v=2">
+  <link rel="stylesheet" href="/static/style.css?v=3">
 </head>
 <body>
   <div id="app">
@@ -127,6 +127,13 @@
     </div>
   </div>
 
-  <script src="/static/game.js?v=2"></script>
+  <!-- PWA install affordance (hidden until installable / iOS Safari) -->
+  <div id="install-bar" hidden>
+    <span id="install-text"></span>
+    <button id="install-btn" type="button" hidden>Install</button>
+    <button id="install-dismiss" type="button" aria-label="Dismiss">&times;</button>
+  </div>
+
+  <script src="/static/game.js?v=3"></script>
 </body>
 </html>

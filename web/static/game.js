@@ -519,6 +519,7 @@ _mq.addEventListener('change', syncResponsiveLayout);
 window.addEventListener('load', () => {
   syncResponsiveLayout();
   connect();
+  initInstall();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
     // A Render redeploy activates a new worker; reload once so the
@@ -530,4 +531,85 @@ window.addEventListener('load', () => {
       window.location.reload();
     });
   }
+});
+
+// ── PWA install affordance ──
+let _installEvent = null;
+
+function _isStandalone() {
+  return (window.matchMedia
+            && window.matchMedia('(display-mode: standalone)').matches)
+         || window.navigator.standalone === true;
+}
+function _installDismissed() {
+  try { return localStorage.getItem('fortyfivesInstallDismissed') === '1'; }
+  catch (e) { return false; }
+}
+function _markInstallDone() {
+  try { localStorage.setItem('fortyfivesInstallDismissed', '1'); } catch (e) {}
+}
+function _hideInstallBar() {
+  const bar = document.getElementById('install-bar');
+  if (bar) bar.hidden = true;
+}
+function _showAndroidInstall() {
+  if (_isStandalone() || _installDismissed()) return;
+  const bar = document.getElementById('install-bar');
+  const btn = document.getElementById('install-btn');
+  const txt = document.getElementById('install-text');
+  if (!bar || !btn || !txt) return;
+  txt.textContent = 'Install Fortyfives for full-screen play';
+  btn.hidden = false;
+  bar.hidden = false;
+}
+
+function initInstall() {
+  const bar = document.getElementById('install-bar');
+  if (!bar || _isStandalone() || _installDismissed()) return;
+
+  document.getElementById('install-dismiss').addEventListener('click', () => {
+    _hideInstallBar();
+    _markInstallDone();
+  });
+
+  document.getElementById('install-btn').addEventListener('click', async () => {
+    if (!_installEvent) return;
+    _installEvent.prompt();
+    let outcome = 'dismissed';
+    try { ({ outcome } = await _installEvent.userChoice); } catch (e) {}
+    _installEvent = null;
+    _hideInstallBar();
+    if (outcome === 'accepted') _markInstallDone();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    _hideInstallBar();
+    _markInstallDone();
+  });
+
+  // Android / desktop Chrome may have fired the event before init ran
+  if (_installEvent) {
+    _showAndroidInstall();
+    return;
+  }
+
+  // iOS Safari never fires beforeinstallprompt — show a one-time manual
+  // hint (Add to Home Screen lives in the Share sheet there).
+  const ua = navigator.userAgent || '';
+  const iOS = /iPad|iPhone|iPod/.test(ua)
+    || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua));
+  const inApp = /CriOS|FxiOS|EdgiOS|GSA|FBAN|FBAV|Instagram|Line/i.test(ua);
+  if (iOS && !inApp) {
+    document.getElementById('install-btn').hidden = true;
+    document.getElementById('install-text').innerHTML =
+      'Install: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>';
+    bar.hidden = false;
+  }
+}
+
+// Capture the install event as early as possible (it can fire before load)
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _installEvent = e;
+  _showAndroidInstall();
 });

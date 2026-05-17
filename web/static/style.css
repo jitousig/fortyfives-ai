@@ -536,6 +536,52 @@ body {
 }
 #hand-overlay-box button:hover { background: #ffee58; }
 
+/* ── PWA install bar ── */
+#install-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
+  background: #1b5e20;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.35);
+  font-size: 13px;
+}
+#install-bar[hidden] { display: none; }
+#install-text { flex: 1; line-height: 1.4; }
+#install-text strong { color: #fdd835; }
+#install-btn {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  background: #fdd835;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+#install-btn[hidden] { display: none; }
+#install-btn:hover { background: #ffee58; }
+#install-dismiss {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  padding: 0 4px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+#install-dismiss:hover { opacity: 1; }
+
 /* ── Misc ── */
 .red-text { color: #ef5350; }
 
