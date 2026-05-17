@@ -88,9 +88,16 @@ class EVBidder:
     """Faithful-rollout EV bidder. NS phase-1 only differs from
     RuleBasedAgent; everything else delegates to it."""
 
-    def __init__(self, num_actions=18, n_worlds=20, seed=0):
+    def __init__(self, num_actions=18, n_worlds=20, seed=0,
+                 ev_declare=True):
         self.num_actions = num_actions
         self.n_worlds = n_worlds
+        # ev_declare=True: also EV-choose the phase-2 trump declaration
+        # (single-variable lever vs the level-only agent). ev_declare=
+        # False reproduces the prior committed bid-level-only EVBidder
+        # byte-for-byte (phase-2 delegates to rule-based) for a clean
+        # A/B ablation.
+        self.ev_declare = ev_declare
         self.use_raw = True
         self._rb = RuleBasedAgent(num_actions)       # delegate + rollout policy
         self._rng = np.random.RandomState(seed)
@@ -163,9 +170,13 @@ class EVBidder:
         raw = state['raw_obs']
         phase = raw.get('phase')
 
-        # Only the phase-1 bid level is EV-chosen; everything else
-        # (declaration/discard/play) delegates to rule-based unchanged.
-        if phase != 1 or self._env is None:
+        # Phase-1 bid level is always EV-chosen; phase-2 trump
+        # declaration is EV-chosen only when ev_declare. Discard/play
+        # always delegate to rule-based (held constant). The rollout
+        # machinery is phase-agnostic (_decode_action is phase-aware),
+        # so the same argmax loop drives both.
+        ev_phase = (phase == 1) or (phase == 2 and self.ev_declare)
+        if not ev_phase or self._env is None:
             return self._rb.step(state)
 
         legal = sorted(state['legal_actions'].keys())
