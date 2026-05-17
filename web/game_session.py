@@ -8,7 +8,8 @@ from rlcard.envs.registration import register, registry
 from fortyfives.games.fortyfives.game import (
     FortyfivesGame,
     PHASE_AUCTION, PHASE_DECLARATION, PHASE_DISCARD, PHASE_GAMEPLAY,
-    BID_VALUES, BID_PASS, BID_20, BID_25, BID_30, BID_HOLD, DISCARD_DONE,
+    BID_VALUES, BID_SUCCESS_VALUES,
+    BID_PASS, BID_20, BID_25, BID_30, BID_HOLD, DISCARD_DONE,
 )
 
 # ── SOTA opponent (composite, wired exactly like play_eval._run_hand) ──
@@ -82,6 +83,44 @@ class GameSession:
         self.game_over = False
         self.hand_over = False
         self.last_hand_summary = None
+        # Rich per-hand breakdown for the hand-summary popup. tricks /
+        # high-trump / bid_made are reset by FortyfivesGame.end_hand(),
+        # so capture them at that boundary (instance wrapper — keeps the
+        # rlcard env's own game instance; main's pause/dismiss flow is
+        # untouched, only the popup payload is enriched).
+        self._last_hand_result = None
+        _orig_end_hand = self.game.end_hand
+
+        def _capturing_end_hand():
+            g = self.game
+            pre_ns = g.points.get(0, 0) if isinstance(g.points, dict) else 0
+            pre_ew = g.points.get(1, 0) if isinstance(g.points, dict) else 0
+            tricks = list(g.tricks_won) if g.tricks_won else [0, 0, 0, 0]
+            ht_player = g.highest_trump_player
+            ht_card = (str(g.highest_trump_played)
+                       if g.highest_trump_played else None)
+            _orig_end_hand()  # scores, updates points, resets trump fields
+            bid_team_idx = (g.highest_bidder % 2
+                            if g.highest_bidder is not None else None)
+            self._last_hand_result = {
+                "bid_team": ("ns" if bid_team_idx == 0
+                             else "ew" if bid_team_idx == 1 else None),
+                "bid_value": BID_VALUES.get(g.highest_bid),
+                "bid_made": bool(getattr(g, "bid_made", False)),
+                "bid_success_val": BID_SUCCESS_VALUES.get(g.highest_bid),
+                "ns_tricks": tricks[0] + tricks[2],
+                "ew_tricks": tricks[1] + tricks[3],
+                "ns_raw": int(g.hand_points[0]) if g.hand_points else 0,
+                "ew_raw": int(g.hand_points[1]) if g.hand_points else 0,
+                "high_trump_team": ("ns" if (ht_player is not None
+                                             and ht_player % 2 == 0)
+                                    else "ew" if ht_player is not None
+                                    else None),
+                "high_trump_card": ht_card,
+                "trump_suit": g.trump_suit,
+            }
+
+        self.game.end_hand = _capturing_end_hand
 
         # Composite SOTA opponent. PIMC n_worlds=10: documented as
         # statistically indistinguishable from 20 and ~2x faster — picked
@@ -226,9 +265,8 @@ class GameSession:
             d_ew = ew - pre_points.get(1, 0)
             self.log.append(f"Hand over — NS: {ns} ({d_ns:+d}), EW: {ew} ({d_ew:+d})")
             self.hand_over = True
-            self.last_hand_summary = {
-                "ns": ns, "ew": ew, "d_ns": d_ns, "d_ew": d_ew,
-            }
+            self.last_hand_summary = self._compose_hand_summary(
+                ns, ew, d_ns, d_ew)
 
         if game.check_game_over():
             ns = game.points.get(0, 0)
@@ -244,10 +282,22 @@ class GameSession:
 
         return game.current_player_id != self.human_player
 
+    def _compose_hand_summary(self, ns, ew, d_ns, d_ew):
+        """Main's score line ({ns,ew,d_ns,d_ew}) plus the rich
+        per-hand breakdown captured at the end_hand() boundary. The
+        legacy keys are kept so any older client still works; the
+        frontend renders the detailed view when the rich keys exist."""
+        summary = {"ns": ns, "ew": ew, "d_ns": d_ns, "d_ew": d_ew}
+        if self._last_hand_result:
+            summary.update(self._last_hand_result)
+        self._last_hand_result = None
+        return summary
+
     def continue_after_hand(self):
         """Dismiss the hand-summary popup and resume play."""
         self.hand_over = False
         self.last_hand_summary = None
+        self._last_hand_result = None
 
     def take_human_action(self, action):
         """Process human action. Returns error dict or None on success."""
@@ -281,9 +331,8 @@ class GameSession:
             d_ew = ew - pre_points.get(1, 0)
             self.log.append(f"Hand over — NS: {ns} ({d_ns:+d}), EW: {ew} ({d_ew:+d})")
             self.hand_over = True
-            self.last_hand_summary = {
-                "ns": ns, "ew": ew, "d_ns": d_ns, "d_ew": d_ew,
-            }
+            self.last_hand_summary = self._compose_hand_summary(
+                ns, ew, d_ns, d_ew)
 
         if game.check_game_over():
             ns = game.points.get(0, 0)

@@ -878,3 +878,31 @@ body {
   }
   #drawer-body #new-game-btn { display: block; }
 }
+
+/* Hand-summary breakdown (enriched popup payload) */
+#hand-overlay-msg .hr-grid {
+  display: flex; gap: 14px; justify-content: center;
+  flex-wrap: wrap; margin: 6px 0 10px;
+}
+#hand-overlay-msg .hr-team {
+  background: rgba(255,255,255,0.06); border-radius: 8px;
+  padding: 10px 14px; min-width: 180px; text-align: left;
+}
+#hand-overlay-msg .hr-team-label {
+  font-weight: 600; font-size: 13px; opacity: 0.85;
+  margin-bottom: 6px; text-align: center;
+}
+#hand-overlay-msg .hr-row {
+  display: flex; justify-content: space-between; gap: 18px;
+  font-size: 13px; line-height: 1.7;
+}
+#hand-overlay-msg .hr-row.highlight { color: #ffe082; }
+#hand-overlay-msg .hr-row.total {
+  border-top: 1px solid rgba(255,255,255,0.18);
+  margin-top: 4px; padding-top: 4px; font-weight: 600;
+}
+#hand-overlay-msg .hr-verdict {
+  margin-top: 8px; font-size: 13px; font-weight: 600; text-align: center;
+}
+#hand-overlay-msg .hr-verdict.made { color: #81c784; }
+#hand-overlay-msg .hr-verdict.fail { color: #e57373; }
