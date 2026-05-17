@@ -437,21 +437,31 @@ function escHtml(str) {
 
 const _mq = window.matchMedia('(max-width: 820px)');
 
-function syncDrawerContents() {
+function syncResponsiveLayout() {
   const body = document.getElementById('drawer-body');
   const panel = document.getElementById('right-panel');
-  const items = [
+  const drawerItems = [
     document.getElementById('log-wrap'),
     document.getElementById('new-game-btn'),
   ];
+  // Bid status is needed during the auction; on mobile it can't live in
+  // the compact top bar, so it goes into the centre of the table.
+  const bid = document.getElementById('bid-block');
+  const trickCenter = document.getElementById('trick-center');
+  const status = document.getElementById('status-block');
+  const tricks = document.getElementById('tricks-block');
+
   if (_mq.matches) {
-    for (const el of items) {
+    for (const el of drawerItems) {
       if (el && el.parentElement !== body) body.appendChild(el);
     }
+    if (bid && bid.parentElement !== trickCenter) trickCenter.appendChild(bid);
   } else {
-    for (const el of items) {
+    for (const el of drawerItems) {
       if (el && el.parentElement === body) panel.appendChild(el);
     }
+    // Restore bid-block to its original spot (before tricks-block).
+    if (bid && bid.parentElement !== status) status.insertBefore(bid, tricks);
     closeDrawer();
   }
 }
@@ -466,11 +476,11 @@ function closeDrawer() {
   document.getElementById('drawer-backdrop').classList.remove('visible');
 }
 
-_mq.addEventListener('change', syncDrawerContents);
+_mq.addEventListener('change', syncResponsiveLayout);
 
 // ── Boot ──
 window.addEventListener('load', () => {
-  syncDrawerContents();
+  syncResponsiveLayout();
   connect();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

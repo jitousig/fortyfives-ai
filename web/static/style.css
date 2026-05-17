@@ -668,6 +668,19 @@ body {
   .trick-slot { min-width: var(--card-w); min-height: var(--card-h); }
   #trump-badge { font-size: 17px; padding: 2px 6px; }
 
+  /* Bid status relocated into the table centre (visible during auction) */
+  #trick-center #bid-block {
+    margin-top: 6px;
+    background: rgba(0,0,0,0.45);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: center;
+    white-space: nowrap;
+  }
+  #trick-center #bid-block:empty { display: none; }
+
   /* Game-over overlay sized for phone */
   #overlay-box { padding: 28px 24px; }
   #overlay-title { font-size: 24px; }
