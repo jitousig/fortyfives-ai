@@ -474,5 +474,13 @@ window.addEventListener('load', () => {
   connect();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
+    // A Render redeploy activates a new worker; reload once so the
+    // client picks up fresh assets and a clean WebSocket.
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return;
+      reloaded = true;
+      window.location.reload();
+    });
   }
 });

@@ -518,6 +518,9 @@ body {
     overflow-y: auto;
     height: auto;
     min-height: 100dvh;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 
   #app {
@@ -619,8 +622,10 @@ body {
     justify-content: center;
     max-width: 100%;
     overflow-x: auto;
+    overflow-y: visible;
     scrollbar-width: none;
-    padding-top: 14px;
+    padding-top: 22px;
+    padding-bottom: 4px;
   }
   #south-hand::-webkit-scrollbar { display: none; }
   #south-hand .card { margin-left: -18px; }

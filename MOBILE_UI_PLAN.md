@@ -42,8 +42,9 @@ ephemeral web-session container via git. Update the checkboxes as milestones lan
 - [x] **M4 PWA** — manifest, app icons (incl. maskable + apple-touch),
   iOS meta, network-first service worker, FastAPI `/sw.js` root-scope
   route with `Service-Worker-Allowed`. *(done)*
-- [ ] **M5 Polish & test pass** — tap targets, animations, edge cases (discard
-  hand of 6+, long log, game-over, reconnect after Render redeploy).
+- [x] **M5 Polish & test pass** — lifted-card clip fix for big discard
+  hands, auto-reload on redeploy (SW controllerchange), no long-press
+  text selection. *(done)*
 
 ## Files in scope
 
