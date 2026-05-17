@@ -247,3 +247,58 @@ One change at a time, `git commit` per change, **plan-first** for non-trivial
 work, and re-run invariant #2 after any `env`/`eval` edit. A result you cannot
 trust is worse than no result.
 
+## Repository Workflow & Branching Discipline — READ BEFORE ANY GIT OP
+
+This is a **monorepo** with three components over one shared core. A
+long-divergent branch + unpushed commits + a `git reset --hard` once nearly
+destroyed an entire session's research. These rules are invariants, not
+suggestions. The monorepo is correct (a core fix must reach research AND the
+UIs atomically) — the failure mode is branch divergence, not repo structure.
+
+### Components & the one-way dependency rule
+- `fortyfives/` — core game logic. STABLE. Imported by everything; imports
+  none of our other code.
+- agent modules (`examples/fortyfives_pimc.py`,
+  `examples/fortyfives_rule_based.py`, or an `agents/` dir) — released,
+  UI-usable agents. Import only `fortyfives/`.
+- research (`examples/` eval/training, experiments) — imports core + agents;
+  churns freely; NOT imported by the UI.
+- `web/` / mobile — UI. Imports core + agents. Nothing imports the UI.
+- Imports flow ONE way: **core → agents → {research, UI}**. research and UI
+  never import each other. A bug found via the UI is fixed in `fortyfives/`,
+  never patched around in the UI.
+
+### Branching — trunk-based, kept boring
+- `main` is the single source of truth and MUST stay green (tests pass).
+  Core fixes land on `main` FIRST.
+- Work on SHORT-lived branches off `main`; push the branch immediately on
+  creation; merge back when green; delete it after merge.
+- Rebase/merge from `main` frequently. NEVER let a branch diverge far.
+- Released agents are ARTIFACTS, not branches: pure-code agents live on
+  `main` and are git-TAGGED at release (`agent-vN`); the UI imports them
+  from `main`. Trained weights → GitHub Releases / git-LFS, never committed
+  source.
+
+### Git safety (each of these, alone, would have prevented the incident)
+1. PUSH immediately. An unpushed commit is unrecoverable once the branch
+   moves.
+2. NEVER `git reset --hard`, `checkout -f`, or `branch -f` a branch that has
+   unpushed commits or a dirty tree. Check `git status` and
+   `git log @{u}..HEAD` first.
+3. Before ANY destructive git op, confirm every commit is reachable from a
+   pushed ref (`git branch -r --contains <sha>`); if not, push it first.
+4. Do NOT propagate core fixes sideways between divergent branches via
+   ad-hoc cherry-pick or reset+merge. Land the fix on `main`; other branches
+   merge `main`.
+5. Bug found while testing (including via the UI): add a FAILING test in
+   `tests/` that reproduces it, fix in core on a short branch, merge to
+   `main`, other branches merge `main`. `main` stays green.
+6. Prefer git worktrees (already in use) to run components in parallel.
+   Never branch-switch or reset a worktree that has a dirty tree or a
+   running experiment.
+
+### This document
+This guidance is repo-wide and MUST live on `main` so every branch/worktree
+inherits it. If you edited it on a feature or research branch, explicitly
+flag that it still needs merging to `main`.
+
