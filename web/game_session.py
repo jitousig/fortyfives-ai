@@ -34,7 +34,7 @@ if 'fortyfives' not in registry.env_specs:
         entry_point='fortyfives.envs.fortyfives_env:FortyfivesEnv',
     )
 
-PLAYER_NAMES = ["You (South)", "West", "North", "East"]
+PLAYER_NAMES = ["South", "West", "North", "East"]
 SUIT_SYMBOLS = {'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣'}
 PHASE_NAMES = {
     PHASE_AUCTION: 'Bidding',
@@ -133,7 +133,12 @@ class GameSession:
         self._rule_agent = RuleBasedAgent(num_actions=18)
         self._pimc_agent = PIMCAgent(num_actions=18, n_worlds=10)
 
-        self.log.append("Game started! You are South (partner: North).")
+        # Neutral, seat-correct transcript: the log is broadcast
+        # identically to every connection, so it must NOT be written
+        # from one seat's "you" POV (was a multiplayer bug). The
+        # rotated UI still shows "You"/Partner per client.
+        self.log.append(
+            "New game — North/South vs East/West. First to 125.")
         self._log_phase()
 
     def _agent_for_phase(self, phase):
@@ -345,7 +350,7 @@ class GameSession:
         # Frontend speaks raw game ids; the env expects env ids.
         env_action = self.env._game_to_env_action(action, pre_phase)
         self._state, self._pid = self.env.step(env_action)
-        self.log.append(f"You: {action_desc}")
+        self.log.append(f"{PLAYER_NAMES[seat]}: {action_desc}")
 
         post_phase = game.phase
         if pre_phase != post_phase:
