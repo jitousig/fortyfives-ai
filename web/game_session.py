@@ -79,6 +79,10 @@ class GameSession:
         # env wraps the same FortyfivesGame instance.
         self.game = self.env.game
         self.human_player = human_player
+        # Seats controlled by humans; every other seat is a bot. Solo
+        # (default) = {human_player}. Multiplayer (PR-B) grows this set;
+        # all per-seat logic keys off membership here, not human_player.
+        self.human_seats = {human_player}
         self.log = []
         self.game_over = False
         self.hand_over = False
@@ -152,6 +156,16 @@ class GameSession:
             self.log.append(f"Play begins. Trump: {trump}")
 
     def serialize_state(self):
+        """Back-compat: the solo human's view. Identical output to the
+        pre-multiplayer implementation (delegates to serialize_state_for
+        with the single human seat)."""
+        return self.serialize_state_for(self.human_player)
+
+    def serialize_state_for(self, seat):
+        """State as seen by `seat`. ONLY this seat's hand is included;
+        every other seat is reduced to a card COUNT. Hidden-information
+        boundary — never leak another seat's cards here (regression
+        test: tests/test_state_no_leak.py)."""
         game = self.game
 
         def _hand(i):
@@ -160,7 +174,7 @@ class GameSession:
                 return h.get(i, [])
             return h[i] if i < len(h) else []
 
-        hand = [card_to_str(c) for c in _hand(self.human_player)]
+        hand = [card_to_str(c) for c in _hand(seat)]
 
         current_trick = [None] * game.num_players
         if game.current_trick:
@@ -178,7 +192,10 @@ class GameSession:
         ew_points = pts.get(1, 0) if isinstance(pts, dict) else 0
 
         legal_actions = []
-        if not self.game_over and game.current_player_id == self.human_player:
+        is_seat_turn = (not self.game_over
+                        and game.current_player_id == seat
+                        and seat in self.human_seats)
+        if is_seat_turn:
             legal_actions = game.get_legal_actions()
 
         bids = _bids_to_dict(game.bids, game.num_players)
@@ -188,9 +205,10 @@ class GameSession:
             "type": "state",
             "phase": game.phase,
             "phase_name": PHASE_NAMES.get(game.phase, "Unknown"),
-            "human_player": self.human_player,
+            "human_player": seat,
+            "your_seat": seat,
             "current_player": game.current_player_id,
-            "is_human_turn": not self.game_over and game.current_player_id == self.human_player,
+            "is_human_turn": is_seat_turn,
             "hand": hand,
             "legal_actions": legal_actions,
             "current_trick": current_trick,
@@ -218,7 +236,7 @@ class GameSession:
     def run_ai_turn(self):
         """Run one AI turn. Returns True if more AI turns are needed."""
         game = self.game
-        if game.current_player_id == self.human_player:
+        if game.current_player_id in self.human_seats:
             return False
         if self.game_over:
             return False
@@ -280,7 +298,7 @@ class GameSession:
         if self.hand_over:
             return False  # pause for the hand-summary popup
 
-        return game.current_player_id != self.human_player
+        return game.current_player_id not in self.human_seats
 
     def _compose_hand_summary(self, ns, ew, d_ns, d_ew):
         """Main's score line ({ns,ew,d_ns,d_ew}) plus the rich
@@ -300,11 +318,20 @@ class GameSession:
         self._last_hand_result = None
 
     def take_human_action(self, action):
-        """Process human action. Returns error dict or None on success."""
+        """Back-compat: act for the solo human seat."""
+        return self.take_seat_action(self.human_player, action)
+
+    def take_seat_action(self, seat, action):
+        """Process an action submitted for `seat`. Validates it is that
+        seat's turn AND that seat is human-controlled (a connection
+        cannot act for a bot seat or another player's seat). Returns an
+        error dict or None on success."""
         game = self.game
         if self.game_over:
             return {"error": "Game is over"}
-        if game.current_player_id != self.human_player:
+        if seat not in self.human_seats:
+            return {"error": f"Seat {seat} is not human-controlled"}
+        if game.current_player_id != seat:
             return {"error": "Not your turn"}
 
         legal = game.get_legal_actions()
@@ -313,7 +340,7 @@ class GameSession:
 
         pre_phase = game.phase
         pre_points = dict(game.points) if isinstance(game.points, dict) else {}
-        action_desc = self._describe_action(action, game.phase, self.human_player)
+        action_desc = self._describe_action(action, game.phase, seat)
 
         # Frontend speaks raw game ids; the env expects env ids.
         env_action = self.env._game_to_env_action(action, pre_phase)
