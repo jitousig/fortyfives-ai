@@ -52,9 +52,15 @@ class Room:
         # outside a running loop (py3.9 / tests); the server only
         # touches .lock from within the event loop.
         self._lock = None
-        # ws -> seat (int) or None (in lobby, not yet seated)
+        # Live sockets only: ws -> seat (int) or None (lobby/spectator).
         self.conns: dict[object, object] = {}
+        # Join-time names, transient per socket (copied into a seat on
+        # claim).
         self.names: dict[object, str] = {}
+        # PERSISTENT claims, independent of any socket: seat -> {name,
+        # token}. A claimed seat survives disconnect (PR-C: no bot ever
+        # takes a human seat; the game pauses and waits for rejoin).
+        self.seats: dict[int, dict] = {}
 
     @property
     def lock(self) -> asyncio.Lock:
@@ -88,60 +94,94 @@ class Room:
         self.conns[ws] = None
         self.names[ws] = (name or "Player").strip()[:20] or "Player"
 
-    def _seat_taken_by(self, seat):
+    def _ws_at_seat(self, seat):
         for w, s in self.conns.items():
             if s == seat:
                 return w
         return None
+
+    def seat_connected(self, seat) -> bool:
+        """A claimed seat with a live socket bound to it."""
+        return self._ws_at_seat(seat) is not None
+
+    def waiting_seats(self) -> list:
+        """Claimed seats whose player is currently disconnected — the
+        game pauses on these (no bot takeover)."""
+        return [s for s in sorted(self.seats) if not self.seat_connected(s)]
 
     def claim_seat(self, ws, seat) -> dict | None:
         if self.started:
             return {"error": "Game already started"}
         if not isinstance(seat, int) or not (0 <= seat < 4):
             return {"error": "Invalid seat"}
-        holder = self._seat_taken_by(seat)
-        if holder is not None and holder is not ws:
+        if seat in self.seats and self.conns.get(ws) != seat:
             return {"error": f"Seat {SEAT_NAME[seat]} is taken"}
+        # Release any seat this socket already held (moving seats).
+        prev = self.conns.get(ws)
+        if isinstance(prev, int) and prev in self.seats:
+            self.seats.pop(prev, None)
+        token = uuid.uuid4().hex
+        self.seats[seat] = {
+            "name": self.names.get(ws, "Player"),
+            "token": token,
+        }
         self.conns[ws] = seat
-        return None
+        return {"token": token, "seat": seat}
 
     def leave_seat(self, ws) -> None:
-        if ws in self.conns:
-            self.conns[ws] = None
+        if self.started:
+            return  # mid-game: a leave is a disconnect → seat reserved
+        seat = self.conns.get(ws)
+        if isinstance(seat, int):
+            self.seats.pop(seat, None)
+        self.conns[ws] = None
+
+    def rejoin(self, ws, token):
+        """Re-bind a socket to the seat that owns `token` (server-side
+        validation — never trust a client-claimed seat). Returns the
+        seat, or None if the token is unknown (stale/lost)."""
+        for s, info in self.seats.items():
+            if info.get("token") == token:
+                self.conns[ws] = s
+                return s
+        return None
 
     def claimed_seats(self) -> set:
-        return {s for s in self.conns.values() if isinstance(s, int)}
+        return set(self.seats.keys())
 
     def start(self, ws) -> dict | None:
         if self.started:
             return {"error": "Already started"}
-        seats = self.claimed_seats()
-        if not seats:
+        if not self.seats:
             return {"error": "Claim a seat before starting"}
-        # Humans = claimed seats; every other seat is a bot.
-        self.session.human_seats = set(seats)
+        # Humans = claimed seats (permanent). Only seats nobody claimed
+        # AT START become bots; a claimed seat is never botted.
+        self.session.human_seats = set(self.seats.keys())
         self.started = True
         return None
 
     def remove_connection(self, ws) -> None:
-        seat = self.conns.pop(ws, None)
+        # Drop the live socket ONLY. The seat claim (name+token)
+        # persists so the game pauses and the player can rejoin
+        # indefinitely. No bot takeover; human_seats untouched.
+        self.conns.pop(ws, None)
         self.names.pop(ws, None)
-        # If a seated human leaves mid-game, hand the seat to a bot so
-        # the game never stalls (full reconnect-by-token is PR-C).
-        if self.started and isinstance(seat, int):
-            self.session.human_seats.discard(seat)
-        if not self.conns:
+        # GC when no live socket remains AND nothing is worth keeping:
+        #  - solo: transient, drop it (unchanged from pre-PR-C);
+        #  - multiplayer with NO claimed seats: an abandoned lobby.
+        # A multiplayer room with claimed seats SURVIVES an all-
+        # disconnect so players can rejoin (documented v1 in-memory
+        # limitation; the game is paused, not lost).
+        if not self.conns and (self.solo or not self.seats):
             rooms.pop(self.code, None)
 
     def reset_session(self) -> None:
-        """Fresh game, keeping connections/seats. For a room, re-arm the
-        lobby unless seats are still claimed (rematch keeps seats)."""
+        """Fresh game, keeping claimed seats (rematch)."""
         self.session = GameSession(human_player=0)
         if self.solo:
             return
-        seats = self.claimed_seats()
-        if seats:
-            self.session.human_seats = set(seats)
+        if self.seats:
+            self.session.human_seats = set(self.seats.keys())
             self.started = True
         else:
             self.started = False
@@ -151,13 +191,14 @@ class Room:
         my_seat = self.conns.get(ws)
         seats = []
         for s in range(4):
-            holder = self._seat_taken_by(s)
+            claimed = s in self.seats
             seats.append({
                 "seat": s,
                 "name": SEAT_NAME[s],
                 "partnership": SEAT_PARTNERSHIP[s],
-                "claimed_by": self.names.get(holder) if holder else None,
-                "is_you": holder is ws,
+                "claimed_by": self.seats[s]["name"] if claimed else None,
+                "connected": self.seat_connected(s),
+                "is_you": my_seat == s,
             })
         return {
             "type": "lobby",
@@ -165,23 +206,26 @@ class Room:
             "started": self.started,
             "your_seat": my_seat if isinstance(my_seat, int) else None,
             "seats": seats,
-            "can_start": (not self.started) and bool(self.claimed_seats()),
+            "can_start": (not self.started) and bool(self.seats),
+            "waiting_for": [self.seats[s]["name"]
+                            for s in self.waiting_seats()],
         }
 
     def _seat_names(self) -> dict:
-        """seat -> display name: the human in that seat, else 'Bot'.
-        (Solo rooms don't call this → solo state has no seat_names →
-        the frontend falls back to its compass labels, unchanged.)"""
-        out = {}
-        for s in range(4):
-            holder = self._seat_taken_by(s)
-            out[str(s)] = self.names.get(holder, "You") if holder else "Bot"
-        return out
+        """seat -> display name: the claiming human, else 'Bot'."""
+        return {str(s): (self.seats[s]["name"] if s in self.seats
+                         else "Bot") for s in range(4)}
 
     def _game_state(self, seat) -> dict:
         st = self.session.serialize_state_for(seat)
         if not self.solo:
             st["seat_names"] = self._seat_names()
+            # Non-empty => game is paused waiting on these (disconnected)
+            # players; the client shows a "waiting for …" banner instead
+            # of a silent freeze. The turn driver already won't advance a
+            # claimed human seat, so this IS the pause.
+            st["waiting_for"] = [self.seats[s]["name"]
+                                 for s in self.waiting_seats()]
         return st
 
     def _frozen(self, seat) -> dict:

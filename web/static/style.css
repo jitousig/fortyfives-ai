@@ -963,3 +963,12 @@ body {
   padding: 6px 12px; border: 0; border-radius: 7px;
   background: #ffee58; font-weight: 700; cursor: pointer; font-size: 13px;
 }
+
+/* Game paused on a disconnected player (PR-C: no bot takeover). */
+#waiting-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  background: #b71c1c; color: #fff;
+  font-weight: 700; font-size: 14px; text-align: center;
+  padding: 9px 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}

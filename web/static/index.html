@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Fortyfives">
   <title>Fortyfives</title>
-  <link rel="stylesheet" href="/static/style.css?v=9">
+  <link rel="stylesheet" href="/static/style.css?v=10">
 </head>
 <body>
 
@@ -47,6 +47,10 @@
   </div>
 
   <div id="app" style="display:none">
+
+    <!-- Shown when a claimed seat is disconnected: the game is paused
+         (no bot takeover) and waiting for that player to rejoin. -->
+    <div id="waiting-banner" style="display:none"></div>
 
     <!-- ── Main table ── -->
     <div id="table-area">
@@ -166,6 +170,6 @@
     <button id="install-dismiss" type="button" aria-label="Dismiss">&times;</button>
   </div>
 
-  <script src="/static/game.js?v=9"></script>
+  <script src="/static/game.js?v=10"></script>
 </body>
 </html>
