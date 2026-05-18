@@ -40,14 +40,22 @@ function _wsPath() {
   return roomCode ? `/ws/${roomCode}` : '/ws';
 }
 
+function _tokKey() { return 'ff_tok_' + (roomCode || ''); }
+
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   ws = new WebSocket(`${proto}://${location.host}${_wsPath()}`);
 
   ws.onopen = () => {
     setConn(true);
-    // Rejoining a room after a reconnect: re-announce name/seat.
-    if (roomCode && playerName) {
+    if (!roomCode) return;            // solo: server pushes state
+    // Prefer reconnecting to our existing seat (survives phone-lock /
+    // network blips — the server keeps the seat & game paused). Fall
+    // back to a fresh lobby join if we have no token yet.
+    const tok = localStorage.getItem(_tokKey());
+    if (tok) {
+      ws.send(JSON.stringify({ type: 'rejoin', token: tok }));
+    } else if (playerName) {
       ws.send(JSON.stringify({ type: 'join', name: playerName }));
     }
   };
@@ -55,8 +63,15 @@ function connect() {
   ws.onerror = () => setConn(false);
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
+    if (data.type === 'seat') {
+      // Persist the reconnect token so a phone-lock/refresh rejoins
+      // the same seat instead of starting over.
+      try { localStorage.setItem(_tokKey(), data.token); } catch (_) {}
+      return;
+    }
     if (data.type === 'lobby') {
       lobby = data;
+      updateWaiting(data.waiting_for);
       showScreen(data.started ? 'game' : 'lobby');
       if (!data.started) renderLobby();
       return;
@@ -72,6 +87,7 @@ function connect() {
         trickAnimTimer = null;
       }
       state = data;
+      updateWaiting(data.waiting_for);
       render();
       if (data.trick_animating && data.last_trick_winner != null) {
         const winner = data.last_trick_winner;
@@ -82,8 +98,29 @@ function connect() {
       }
     } else if (data.type === 'error') {
       console.warn('Server error:', data.error);
+      if (data.error === 'reconnect_failed') {
+        // Stale token (e.g. server restarted) — drop it and re-enter
+        // the lobby fresh.
+        try { localStorage.removeItem(_tokKey()); } catch (_) {}
+        if (roomCode && playerName) {
+          ws.send(JSON.stringify({ type: 'join', name: playerName }));
+        }
+      }
     }
   };
+}
+
+// "Waiting for <names> to reconnect…" banner — shown whenever a
+// claimed seat is disconnected (the game is paused, not frozen).
+function updateWaiting(list) {
+  const el = document.getElementById('waiting-banner');
+  if (!el) return;
+  if (list && list.length) {
+    el.textContent = `Waiting for ${list.join(', ')} to reconnect…`;
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 function setConn(ok) {

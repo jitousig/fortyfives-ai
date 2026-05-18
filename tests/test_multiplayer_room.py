@@ -56,11 +56,16 @@ class TestMultiplayerRoom(unittest.TestCase):
         a, b = FakeWS(), FakeWS()
         room.join(a, "Alice")
         room.join(b, "Bob")
-        self.assertIsNone(room.claim_seat(a, 0))      # Alice: South (NS)
-        self.assertIsNone(room.claim_seat(b, 2))      # Bob:   North (NS)
-        # seat already taken
+        # claim_seat now returns a reconnect token (PR-C) on success.
+        ra = room.claim_seat(a, 0)                     # Alice: South (NS)
+        rb = room.claim_seat(b, 2)                     # Bob:   North (NS)
+        self.assertEqual(ra["seat"], 0)
+        self.assertTrue(ra["token"])
+        self.assertEqual(rb["seat"], 2)
+        self.assertNotEqual(ra["token"], rb["token"])
+        # seat already taken → error, claim refused.
         c = FakeWS(); room.join(c, "Cara")
-        self.assertIsNotNone(room.claim_seat(c, 0))
+        self.assertIn("error", room.claim_seat(c, 0))
 
         ls = room.lobby_state_for(a)
         self.assertEqual(ls["type"], "lobby")
@@ -111,21 +116,86 @@ class TestMultiplayerRoom(unittest.TestCase):
             self.assertFalse(
                 leak, f"LEAK to seat {seat}: {sorted(leak)}")
 
-    def test_disconnect_frees_seat_and_bot_takes_over(self):
+    def test_disconnect_keeps_seat_human_no_bot(self):
+        """PR-C: a claimed seat is NEVER converted to a bot on
+        disconnect. The seat stays human and the game pauses on it."""
         room = Room.create_room()
         a, b = FakeWS(), FakeWS()
-        room.join(a, "A"); room.join(b, "B")
+        room.join(a, "Alice"); room.join(b, "Bob")
         room.claim_seat(a, 0); room.claim_seat(b, 2)
         room.start(a)
         self.assertEqual(room.session.human_seats, {0, 2})
 
-        room.remove_connection(a)        # Alice drops mid-game
-        self.assertNotIn(0, room.session.human_seats)  # seat 0 -> bot
-        self.assertEqual(room.session.human_seats, {2})
-        self.assertIn(room.code, rooms)  # room still alive (Bob present)
+        room.remove_connection(a)        # Alice's phone locks mid-game
+        # Seat 0 stays human (no bot takeover); game pauses on it.
+        self.assertEqual(room.session.human_seats, {0, 2})
+        self.assertFalse(room.seat_connected(0))
+        self.assertTrue(room.seat_connected(2))
+        self.assertEqual(room.waiting_seats(), [0])
+        self.assertIn(room.code, rooms)  # room kept alive for reconnect
 
-        room.remove_connection(b)        # last player leaves
-        self.assertNotIn(room.code, rooms)  # room GC'd
+        room.remove_connection(b)        # everyone gone, game in progress
+        # Room SURVIVES an all-disconnect while a game is running so
+        # players can come back (documented v1 in-memory limitation).
+        self.assertIn(room.code, rooms)
+        self.assertEqual(room.waiting_seats(), [0, 2])
+
+    def test_rejoin_by_token_restores_seat_and_resumes(self):
+        room = Room.create_room()
+        a, b = FakeWS(), FakeWS()
+        room.join(a, "Alice"); room.join(b, "Bob")
+        tok = room.claim_seat(a, 0)["token"]
+        room.claim_seat(b, 2)
+        room.start(a)
+
+        room.remove_connection(a)
+        self.assertEqual(room.waiting_seats(), [0])
+
+        a2 = FakeWS()                    # Alice reopens the app
+        seat = room.rejoin(a2, tok)
+        self.assertEqual(seat, 0)
+        self.assertTrue(room.seat_connected(0))
+        self.assertEqual(room.waiting_seats(), [])  # game un-pauses
+        self.assertEqual(room.session.human_seats, {0, 2})
+
+        # A bad/stale token is refused (server falls back to lobby).
+        self.assertIsNone(room.rejoin(FakeWS(), "deadbeef"))
+
+    def test_rejoin_no_leak(self):
+        """No-leak canary still holds after a reconnect."""
+        room = Room.create_room()
+        a, b = FakeWS(), FakeWS()
+        room.join(a, "A"); room.join(b, "B")
+        tok = room.claim_seat(a, 0)["token"]
+        room.claim_seat(b, 1)
+        room.start(a)
+        room.remove_connection(a)
+        a2 = FakeWS()
+        room.rejoin(a2, tok)
+
+        roommod.TRICK_DISPLAY_SECS = 0
+        asyncio.run(room.broadcast())
+
+        g = room.session.game
+        hands = g.hands
+        cards = {s: {card_to_str(c) for c in (
+            hands.get(s, []) if isinstance(hands, dict)
+            else (hands[s] if s < len(hands) else []))} for s in range(4)}
+        payload = a2.sent[-1]
+        if payload.get("type") == "state":
+            self.assertEqual(set(payload["hand"]), cards[0])
+            forbidden = (cards[1] | cards[2] | cards[3]) - cards[0]
+            self.assertFalse(
+                forbidden.intersection(_strings(payload)))
+
+    def test_solo_unaffected_by_reconnect_model(self):
+        room = Room.create_solo()
+        ws = FakeWS()
+        room.add_connection(ws, 0)
+        self.assertTrue(room.solo)
+        self.assertTrue(room.started)
+        room.remove_connection(ws)       # solo: no seats dict → GC'd
+        self.assertNotIn(room.code, rooms)
 
     def test_advance_drives_bots_no_leak(self):
         room = Room.create_room()
@@ -202,6 +272,47 @@ class TestRoomWsHandlerSmoke(unittest.TestCase):
         self.assertTrue(s1["is_you"])
         # Disconnect cleanup ran: last connection gone → room GC'd.
         self.assertNotIn(code, rooms)
+
+    def test_handler_rejoin_by_token_resumes(self):
+        """End-to-end through the real /ws handler: claim → start →
+        drop → reconnect with the issued token resumes the same seat."""
+        import asyncio as aio
+        from web.server import room_ws
+
+        roommod.TRICK_DISPLAY_SECS = 0
+        room = Room.create_room()
+        code = room.code
+
+        ws1 = ScriptedWS([
+            {"type": "join", "name": "Zoe"},
+            {"type": "claim_seat", "seat": 0},
+            {"type": "start"},
+        ])
+        aio.run(room_ws(ws1, code))
+        seat_msg = next(m for m in ws1.sent if m.get("type") == "seat")
+        token = seat_msg["token"]
+        self.assertEqual(seat_msg["seat"], 0)
+        # Seat persisted across the disconnect; game paused on it.
+        self.assertIn(code, rooms)
+        self.assertEqual(room.waiting_seats(), [0])
+
+        ws2 = ScriptedWS([{"type": "rejoin", "token": token}])
+        aio.run(room_ws(ws2, code))
+        # Reconnect bound seat 0 and resumed (no reconnect_failed).
+        self.assertFalse(
+            any(m.get("error") == "reconnect_failed" for m in ws2.sent))
+        self.assertTrue(
+            any(m.get("type") == "state" for m in ws2.sent))
+
+    def test_handler_rejoin_bad_token_falls_back(self):
+        import asyncio as aio
+        from web.server import room_ws
+        code = Room.create_room().code
+        ws = ScriptedWS([{"type": "rejoin", "token": "nope"}])
+        aio.run(room_ws(ws, code))
+        self.assertTrue(
+            any(m.get("error") == "reconnect_failed" for m in ws.sent))
+        self.assertTrue(any(m.get("type") == "lobby" for m in ws.sent))
 
     def test_unknown_room_rejected(self):
         import asyncio as aio

@@ -155,10 +155,31 @@ async def room_ws(websocket: WebSocket, code: str):
                 await room.broadcast_lobby()
 
             elif t == "claim_seat":
-                err = room.claim_seat(websocket, data.get("seat"))
-                if err:
-                    await websocket.send_json({"type": "error", **err})
+                res = room.claim_seat(websocket, data.get("seat"))
+                if res and "error" in res:
+                    await websocket.send_json({"type": "error", **res})
+                elif res and "token" in res:
+                    # Reconnect token — client persists this to rejoin
+                    # the same seat after a disconnect (server validates).
+                    await websocket.send_json({"type": "seat", **res})
                 await room.broadcast_lobby()
+
+            elif t == "rejoin":
+                seat = room.rejoin(websocket, data.get("token"))
+                if seat is None:
+                    # Stale/unknown token (e.g. server restarted) →
+                    # tell the client to fall back to the lobby.
+                    await websocket.send_json(
+                        {"type": "error", "error": "reconnect_failed"})
+                    await websocket.send_json(room.lobby_state_for(websocket))
+                else:
+                    async with room.lock:
+                        if room.started:
+                            # Resume: rebroadcast state to everyone;
+                            # clears the "waiting for …" banner.
+                            await room.advance_and_broadcast(delay=0.15)
+                        else:
+                            await room.broadcast_lobby()
 
             elif t == "leave_seat":
                 room.leave_seat(websocket)
@@ -212,14 +233,15 @@ async def room_ws(websocket: WebSocket, code: str):
     except WebSocketDisconnect:
         pass
     finally:
+        # Drop the socket only — the seat claim persists. NO advance:
+        # the game simply pauses on the disconnected player (no bot
+        # takeover). Just refresh everyone so they see the "waiting
+        # for …" banner instead of a silent freeze.
         room.remove_connection(websocket)
-        # If a seated human dropped mid-game, their seat is now a bot —
-        # nudge the game so it doesn't stall on the vacated seat.
         try:
             if room.code in rooms:
                 if room.started:
-                    async with room.lock:
-                        await room.advance_and_broadcast(delay=0.3)
+                    await room.broadcast()
                 else:
                     await room.broadcast_lobby()
         except Exception:
