@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from web.game_session import GameSession, card_to_str
-from web.room import Room, rooms
+from web.room import Room, rooms, idle_room_reaper
 
 TRICK_DISPLAY_SECS = 4.0
 # When the completed trick also ENDS the hand, hold it on screen longer
@@ -17,6 +17,13 @@ app = FastAPI(title="Fortyfives")
 
 _static = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=_static), name="static")
+
+
+@app.on_event("startup")
+async def _start_reaper():
+    # Bound in-memory room growth: paused games with nobody connected
+    # for >1 week are dropped (PR-D). Server restart clears all rooms.
+    asyncio.create_task(idle_room_reaper())
 
 
 @app.get("/")

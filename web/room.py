@@ -18,6 +18,7 @@ path (`/ws/{code}`) uses advance_and_broadcast below.
 from __future__ import annotations  # py3.9: allow `X | None` hints
 
 import asyncio
+import time
 import uuid
 
 from web.game_session import GameSession, card_to_str
@@ -25,6 +26,13 @@ from web.game_session import GameSession, card_to_str
 # code -> Room. In-memory only (lost on server restart; acceptable for
 # v1 — see RESEARCH.md / the multiplayer plan).
 rooms: dict[str, "Room"] = {}
+
+# A paused multiplayer room (claimed seats, nobody connected) is kept in
+# memory so players can come back — but not forever. Reaped after this
+# many seconds with zero live connections (server restart also clears
+# all rooms regardless). Product decision: 1 week.
+IDLE_ROOM_TTL_SECS = 7 * 24 * 60 * 60
+REAP_INTERVAL_SECS = 60 * 60  # sweep hourly
 
 TRICK_DISPLAY_SECS = 4.0
 HAND_END_TRICK_SECS = 6.0  # longer hold when the trick ends the hand (#4)
@@ -61,6 +69,10 @@ class Room:
         # token}. A claimed seat survives disconnect (PR-C: no bot ever
         # takes a human seat; the game pauses and waits for rejoin).
         self.seats: dict[int, dict] = {}
+        # monotonic ts of when the room last went to zero live sockets
+        # (None while anyone is connected). Drives the idle reaper so a
+        # forever-paused room can't leak memory (PR-D).
+        self.empty_since: float | None = None
 
     @property
     def lock(self) -> asyncio.Lock:
@@ -89,10 +101,12 @@ class Room:
     # ---- connection / lobby ------------------------------------------
     def add_connection(self, ws, seat) -> None:
         self.conns[ws] = seat
+        self.empty_since = None  # someone's here → not idle
 
     def join(self, ws, name: str) -> None:
         self.conns[ws] = None
         self.names[ws] = (name or "Player").strip()[:20] or "Player"
+        self.empty_since = None
 
     def _ws_at_seat(self, seat):
         for w, s in self.conns.items():
@@ -143,6 +157,7 @@ class Room:
         for s, info in self.seats.items():
             if info.get("token") == token:
                 self.conns[ws] = s
+                self.empty_since = None  # player's back → cancel reap
                 return s
         return None
 
@@ -174,6 +189,10 @@ class Room:
         # limitation; the game is paused, not lost).
         if not self.conns and (self.solo or not self.seats):
             rooms.pop(self.code, None)
+        elif not self.conns and self.empty_since is None:
+            # Survives (claimed seats, game paused) but now has zero
+            # live sockets — start the idle clock for the reaper (PR-D).
+            self.empty_since = time.monotonic()
 
     def reset_session(self) -> None:
         """Fresh game, keeping claimed seats (rematch)."""
@@ -304,3 +323,32 @@ class Room:
             if not more:
                 break
         await self.broadcast()
+
+
+# ---- idle-room reaper (PR-D) -----------------------------------------
+def reap_idle_rooms(ttl: float = IDLE_ROOM_TTL_SECS) -> list:
+    """Drop multiplayer rooms with zero live sockets for longer than
+    `ttl` seconds. Solo rooms and any room with a live connection are
+    untouched. Returns the reaped codes. Pure/synchronous so it's
+    trivially unit-testable (the loop below just schedules it)."""
+    now = time.monotonic()
+    reaped = []
+    for code, room in list(rooms.items()):
+        if room.solo or room.conns or room.empty_since is None:
+            continue
+        if now - room.empty_since >= ttl:
+            rooms.pop(code, None)
+            reaped.append(code)
+    return reaped
+
+
+async def idle_room_reaper(
+        interval: float = REAP_INTERVAL_SECS,
+        ttl: float = IDLE_ROOM_TTL_SECS) -> None:
+    """Background sweep started on server startup; never returns."""
+    while True:
+        await asyncio.sleep(interval)
+        try:
+            reap_idle_rooms(ttl)
+        except Exception:
+            pass  # a reaper crash must never take down the server

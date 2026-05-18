@@ -42,6 +42,82 @@ function _wsPath() {
 
 function _tokKey() { return 'ff_tok_' + (roomCode || ''); }
 
+// Set true on a FATAL room error (room gone / stale token on a
+// cold-start resume) so ws.onclose stops the 2s reconnect loop instead
+// of hammering a dead room forever.
+let abandon = false;
+
+// Remember which room we have a live seat in, so a cold start (app
+// killed & relaunched) can OFFER to resume it. Token itself is under
+// _tokKey(); these point at it.
+function _rememberActiveRoom() {
+  if (!roomCode) return;
+  try {
+    localStorage.setItem('ff_active_room', roomCode);
+    localStorage.setItem('ff_active_name', playerName || '');
+  } catch (_) {}
+}
+
+function _forgetActiveRoom() {
+  try {
+    if (roomCode) localStorage.removeItem(_tokKey());
+    const saved = localStorage.getItem('ff_active_room');
+    if (saved) localStorage.removeItem('ff_tok_' + saved);
+    localStorage.removeItem('ff_active_room');
+    localStorage.removeItem('ff_active_name');
+  } catch (_) {}
+}
+
+// Landing-screen "Resume game ABCD" affordance: visible only when a
+// paused game is saved on this device.
+function renderResume() {
+  const row = document.getElementById('resume-row');
+  if (!row) return;
+  let code = '';
+  try { code = localStorage.getItem('ff_active_room') || ''; } catch (_) {}
+  if (code && localStorage.getItem('ff_tok_' + code)) {
+    document.getElementById('resume-code').textContent = code;
+    row.style.display = '';
+  } else {
+    row.style.display = 'none';
+  }
+}
+
+function resumeGame() {
+  let code = '';
+  try { code = localStorage.getItem('ff_active_room') || ''; } catch (_) {}
+  if (!code) { renderResume(); return; }
+  abandon = false;
+  roomCode = code;
+  playerName = (localStorage.getItem('ff_active_name') || 'Player');
+  connect();                 // onopen rejoins via ff_tok_<code>
+  showScreen('lobby');       // server pushes state → game, or lobby
+}
+
+function forgetSavedGame() {
+  const saved = (() => {
+    try { return localStorage.getItem('ff_active_room'); } catch (_) { return null; }
+  })();
+  if (saved) { try { localStorage.removeItem('ff_tok_' + saved); } catch (_) {} }
+  try {
+    localStorage.removeItem('ff_active_room');
+    localStorage.removeItem('ff_active_name');
+  } catch (_) {}
+  renderResume();
+}
+
+// In-game "Leave": forget the game ON THIS DEVICE and go back to the
+// landing screen. The seat stays reserved server-side (PR-C: the game
+// waits for that player) — this just stops THIS device auto-returning.
+function leaveGame() {
+  abandon = true;
+  _forgetActiveRoom();
+  try { if (ws) ws.close(); } catch (_) {}
+  roomCode = null; playerName = null; state = null; lobby = null;
+  showScreen('landing');
+  renderResume();
+}
+
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   ws = new WebSocket(`${proto}://${location.host}${_wsPath()}`);
@@ -59,14 +135,20 @@ function connect() {
       ws.send(JSON.stringify({ type: 'join', name: playerName }));
     }
   };
-  ws.onclose = () => { setConn(false); setTimeout(connect, 2000); };
+  ws.onclose = () => {
+    setConn(false);
+    if (abandon) return;          // dead room / left — stop retrying
+    setTimeout(connect, 2000);
+  };
   ws.onerror = () => setConn(false);
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
     if (data.type === 'seat') {
       // Persist the reconnect token so a phone-lock/refresh rejoins
-      // the same seat instead of starting over.
+      // the same seat instead of starting over, and mark this as the
+      // saved game so a cold start can offer to resume it.
       try { localStorage.setItem(_tokKey(), data.token); } catch (_) {}
+      _rememberActiveRoom();
       return;
     }
     if (data.type === 'lobby') {
@@ -98,9 +180,20 @@ function connect() {
       }
     } else if (data.type === 'error') {
       console.warn('Server error:', data.error);
-      if (data.error === 'reconnect_failed') {
-        // Stale token (e.g. server restarted) — drop it and re-enter
-        // the lobby fresh.
+      if (data.error === 'Room not found') {
+        // The room is gone (server restarted / reaped after a week).
+        // Don't loop-reconnect into a dead room — forget it and go
+        // back to landing.
+        abandon = true;
+        _forgetActiveRoom();
+        try { if (ws) ws.close(); } catch (_) {}
+        roomCode = null;
+        showScreen('landing');
+        renderResume();
+        alert('That game is no longer available — it ended or expired.');
+      } else if (data.error === 'reconnect_failed') {
+        // Stale token but the room still exists — drop the token and
+        // re-enter the lobby fresh.
         try { localStorage.removeItem(_tokKey()); } catch (_) {}
         if (roomCode && playerName) {
           ws.send(JSON.stringify({ type: 'join', name: playerName }));
@@ -154,6 +247,8 @@ function showScreen(name) {
   set('landing', name === 'landing');
   set('lobby', name === 'lobby');
   set('app', name === 'game');
+  // "Leave" only matters in a multiplayer game (solo just uses New Game).
+  set('leave-btn', name === 'game' && !!roomCode);
 }
 
 function _send(obj) {
@@ -163,6 +258,7 @@ function _send(obj) {
 }
 
 function playSolo() {
+  abandon = false;
   roomCode = null;            // → connects to /ws (unchanged solo flow)
   connect();
   showScreen('game');
@@ -186,6 +282,7 @@ function joinRoom() {
 }
 
 function _enterRoom(code) {
+  abandon = false;
   roomCode = code;
   playerName = (document.getElementById('player-name')
     && document.getElementById('player-name').value || '').trim()
@@ -785,7 +882,11 @@ window.addEventListener('load', () => {
     // name still entered on landing; prefill then join
     _enterRoom(deepRoom);
   } else {
+    // Cold start with no deep link: stay on landing, but OFFER to
+    // resume a saved paused game (PR-D) — never auto-rejoin, so the
+    // player can always choose to start fresh instead.
     showScreen('landing');
+    renderResume();
   }
   initInstall();
   if ('serviceWorker' in navigator) {
