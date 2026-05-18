@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from web.game_session import GameSession, card_to_str
+from web.room import Room
 
 TRICK_DISPLAY_SECS = 4.0
 
@@ -35,9 +36,10 @@ async def service_worker():
     )
 
 
-def _trick_complete_state(session: GameSession) -> dict:
-    """Return a state dict with the last completed trick frozen in place for animation."""
-    state = session.serialize_state()
+def _trick_complete_state(session: GameSession, seat: int = 0) -> dict:
+    """`seat`'s filtered state with the last completed trick frozen in
+    place for animation. Per-seat so it's safe to broadcast."""
+    state = session.serialize_state_for(seat)
     game = session.game
     if game.last_completed_trick:
         state["current_trick"] = [
@@ -52,11 +54,19 @@ def _trick_complete_state(session: GameSession) -> dict:
 @app.websocket("/ws")
 async def game_ws(websocket: WebSocket):
     await websocket.accept()
-    session = GameSession(human_player=0)
+    # PR-A: a private solo room (one connection on seat 0; bots fill
+    # 1-3) — single-player behaviour is unchanged, just expressed via
+    # the Room model so PR-B can add real lobbies/seats. State sends go
+    # through room.broadcast (per-seat filtered); with one seat-0
+    # connection this is byte-identical to the old single send.
+    room = Room.create_solo()
+    room.add_connection(websocket, 0)
+    session = room.session
+    seat = 0  # the seat this connection controls
 
     # Advance past any opening AI turns (player 1 starts the auction)
-    await _run_ai_turns(websocket, session, delay=0.15)
-    await websocket.send_json(session.serialize_state())
+    await _run_ai_turns(room, delay=0.15)
+    await room.broadcast()
 
     try:
         while True:
@@ -66,60 +76,67 @@ async def game_ws(websocket: WebSocket):
             if msg_type == "action":
                 action = int(data["action"])
                 pre_tricks = session.game.total_tricks_completed
-                err = session.take_human_action(action)
+                err = session.take_seat_action(seat, action)
                 if err:
+                    # Validation error → only the offending connection.
                     await websocket.send_json({"type": "error", **err})
                     continue
 
                 if session.game.total_tricks_completed > pre_tricks:
-                    # Human just completed a trick — freeze it on screen then advance
-                    await websocket.send_json(_trick_complete_state(session))
+                    # A trick just completed — freeze it on screen then advance
+                    await room.broadcast(
+                        lambda s: _trick_complete_state(session, s))
                     await asyncio.sleep(TRICK_DISPLAY_SECS)
                 else:
                     # Normal card play or non-gameplay action
-                    await websocket.send_json(session.serialize_state())
+                    await room.broadcast()
 
                 # The human's own card may have ended the hand — pause for
                 # the summary popup before any next-hand AI turns.
                 if session.hand_over:
-                    await websocket.send_json(session.serialize_state())
+                    await room.broadcast()
                     continue
 
-                await _run_ai_turns(websocket, session, delay=0.5)
-                await websocket.send_json(session.serialize_state())
+                await _run_ai_turns(room, delay=0.5)
+                await room.broadcast()
 
             elif msg_type == "continue_hand":
                 session.continue_after_hand()
-                await _run_ai_turns(websocket, session, delay=0.5)
-                await websocket.send_json(session.serialize_state())
+                await _run_ai_turns(room, delay=0.5)
+                await room.broadcast()
 
             elif msg_type == "new_game":
-                session = GameSession(human_player=0)
-                await _run_ai_turns(websocket, session, delay=0.15)
-                await websocket.send_json(session.serialize_state())
+                room.reset_session()
+                session = room.session
+                await _run_ai_turns(room, delay=0.15)
+                await room.broadcast()
 
     except WebSocketDisconnect:
         pass
+    finally:
+        room.remove_connection(websocket)
 
 
-async def _run_ai_turns(websocket: WebSocket, session: GameSession, delay: float = 0.4):
-    """Drive AI players one turn at a time, sending state updates in between."""
+async def _run_ai_turns(room: Room, delay: float = 0.4):
+    """Drive bot seats one turn at a time, broadcasting per-seat state
+    updates between turns. A bot seat = any seat not in human_seats."""
+    session = room.session
     safety = 0
     while (not session.game_over
-           and session.game.current_player_id != session.human_player
+           and session.game.current_player_id not in session.human_seats
            and safety < 120):
         pre_tricks = session.game.total_tricks_completed
         has_more = session.run_ai_turn()
         safety += 1
 
         if session.game.total_tricks_completed > pre_tricks:
-            # AI just completed a trick — freeze it on screen then advance
-            await websocket.send_json(_trick_complete_state(session))
+            # A bot just completed a trick — freeze it on screen then advance
+            await room.broadcast(lambda s: _trick_complete_state(session, s))
             await asyncio.sleep(TRICK_DISPLAY_SECS)
-            await websocket.send_json(session.serialize_state())
+            await room.broadcast()
         else:
             await asyncio.sleep(delay)
-            await websocket.send_json(session.serialize_state())
+            await room.broadcast()
 
         if not has_more:
             break
