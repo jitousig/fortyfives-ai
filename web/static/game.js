@@ -796,6 +796,20 @@ function renderActions() {
 
 // ── Log ──
 
+// The broadcast log is built server-side with absolute compass labels
+// (South/West/North/East = seats 0/1/2/3). In multiplayer, swap them
+// for the real lobby names so the log reads "Alice bids 20". Solo has
+// no seat_names → returned unchanged (single-player log byte-identical).
+// Single regex pass so an injected name can't be re-matched as another
+// compass word; escHtml still runs AFTER, so names stay XSS-safe.
+const _ABS_SEAT = { South: 0, West: 1, North: 2, East: 3 };
+function _personalizeLog(line) {
+  const names = state && state.seat_names;
+  if (!names) return line;
+  return line.replace(/\b(South|West|North|East)\b/g,
+    (w) => names[String(_ABS_SEAT[w])] || w);
+}
+
 function renderLog() {
   const el = document.getElementById('game-log');
   const log = state.log || [];
@@ -804,7 +818,7 @@ function renderLog() {
     const isSep = line.startsWith('Hand over') || line.startsWith('===');
     const cls = isLatest ? 'latest' : isSep ? 'hand-sep' : '';
     const gameEnd = line.startsWith('===');
-    return `<div class="log-entry ${gameEnd ? 'game-end' : cls}">${escHtml(line)}</div>`;
+    return `<div class="log-entry ${gameEnd ? 'game-end' : cls}">${escHtml(_personalizeLog(line))}</div>`;
   }).join('');
   el.scrollTop = el.scrollHeight;
 }
