@@ -93,6 +93,11 @@ class GameSession:
         # rlcard env's own game instance; main's pause/dismiss flow is
         # untouched, only the popup payload is enriched).
         self._last_hand_result = None
+        # Discards in 45s are face down: never name a discarded card in
+        # the broadcast log. Count per player instead, then log a single
+        # aggregate ("West: discards 3 cards") on DISCARD_DONE. Reset on
+        # entering each hand's discard phase (see _log_phase).
+        self._discard_counts = {}
         _orig_end_hand = self.game.end_hand
 
         def _capturing_end_hand():
@@ -155,6 +160,7 @@ class GameSession:
             val = BID_VALUES.get(game.highest_bid, '?')
             self.log.append(f"{bidder} won bid ({val}). Select trump suit.")
         elif phase == PHASE_DISCARD:
+            self._discard_counts = {}  # fresh count for this hand
             self.log.append("Discard — remove unwanted cards, then click Done.")
         elif phase == PHASE_GAMEPLAY:
             trump = SUIT_SYMBOLS.get(game.trump_suit, '?')
@@ -275,7 +281,8 @@ class GameSession:
         name = PLAYER_NAMES[player_id]
 
         self._state, self._pid = self.env.step(env_action)
-        self.log.append(f"{name}: {action_desc}")
+        if action_desc is not None:  # None = silent (per-card discard)
+            self.log.append(f"{name}: {action_desc}")
 
         post_phase = game.phase
         if pre_phase != post_phase:
@@ -350,7 +357,8 @@ class GameSession:
         # Frontend speaks raw game ids; the env expects env ids.
         env_action = self.env._game_to_env_action(action, pre_phase)
         self._state, self._pid = self.env.step(env_action)
-        self.log.append(f"{PLAYER_NAMES[seat]}: {action_desc}")
+        if action_desc is not None:  # None = silent (per-card discard)
+            self.log.append(f"{PLAYER_NAMES[seat]}: {action_desc}")
 
         post_phase = game.phase
         if pre_phase != post_phase:
@@ -388,11 +396,18 @@ class GameSession:
 
         if phase == PHASE_DISCARD:
             if action == DISCARD_DONE:
-                return "done discarding"
-            hand = self._get_hand(player_id)
-            if 0 <= action < len(hand):
-                return f"discards {format_card(hand[action])}"
-            return f"discards card {action}"
+                # Discards are face down — reveal only the COUNT, never
+                # the cards (the log is broadcast to every seat).
+                k = self._discard_counts.pop(player_id, 0)
+                if k == 0:
+                    return "keeps all cards"
+                return f"discards {k} card{'s' if k != 1 else ''}"
+            # An individual card discard: tally it, emit NOTHING (the
+            # aggregate is logged on DISCARD_DONE). None tells the caller
+            # to skip the log line entirely.
+            self._discard_counts[player_id] = (
+                self._discard_counts.get(player_id, 0) + 1)
+            return None
 
         if phase == PHASE_GAMEPLAY:
             hand = self._get_hand(player_id)
