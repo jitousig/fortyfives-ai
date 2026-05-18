@@ -566,7 +566,20 @@ function renderSeatBids() {
     const cid = (p - _you() + 4) % 4;
     const el = document.getElementById(`bid-chip-${cid}`);
     if (!el) continue;
-    if (!show) { el.textContent = ''; el.className = 'bid-chip'; continue; }
+    if (!show) {
+      // After the auction: keep ONLY the winning bidder's pill on
+      // their seat for the whole hand; clear everyone else.
+      if (p === state.highest_bidder && state.highest_bid != null) {
+        el.textContent = state.highest_bid === 4
+          ? 'Hold'
+          : (BID_LABEL[state.highest_bid] || state.highest_bid_value || '');
+        el.className = 'bid-chip active';
+      } else {
+        el.textContent = '';
+        el.className = 'bid-chip';
+      }
+      continue;
+    }
     const bid = bids[String(p)];
     if (passed[p]) {
       el.textContent = 'Pass';
