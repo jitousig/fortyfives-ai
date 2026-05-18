@@ -27,6 +27,7 @@ from web.game_session import GameSession, card_to_str
 rooms: dict[str, "Room"] = {}
 
 TRICK_DISPLAY_SECS = 4.0
+HAND_END_TRICK_SECS = 6.0  # longer hold when the trick ends the hand (#4)
 SEAT_PARTNERSHIP = {0: "NS", 1: "EW", 2: "NS", 3: "EW"}
 SEAT_NAME = {0: "South", 1: "West", 2: "North", 3: "East"}
 
@@ -167,11 +168,27 @@ class Room:
             "can_start": (not self.started) and bool(self.claimed_seats()),
         }
 
+    def _seat_names(self) -> dict:
+        """seat -> display name: the human in that seat, else 'Bot'.
+        (Solo rooms don't call this → solo state has no seat_names →
+        the frontend falls back to its compass labels, unchanged.)"""
+        out = {}
+        for s in range(4):
+            holder = self._seat_taken_by(s)
+            out[str(s)] = self.names.get(holder, "You") if holder else "Bot"
+        return out
+
+    def _game_state(self, seat) -> dict:
+        st = self.session.serialize_state_for(seat)
+        if not self.solo:
+            st["seat_names"] = self._seat_names()
+        return st
+
     def _frozen(self, seat) -> dict:
         """Per-seat state with the last completed trick frozen for
         animation (multiplayer-safe; mirrors server._trick_complete_state
         but per recipient seat)."""
-        st = self.session.serialize_state_for(seat)
+        st = self._game_state(seat)
         g = self.session.game
         if getattr(g, "last_completed_trick", None):
             st["current_trick"] = [
@@ -200,8 +217,7 @@ class Room:
                 elif builder is not None:
                     await ws.send_json(builder(seat))
                 else:
-                    await ws.send_json(
-                        self.session.serialize_state_for(seat))
+                    await ws.send_json(self._game_state(seat))
             except Exception:
                 dead.append(ws)
         for ws in dead:
@@ -234,7 +250,9 @@ class Room:
             safety += 1
             if s.game.total_tricks_completed > pre:
                 await self.broadcast(self._frozen)
-                await asyncio.sleep(TRICK_DISPLAY_SECS)
+                await asyncio.sleep(
+                    HAND_END_TRICK_SECS if s.hand_over
+                    else TRICK_DISPLAY_SECS)
                 await self.broadcast()
             else:
                 await asyncio.sleep(delay)

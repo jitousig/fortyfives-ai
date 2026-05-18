@@ -9,6 +9,9 @@ from web.game_session import GameSession, card_to_str
 from web.room import Room, rooms
 
 TRICK_DISPLAY_SECS = 4.0
+# When the completed trick also ENDS the hand, hold it on screen longer
+# so players see the final cards before the hand-summary popup (#4).
+HAND_END_TRICK_SECS = 6.0
 
 app = FastAPI(title="Fortyfives")
 
@@ -86,7 +89,9 @@ async def game_ws(websocket: WebSocket):
                     # A trick just completed — freeze it on screen then advance
                     await room.broadcast(
                         lambda s: _trick_complete_state(session, s))
-                    await asyncio.sleep(TRICK_DISPLAY_SECS)
+                    await asyncio.sleep(
+                        HAND_END_TRICK_SECS if session.hand_over
+                        else TRICK_DISPLAY_SECS)
                 else:
                     # Normal card play or non-gameplay action
                     await room.broadcast()
@@ -180,7 +185,9 @@ async def room_ws(websocket: WebSocket, code: str):
                     else:
                         if s.game.total_tricks_completed > pre:
                             await room.broadcast(room._frozen)
-                            await asyncio.sleep(TRICK_DISPLAY_SECS)
+                            await asyncio.sleep(
+                                HAND_END_TRICK_SECS if s.hand_over
+                                else TRICK_DISPLAY_SECS)
                             await room.broadcast()
                         else:
                             await room.broadcast()
@@ -234,7 +241,9 @@ async def _run_ai_turns(room: Room, delay: float = 0.4):
         if session.game.total_tricks_completed > pre_tricks:
             # A bot just completed a trick — freeze it on screen then advance
             await room.broadcast(lambda s: _trick_complete_state(session, s))
-            await asyncio.sleep(TRICK_DISPLAY_SECS)
+            await asyncio.sleep(
+                HAND_END_TRICK_SECS if session.hand_over
+                else TRICK_DISPLAY_SECS)
             await room.broadcast()
         else:
             await asyncio.sleep(delay)

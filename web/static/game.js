@@ -17,6 +17,13 @@ function _you() {
 }
 function posOf(seat) { return POS[(seat - _you() + 4) % 4]; }
 function nameOf(seat) { return REL_NAMES[(seat - _you() + 4) % 4]; }
+// Actual player/bot name for a seat (multiplayer); solo has no
+// seat_names so this falls back to the rotated compass label →
+// single-player display is unchanged.
+function playerLabel(seat) {
+  const n = state && state.seat_names;
+  return (n && n[String(seat)]) || nameOf(seat);
+}
 
 let ws = null;
 let state = null;
@@ -390,7 +397,7 @@ function renderPlayerZones() {
       ? ' <span class="dealer-tag">Dealer</span>' : '';
     const partnerMark = pos === 'north'
       ? ' <span class="partner-tag">Partner</span>' : '';
-    el.innerHTML = labelBase[pos] + dealerMark + partnerMark;
+    el.innerHTML = playerLabel(seat) + dealerMark + partnerMark;
   }
 }
 
@@ -477,7 +484,7 @@ function renderInfo() {
     turnEl.textContent = 'Your turn ▶';
     turnEl.style.color = '#fdd835';
   } else {
-    turnEl.textContent = `${nameOf(state.current_player)}'s turn…`;
+    turnEl.textContent = `${playerLabel(state.current_player)}'s turn…`;
     turnEl.style.color = '';
   }
 
@@ -491,11 +498,16 @@ function renderInfo() {
 function renderBidBlock() {
   const el = document.getElementById('bid-block');
   if (state.phase !== PHASE.AUCTION && state.phase !== PHASE.DECLARATION) {
-    // Show final bid result during play phases
+    // Persistent through the whole hand: who won the bid, the value,
+    // and trump (the user wants this visible the entire hand).
     if (state.highest_bidder !== null && state.highest_bidder !== undefined) {
-      const name = nameOf(state.highest_bidder);
+      const name = playerLabel(state.highest_bidder);
       const val = state.highest_bid_value || '?';
-      el.innerHTML = `Bid: ${name} at ${val}`;
+      const sixty = val === 30 ? ' <span class="bb-bonus">(30→60)</span>' : '';
+      const tr = state.trump_display
+        ? ` · Trump <strong>${state.trump_display}</strong>` : '';
+      el.innerHTML =
+        `Bid: <strong>${name}</strong> won at <strong>${val}</strong>${sixty}${tr}`;
     } else {
       el.innerHTML = '';
     }
@@ -508,7 +520,7 @@ function renderBidBlock() {
   const lines = [];
 
   for (let i = 0; i < 4; i++) {
-    const name = nameOf(i);
+    const name = playerLabel(i);
     const isDealer = i === dealer;
     const hasPassed = passed[i];
     const bid = bids[String(i)];
@@ -534,7 +546,11 @@ function renderSeatBids() {
   const bids = state.bids || {};
   const passed = state.passed || [];
   for (let p = 0; p < 4; p++) {
-    const el = document.getElementById(`bid-chip-${p}`);
+    // The chip element lives in the fixed zone; rotate seat p to its
+    // on-screen chip so pills line up with the rotated board (#2).
+    // Solo (your_seat 0) → identity → unchanged.
+    const cid = (p - _you() + 4) % 4;
+    const el = document.getElementById(`bid-chip-${cid}`);
     if (!el) continue;
     if (!show) { el.textContent = ''; el.className = 'bid-chip'; continue; }
     const bid = bids[String(p)];
