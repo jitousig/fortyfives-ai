@@ -466,7 +466,14 @@ function renderTrumpBadge() {
     badge.innerHTML = '';
   }
   if (state.phase === PHASE.GAMEPLAY) {
-    num.textContent = `Trick ${state.trick_count + 1}/5`;
+    // While the trick-winning animation plays, the engine has already
+    // advanced trick_count — hold the displayed number on the trick
+    // being animated; it advances once the next (non-animating) state
+    // arrives. (Was a solo bug too.)
+    const shown = state.trick_animating
+      ? state.trick_count
+      : state.trick_count + 1;
+    num.textContent = `Trick ${Math.min(Math.max(shown, 1), 5)}/5`;
   } else {
     num.textContent = '';
   }
@@ -490,6 +497,13 @@ function renderInfo() {
 
   document.getElementById('score-ns').textContent = state.points.ns;
   document.getElementById('score-ew').textContent = state.points.ew;
+  // Partnership member names (NS = seats 0&2, EW = 1&3 — absolute, not
+  // rotated). Multiplayer → real names via seat_names; solo → falls
+  // back to "You & North" / "West & East" (unchanged).
+  const tns = document.getElementById('team-ns');
+  const tew = document.getElementById('team-ew');
+  if (tns) tns.textContent = `(${playerLabel(0)} & ${playerLabel(2)})`;
+  if (tew) tew.textContent = `(${playerLabel(1)} & ${playerLabel(3)})`;
 
   renderBidBlock();
   renderTricksBlock();
