@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from web.game_session import GameSession, card_to_str
-from web.room import Room
+from web.room import Room, rooms
 
 TRICK_DISPLAY_SECS = 4.0
 
@@ -115,6 +115,108 @@ async def game_ws(websocket: WebSocket):
         pass
     finally:
         room.remove_connection(websocket)
+
+
+# ---- Multiplayer rooms (PR-B1) -------------------------------------------
+# Solo `/ws` above is untouched. These add lobby rooms: POST /room to
+# create, then connect /ws/{code}. All game-mutating handlers run under
+# room.lock so concurrent connections can't corrupt one shared game.
+
+@app.post("/room")
+async def create_room():
+    return {"code": Room.create_room().code}
+
+
+@app.websocket("/ws/{code}")
+async def room_ws(websocket: WebSocket, code: str):
+    await websocket.accept()
+    room = rooms.get((code or "").upper())
+    if room is None or room.solo:
+        await websocket.send_json({"type": "error",
+                                   "error": "Room not found"})
+        await websocket.close()
+        return
+
+    room.add_connection(websocket, None)  # in lobby until a seat claimed
+    await websocket.send_json(room.lobby_state_for(websocket))
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            t = data.get("type")
+
+            if t == "join":
+                room.join(websocket, str(data.get("name", "")))
+                await room.broadcast_lobby()
+
+            elif t == "claim_seat":
+                err = room.claim_seat(websocket, data.get("seat"))
+                if err:
+                    await websocket.send_json({"type": "error", **err})
+                await room.broadcast_lobby()
+
+            elif t == "leave_seat":
+                room.leave_seat(websocket)
+                await room.broadcast_lobby()
+
+            elif t == "start":
+                async with room.lock:
+                    err = room.start(websocket)
+                    if err:
+                        await websocket.send_json({"type": "error", **err})
+                    else:
+                        await room.advance_and_broadcast(delay=0.15)
+
+            elif t == "action":
+                async with room.lock:
+                    seat = room.conns.get(websocket)
+                    s = room.session
+                    pre = s.game.total_tricks_completed
+                    err = s.take_seat_action(
+                        seat if isinstance(seat, int) else -1,
+                        int(data["action"]))
+                    if err:
+                        await websocket.send_json({"type": "error", **err})
+                    else:
+                        if s.game.total_tricks_completed > pre:
+                            await room.broadcast(room._frozen)
+                            await asyncio.sleep(TRICK_DISPLAY_SECS)
+                            await room.broadcast()
+                        else:
+                            await room.broadcast()
+                        if s.hand_over:
+                            await room.broadcast()
+                        else:
+                            await room.advance_and_broadcast(delay=0.5)
+
+            elif t == "continue_hand":
+                async with room.lock:
+                    room.session.continue_after_hand()
+                    await room.advance_and_broadcast(delay=0.5)
+
+            elif t == "new_game":
+                async with room.lock:
+                    room.reset_session()
+                    if room.started:
+                        await room.advance_and_broadcast(delay=0.15)
+                    else:
+                        await room.broadcast_lobby()
+
+    except WebSocketDisconnect:
+        pass
+    finally:
+        room.remove_connection(websocket)
+        # If a seated human dropped mid-game, their seat is now a bot —
+        # nudge the game so it doesn't stall on the vacated seat.
+        try:
+            if room.code in rooms:
+                if room.started:
+                    async with room.lock:
+                        await room.advance_and_broadcast(delay=0.3)
+                else:
+                    await room.broadcast_lobby()
+        except Exception:
+            pass
 
 
 async def _run_ai_turns(room: Room, delay: float = 0.4):
