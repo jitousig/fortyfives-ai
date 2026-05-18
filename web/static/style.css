@@ -972,3 +972,16 @@ body {
   padding: 9px 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
+
+/* Cold-start "Resume game ABCD" affordance on the landing screen. */
+#resume-row { margin-bottom: 14px; }
+#resume-row #resume-btn { background: #2e7d32; color: #fff; }
+#resume-row #resume-forget {
+  display: inline-block; margin-top: 6px;
+  font-size: 12px; opacity: 0.7;
+}
+/* In-game "Leave" button (multiplayer only). */
+#leave-btn {
+  margin-left: 8px;
+  background: #555; color: #fff;
+}

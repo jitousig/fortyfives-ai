@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Fortyfives">
   <title>Fortyfives</title>
-  <link rel="stylesheet" href="/static/style.css?v=10">
+  <link rel="stylesheet" href="/static/style.css?v=11">
 </head>
 <body>
 
@@ -19,6 +19,17 @@
   <div id="landing" class="screen">
     <div class="screen-box">
       <h1>Forty-Fives</h1>
+      <!-- Shown only when a paused game is saved on this device
+           (cold-start resume). Tap to rejoin; ignore to start fresh. -->
+      <div id="resume-row" style="display:none">
+        <button class="big-btn" id="resume-btn" onclick="resumeGame()">
+          Resume game <span id="resume-code" class="code"></span>
+        </button>
+        <a href="#" id="resume-forget" onclick="forgetSavedGame();return false;">
+          forget it
+        </a>
+        <div class="screen-or">— or —</div>
+      </div>
       <input id="player-name" maxlength="20" placeholder="Your name (for rooms)" autocomplete="off">
       <button class="big-btn" onclick="playSolo()">Play Solo (vs bots)</button>
       <div class="screen-or">— or play with friends —</div>
@@ -132,6 +143,7 @@
       </div>
 
       <button id="new-game-btn" onclick="newGame()">New Game</button>
+      <button id="leave-btn" onclick="leaveGame()" style="display:none">Leave</button>
     </div>
 
   </div>
@@ -170,6 +182,6 @@
     <button id="install-dismiss" type="button" aria-label="Dismiss">&times;</button>
   </div>
 
-  <script src="/static/game.js?v=10"></script>
+  <script src="/static/game.js?v=11"></script>
 </body>
 </html>

@@ -17,8 +17,10 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _REPO)
 sys.path.insert(0, os.path.join(_REPO, "web"))
 
+import time  # noqa: E402
+
 import web.room as roommod  # noqa: E402
-from web.room import Room, rooms  # noqa: E402
+from web.room import Room, rooms, reap_idle_rooms  # noqa: E402
 from game_session import card_to_str  # noqa: E402
 
 
@@ -320,6 +322,69 @@ class TestRoomWsHandlerSmoke(unittest.TestCase):
         ws = ScriptedWS([])
         aio.run(room_ws(ws, "ZZZZ"))
         self.assertTrue(any(m.get("type") == "error" for m in ws.sent))
+
+
+class TestIdleRoomReaper(unittest.TestCase):
+    """PR-D: a forever-paused multiplayer room must not leak memory —
+    it's reaped after IDLE_ROOM_TTL_SECS with zero live sockets."""
+
+    def tearDown(self):
+        for c in [c for c, r in list(rooms.items()) if not r.solo]:
+            rooms.pop(c, None)
+
+    def test_idle_claimed_room_is_reaped(self):
+        room = Room.create_room()
+        a = FakeWS()
+        room.add_connection(a, None)
+        room.join(a, "Alice")
+        room.claim_seat(a, 0)
+        room.start(a)
+        self.assertIsNone(room.empty_since)  # connected → not idle
+
+        room.remove_connection(a)            # everyone gone, game paused
+        self.assertIn(room.code, rooms)      # survives for reconnect
+        self.assertIsNotNone(room.empty_since)
+
+        # Not idle long enough → kept.
+        self.assertEqual(reap_idle_rooms(ttl=10_000), [])
+        self.assertIn(room.code, rooms)
+
+        # Backdate the idle clock past the TTL → reaped.
+        room.empty_since = time.monotonic() - 20_000
+        self.assertIn(room.code, reap_idle_rooms(ttl=10_000))
+        self.assertNotIn(room.code, rooms)
+
+    def test_reaper_spares_connected_and_solo(self):
+        live = Room.create_room()
+        a = FakeWS()
+        live.add_connection(a, None); live.join(a, "A")
+        live.claim_seat(a, 0); live.start(a)
+        # Force a stale idle ts, but a live socket is still attached →
+        # the reaper must skip it (guard is `room.conns`, not the ts).
+        live.empty_since = time.monotonic() - 99_999
+        reaped = reap_idle_rooms(ttl=0)
+        self.assertNotIn(live.code, reaped)
+        self.assertIn(live.code, rooms)
+
+        solo = Room.create_solo()
+        solo.empty_since = time.monotonic() - 99_999
+        reap_idle_rooms(ttl=0)
+        self.assertIn(solo.code, rooms)      # solo never reaped here
+        rooms.pop(solo.code, None)
+
+    def test_reconnect_clears_idle_clock(self):
+        room = Room.create_room()
+        a = FakeWS()
+        room.add_connection(a, None); room.join(a, "A")
+        tok = room.claim_seat(a, 0)["token"]
+        room.start(a)
+        room.remove_connection(a)
+        self.assertIsNotNone(room.empty_since)
+
+        room.rejoin(FakeWS(), tok)           # player comes back
+        self.assertIsNone(room.empty_since)  # reap clock cancelled
+        self.assertEqual(reap_idle_rooms(ttl=0), [])
+        self.assertIn(room.code, rooms)
 
 
 if __name__ == "__main__":
