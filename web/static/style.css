@@ -906,3 +906,58 @@ body {
 }
 #hand-overlay-msg .hr-verdict.made { color: #81c784; }
 #hand-overlay-msg .hr-verdict.fail { color: #e57373; }
+
+/* ── Landing / Lobby screens (PR-B2) ── */
+.screen {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  background: #14342b; padding: 20px;
+}
+.screen-box {
+  background: rgba(0,0,0,0.30); border-radius: 14px;
+  padding: 26px 22px; width: min(420px, 92vw); text-align: center;
+  color: #f3f3f3;
+}
+.screen-box h1, .screen-box h2 { margin: 0 0 16px; }
+.screen-box input {
+  width: 100%; box-sizing: border-box; padding: 11px 12px;
+  margin: 8px 0; border-radius: 8px; border: 1px solid #3a5a4c;
+  background: #0e241d; color: #fff; font-size: 15px;
+}
+.big-btn {
+  display: block; width: 100%; box-sizing: border-box;
+  padding: 13px; margin: 8px 0; border: 0; border-radius: 9px;
+  background: #ffee58; color: #1a1a1a; font-size: 15px;
+  font-weight: 700; cursor: pointer;
+}
+.big-btn:disabled { background: #6b6b4a; color: #333; cursor: default; }
+.big-btn:hover:not(:disabled) { background: #fff176; }
+.screen-or { margin: 14px 0 6px; opacity: 0.6; font-size: 13px; }
+.join-row { display: flex; gap: 8px; }
+.join-row input { flex: 1; text-transform: uppercase; }
+.join-row button {
+  padding: 0 16px; border: 0; border-radius: 8px;
+  background: #ffee58; font-weight: 700; cursor: pointer;
+}
+.code { font-family: monospace; letter-spacing: 2px; color: #ffe082; }
+.lobby-hint { font-size: 13px; opacity: 0.75; margin-bottom: 14px; }
+.lobby-hint a { color: #ffe082; }
+#seat-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 16px;
+}
+.seat-card {
+  background: rgba(255,255,255,0.06); border: 2px solid transparent;
+  border-radius: 10px; padding: 12px 8px;
+}
+.seat-card.pship-ns { border-left: 4px solid #4fc3f7; }
+.seat-card.pship-ew { border-left: 4px solid #ff8a65; }
+.seat-card.mine { border-color: #ffee58; }
+.seat-card.taken { opacity: 0.6; }
+.seat-pos { font-weight: 700; font-size: 14px; }
+.seat-pos .pship { font-size: 11px; opacity: 0.6; margin-left: 4px; }
+.seat-who { font-size: 13px; margin: 6px 0 8px; min-height: 1.2em; }
+.seat-card button {
+  padding: 6px 12px; border: 0; border-radius: 7px;
+  background: #ffee58; font-weight: 700; cursor: pointer; font-size: 13px;
+}
