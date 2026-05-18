@@ -5,26 +5,57 @@ const SUIT_SYM = { S: '♠', H: '♥', D: '♦', C: '♣' };
 const BID_LABEL = { 0: 'Pass', 1: '20', 2: '25', 3: '30', 4: 'Hold' };
 const BID_VALUES = { 0: null, 1: 20, 2: 25, 3: 30, 4: null };
 const PHASE = { AUCTION: 1, DECLARATION: 2, DISCARD: 3, GAMEPLAY: 4 };
-const PLAYER_NAMES = ['You', 'West', 'North', 'East'];
-// Player 0 = South (human), 1 = West, 2 = North, 3 = East
+// Screen positions around the table, index 0 = bottom (always "you").
+const POS = ['south', 'west', 'north', 'east'];
+const REL_NAMES = ['You', 'West', 'North', 'East'];
+
+// Rotate an absolute seat to the local player's view: your seat is
+// always at the bottom ('south'). Solo (your_seat 0 / undefined) → the
+// identity, so single-player rendering is byte-identical to before.
+function _you() {
+  return (state && state.your_seat != null) ? state.your_seat : 0;
+}
+function posOf(seat) { return POS[(seat - _you() + 4) % 4]; }
+function nameOf(seat) { return REL_NAMES[(seat - _you() + 4) % 4]; }
 
 let ws = null;
 let state = null;
+let roomCode = null;        // null = solo; set = multiplayer room
+let lobby = null;           // last lobby payload (multiplayer only)
+let playerName = null;      // multiplayer display name
+let curScreen = 'landing';  // 'landing' | 'lobby' | 'game'
 let discardSelections = new Set();
 let trickAnimTimer = null;
 
 // ── Connection ──
 
+function _wsPath() {
+  return roomCode ? `/ws/${roomCode}` : '/ws';
+}
+
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  ws = new WebSocket(`${proto}://${location.host}/ws`);
+  ws = new WebSocket(`${proto}://${location.host}${_wsPath()}`);
 
-  ws.onopen = () => setConn(true);
+  ws.onopen = () => {
+    setConn(true);
+    // Rejoining a room after a reconnect: re-announce name/seat.
+    if (roomCode && playerName) {
+      ws.send(JSON.stringify({ type: 'join', name: playerName }));
+    }
+  };
   ws.onclose = () => { setConn(false); setTimeout(connect, 2000); };
   ws.onerror = () => setConn(false);
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
+    if (data.type === 'lobby') {
+      lobby = data;
+      showScreen(data.started ? 'game' : 'lobby');
+      if (!data.started) renderLobby();
+      return;
+    }
     if (data.type === 'state') {
+      showScreen('game');
       if (!state || state.phase !== data.phase || data.game_over) {
         discardSelections.clear();
       }
@@ -68,6 +99,91 @@ function newGame() {
   }
 }
 
+// ── Screens: landing → (lobby) → game ──
+
+function showScreen(name) {
+  curScreen = name;
+  const set = (id, on) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = on ? '' : 'none';
+  };
+  set('landing', name === 'landing');
+  set('lobby', name === 'lobby');
+  set('app', name === 'game');
+}
+
+function _send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
+  }
+}
+
+function playSolo() {
+  roomCode = null;            // → connects to /ws (unchanged solo flow)
+  connect();
+  showScreen('game');
+}
+
+async function createRoom() {
+  try {
+    const r = await fetch('/room', { method: 'POST' });
+    const { code } = await r.json();
+    _enterRoom(code);
+  } catch (e) {
+    alert('Could not create room. Try again.');
+  }
+}
+
+function joinRoom() {
+  const code = (document.getElementById('join-code').value || '')
+    .trim().toUpperCase();
+  if (code.length < 3) { alert('Enter a room code.'); return; }
+  _enterRoom(code);
+}
+
+function _enterRoom(code) {
+  roomCode = code;
+  playerName = (document.getElementById('player-name')
+    && document.getElementById('player-name').value || '').trim()
+    || 'Player';
+  connect();
+  showScreen('lobby');
+  // join announced in ws.onopen once the socket is open
+}
+
+function claimSeat(seat) { _send({ type: 'claim_seat', seat }); }
+function leaveSeat() { _send({ type: 'leave_seat' }); }
+function startGame() { _send({ type: 'start' }); }
+
+function copyRoomLink() {
+  const link = `${location.origin}/?room=${roomCode}`;
+  if (navigator.clipboard) navigator.clipboard.writeText(link);
+}
+
+function renderLobby() {
+  if (!lobby) return;
+  const codeEl = document.getElementById('lobby-code');
+  if (codeEl) codeEl.textContent = lobby.code;
+  const grid = document.getElementById('seat-grid');
+  if (grid) {
+    grid.innerHTML = lobby.seats.map(s => {
+      const taken = s.claimed_by != null;
+      const mine = s.is_you;
+      const who = taken ? s.claimed_by : '<em>open</em>';
+      const cls = ['seat-card', `pship-${s.partnership.toLowerCase()}`,
+        mine ? 'mine' : '', taken && !mine ? 'taken' : ''].filter(Boolean).join(' ');
+      const act = mine
+        ? `<button onclick="leaveSeat()">Leave</button>`
+        : (taken ? '' : `<button onclick="claimSeat(${s.seat})">Sit here</button>`);
+      return `<div class="${cls}">
+        <div class="seat-pos">${s.name} <span class="pship">${s.partnership}</span></div>
+        <div class="seat-who">${who}</div>${act}</div>`;
+    }).join('');
+  }
+  const startBtn = document.getElementById('lobby-start');
+  if (startBtn) startBtn.disabled = !lobby.can_start;
+}
+
 // ── Card helpers ──
 
 function cardStr(cs) {
@@ -108,8 +224,7 @@ function toggleDiscardSelection(index) {
 
 function startTrickAnimation(winnerIdx) {
   const slotIds = ['trick-south', 'trick-west', 'trick-north', 'trick-east'];
-  const handIds = ['south-hand', 'west-hand', 'north-hand', 'east-hand'];
-  const winnerEl = document.getElementById(handIds[winnerIdx]);
+  const winnerEl = document.getElementById(`${posOf(winnerIdx)}-hand`);
   if (!winnerEl) return;
 
   const wr = winnerEl.getBoundingClientRect();
@@ -253,41 +368,43 @@ function continueHand() {
 
 function renderPlayerZones() {
   const cp = state.current_player;
-  const zones = { 0: 'south-zone', 1: 'west-zone', 2: 'north-zone', 3: 'east-zone' };
-  for (const [p, id] of Object.entries(zones)) {
-    const el = document.getElementById(id);
+  for (let seat = 0; seat < 4; seat++) {
+    const el = document.getElementById(`${posOf(seat)}-zone`);
     if (el) {
-      el.classList.toggle('active-player', parseInt(p) === cp && !state.game_over);
+      el.classList.toggle('active-player', seat === cp && !state.game_over);
     }
   }
 
-  // Dealer tags — show for whichever player is dealer
-  document.getElementById('dealer-tag').style.display = state.dealer === 0 ? 'inline' : 'none';
+  // Your dealer tag (the south/bottom position is always you)
+  const dt = document.getElementById('dealer-tag');
+  if (dt) dt.style.display = state.dealer === _you() ? 'inline' : 'none';
 
-  // Update other player labels with dealer indicator
-  const labelIds = { 1: 'west-label', 2: 'north-label', 3: 'east-label' };
-  const labelBase = { 1: 'West', 2: 'North', 3: 'East' };
-  for (const [p, id] of Object.entries(labelIds)) {
-    const el = document.getElementById(id);
+  // The three non-you positions (west/north/east, relative to you)
+  const labelBase = { west: 'West', north: 'North', east: 'East' };
+  for (let seat = 0; seat < 4; seat++) {
+    if (seat === _you()) continue;
+    const pos = posOf(seat);
+    const el = document.getElementById(`${pos}-label`);
     if (!el) continue;
-    const dealerMark = parseInt(p) === state.dealer
+    const dealerMark = seat === state.dealer
       ? ' <span class="dealer-tag">Dealer</span>' : '';
-    const partnerMark = parseInt(p) === 2
+    const partnerMark = pos === 'north'
       ? ' <span class="partner-tag">Partner</span>' : '';
-    el.innerHTML = labelBase[p] + dealerMark + partnerMark;
+    el.innerHTML = labelBase[pos] + dealerMark + partnerMark;
   }
 }
 
 // ── Hands ──
 
 function renderHands() {
-  // Other players: face-down cards
-  renderBackHand('north-hand', state.hand_counts['2']);
-  renderBackHand('west-hand', state.hand_counts['1']);
-  renderBackHand('east-hand', state.hand_counts['3']);
+  // Other players: face-down cards, rotated to your view
+  for (let seat = 0; seat < 4; seat++) {
+    if (seat === _you()) continue;
+    renderBackHand(`${posOf(seat)}-hand`, state.hand_counts[String(seat)]);
+  }
 
-  // Human hand
-  const el = document.getElementById('south-hand');
+  // Your hand is always the bottom (south) position
+  const el = document.getElementById(`${posOf(_you())}-hand`);
   el.innerHTML = '';
   const ph = state.phase;
   const legal = state.legal_actions || [];
@@ -323,13 +440,11 @@ function renderBackHand(id, count) {
 
 function renderTrick() {
   const trick = state.current_trick || [null, null, null, null];
-  // Player 0 = south, 1 = west, 2 = north, 3 = east
-  const slots = { 'trick-south': 0, 'trick-west': 1, 'trick-north': 2, 'trick-east': 3 };
-
-  for (const [slotId, playerIdx] of Object.entries(slots)) {
-    const el = document.getElementById(slotId);
+  // Each seat's played card goes to its rotated screen slot.
+  for (let seat = 0; seat < 4; seat++) {
+    const el = document.getElementById(`trick-${posOf(seat)}`);
     if (!el) continue;
-    const cs = trick[playerIdx];
+    const cs = trick[seat];
     el.innerHTML = cs ? cardHTML(cs, false, -1) : emptySlotHTML();
   }
 }
@@ -362,7 +477,7 @@ function renderInfo() {
     turnEl.textContent = 'Your turn ▶';
     turnEl.style.color = '#fdd835';
   } else {
-    turnEl.textContent = `${PLAYER_NAMES[state.current_player]}'s turn…`;
+    turnEl.textContent = `${nameOf(state.current_player)}'s turn…`;
     turnEl.style.color = '';
   }
 
@@ -378,7 +493,7 @@ function renderBidBlock() {
   if (state.phase !== PHASE.AUCTION && state.phase !== PHASE.DECLARATION) {
     // Show final bid result during play phases
     if (state.highest_bidder !== null && state.highest_bidder !== undefined) {
-      const name = PLAYER_NAMES[state.highest_bidder];
+      const name = nameOf(state.highest_bidder);
       const val = state.highest_bid_value || '?';
       el.innerHTML = `Bid: ${name} at ${val}`;
     } else {
@@ -393,7 +508,7 @@ function renderBidBlock() {
   const lines = [];
 
   for (let i = 0; i < 4; i++) {
-    const name = PLAYER_NAMES[i];
+    const name = nameOf(i);
     const isDealer = i === dealer;
     const hasPassed = passed[i];
     const bid = bids[String(i)];
@@ -578,7 +693,20 @@ _mq.addEventListener('change', syncResponsiveLayout);
 // ── Boot ──
 window.addEventListener('load', () => {
   syncResponsiveLayout();
-  connect();
+  // Multiplayer app: start on the landing screen instead of
+  // auto-connecting. A ?room=CODE deep link jumps straight to that
+  // room's lobby. Solo connects only when "Play Solo" is clicked
+  // (then the game flow is exactly as before).
+  const params = new URLSearchParams(location.search);
+  const deepRoom = (params.get('room') || '').trim().toUpperCase();
+  if (deepRoom) {
+    showScreen('lobby');
+    document.getElementById('join-code').value = deepRoom;
+    // name still entered on landing; prefill then join
+    _enterRoom(deepRoom);
+  } else {
+    showScreen('landing');
+  }
   initInstall();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

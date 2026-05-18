@@ -11,10 +11,42 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Fortyfives">
   <title>Fortyfives</title>
-  <link rel="stylesheet" href="/static/style.css?v=5">
+  <link rel="stylesheet" href="/static/style.css?v=6">
 </head>
 <body>
-  <div id="app">
+
+  <!-- ── Landing ── -->
+  <div id="landing" class="screen">
+    <div class="screen-box">
+      <h1>Forty-Fives</h1>
+      <input id="player-name" maxlength="20" placeholder="Your name (for rooms)" autocomplete="off">
+      <button class="big-btn" onclick="playSolo()">Play Solo (vs bots)</button>
+      <div class="screen-or">— or play with friends —</div>
+      <button class="big-btn" onclick="createRoom()">Create Room</button>
+      <div class="join-row">
+        <input id="join-code" maxlength="8" placeholder="ROOM CODE" autocomplete="off">
+        <button onclick="joinRoom()">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lobby ── -->
+  <div id="lobby" class="screen" style="display:none">
+    <div class="screen-box">
+      <h2>Room <span id="lobby-code" class="code"></span></h2>
+      <div class="lobby-hint">
+        Share the code (or
+        <a href="#" onclick="copyRoomLink();return false;">copy link</a>).
+        Pick a seat — empty seats are bots. NS &amp; EW are partnerships.
+      </div>
+      <div id="seat-grid"></div>
+      <button id="lobby-start" class="big-btn" onclick="startGame()" disabled>
+        Start Game
+      </button>
+    </div>
+  </div>
+
+  <div id="app" style="display:none">
 
     <!-- ── Main table ── -->
     <div id="table-area">
@@ -134,6 +166,6 @@
     <button id="install-dismiss" type="button" aria-label="Dismiss">&times;</button>
   </div>
 
-  <script src="/static/game.js?v=5"></script>
+  <script src="/static/game.js?v=6"></script>
 </body>
 </html>
