@@ -37,9 +37,9 @@ REAP_INTERVAL_SECS = 60 * 60  # sweep hourly
 TRICK_DISPLAY_SECS = 4.0
 # Final-trick hold before the hand-summary popup. MUST outlast the
 # client's fly-to-winner animation (game.js: 2.5s lead-in + 1.2s
-# flight = 3.7s) PLUS a ~5s read pause → 9.0 (margin for jitter).
+# flight = 3.7s) PLUS a ~2.5s read pause → 6.5 (margin for jitter).
 # Keep in sync with server.py HAND_END_TRICK_SECS / game.js. (#4)
-HAND_END_TRICK_SECS = 9.0
+HAND_END_TRICK_SECS = 6.5
 SEAT_PARTNERSHIP = {0: "NS", 1: "EW", 2: "NS", 3: "EW"}
 SEAT_NAME = {0: "South", 1: "West", 2: "North", 3: "East"}
 

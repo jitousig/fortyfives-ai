@@ -230,6 +230,18 @@ body {
   height: var(--back-h);
 }
 
+/* A kitty winner briefly holds 8 cards. Stacked vertically at full
+   height, a side hand (West/East) is ~600px tall and forces the
+   fixed-height table grid past 100dvh, clipping the human hand and
+   the discard button off the bottom (#table-area is overflow:hidden).
+   Overlap the face-down backs so side-hand height stays bounded for
+   any count. Mobile uses a horizontal strip instead (see media query,
+   which resets this margin). */
+#middle-row { min-height: 0; }
+.hand-area.vertical .card.back:not(:first-child) {
+  margin-top: calc(28px - var(--back-h));
+}
+
 /* Playable (human can click) */
 .card.playable {
   border: 2px solid #fdd835;
@@ -594,8 +606,28 @@ body {
 /* Drawer is mobile-only; hidden entirely on desktop. */
 #drawer, #drawer-toggle, #drawer-backdrop { display: none; }
 
-/* Per-seat bid pills are mobile-only; desktop uses the right-panel list. */
-.bid-chip { display: none; }
+/* Per-seat bid pills next to each player (auction/declaration, then the
+   winner's pill persists). Shared by desktop and mobile; :empty so a
+   seat with no bid takes no space and never disturbs the table layout. */
+.bid-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.16);
+  color: #fff;
+}
+.bid-chip:empty { display: none; }
+.bid-chip.active {
+  background: #fdd835;
+  color: #1a1a1a;
+}
+.bid-chip.pass {
+  background: rgba(0,0,0,0.35);
+  opacity: 0.6;
+}
 
 /* Touch press feedback (hover doesn't exist on touch) */
 .card.playable:active { transform: translateY(-12px); }
@@ -708,7 +740,7 @@ body {
   }
   #north-hand .card,
   #west-hand .card,
-  #east-hand .card { margin-left: -16px; }
+  #east-hand .card { margin-left: -16px; margin-top: 0; }
   #north-hand .card:first-child,
   #west-hand .card:first-child,
   #east-hand .card:first-child { margin-left: 0; }
@@ -771,26 +803,7 @@ body {
   .trick-slot { min-width: var(--card-w); min-height: var(--card-h); }
   #trump-badge { font-size: 17px; padding: 2px 6px; }
 
-  /* Per-seat bid pills (visible during auction/declaration) */
-  .bid-chip {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-    padding: 4px 9px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.16);
-    color: #fff;
-  }
-  .bid-chip:empty { display: none; }
-  .bid-chip.active {
-    background: #fdd835;
-    color: #1a1a1a;
-  }
-  .bid-chip.pass {
-    background: rgba(0,0,0,0.35);
-    opacity: 0.6;
-  }
+  /* Bid pills use the shared base rule (now applies on desktop too). */
 
   /* Game-over overlay sized for phone */
   #overlay-box { padding: 28px 24px; }

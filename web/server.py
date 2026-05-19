@@ -11,12 +11,12 @@ from web.room import Room, rooms, idle_room_reaper
 TRICK_DISPLAY_SECS = 4.0
 # When the completed trick also ENDS the hand, hold it before sending
 # the hand_over state (which pops the summary). This MUST outlast the
-# client's fly-to-winner animation AND THEN leave a ~5s read pause, or
+# client's fly-to-winner animation AND THEN leave a short read pause, or
 # the summary covers the final trick almost immediately (#4).
 # Client (game.js): 2.5s lead-in + 1.2s flight = 3.7s of animation,
-# so 3.7 + 5.0 ≈ 8.7; 9.0 adds margin for setTimeout/network jitter.
+# so 3.7 + 2.5 ≈ 6.2; 6.5 adds margin for setTimeout/network jitter.
 # Cross-file coupling: keep in sync with game.js startTrickAnimation.
-HAND_END_TRICK_SECS = 9.0
+HAND_END_TRICK_SECS = 6.5
 
 app = FastAPI(title="Fortyfives")
 
