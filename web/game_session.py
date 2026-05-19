@@ -93,6 +93,12 @@ class GameSession:
         # rlcard env's own game instance; main's pause/dismiss flow is
         # untouched, only the popup payload is enriched).
         self._last_hand_result = None
+        # Per-seat table view captured at the end-of-hand boundary, BEFORE
+        # the engine atomically deals the next hand. While hand_over is
+        # true this is served instead of the live state so the next hand
+        # stays hidden behind the summary popup until "Next Hand" is
+        # clicked (the engine has no post-trick/pre-deal pause to read).
+        self._frozen_hand_state = None
         # Discards in 45s are face down: never name a discarded card in
         # the broadcast log. Count per player instead, then log a single
         # aggregate ("West: discards 3 cards") on DISCARD_DONE. Reset on
@@ -108,6 +114,14 @@ class GameSession:
             ht_player = g.highest_trump_player
             ht_card = (str(g.highest_trump_played)
                        if g.highest_trump_played else None)
+            # The finished hand is fully intact here (trick history, bids,
+            # trump set; hands empty) and start_new_hand() has NOT run yet.
+            # Snapshot each seat's view so the next deal stays hidden until
+            # the player dismisses the summary (continue_after_hand()).
+            self._frozen_hand_state = {
+                i: self._serialize_live_state_for(i)
+                for i in range(g.num_players)
+            }
             _orig_end_hand()  # scores, updates points, resets trump fields
             bid_team_idx = (g.highest_bidder % 2
                             if g.highest_bidder is not None else None)
@@ -173,10 +187,41 @@ class GameSession:
         return self.serialize_state_for(self.human_player)
 
     def serialize_state_for(self, seat):
-        """State as seen by `seat`. ONLY this seat's hand is included;
-        every other seat is reduced to a card COUNT. Hidden-information
-        boundary — never leak another seat's cards here (regression
-        test: tests/test_state_no_leak.py)."""
+        """State as seen by `seat`. While the hand-over popup is up, the
+        end-of-hand snapshot is served so the freshly dealt next hand
+        stays hidden until "Next Hand" is clicked; otherwise the live
+        state. Hidden-info boundary preserved either way (the snapshot is
+        built from per-seat live views; regression: test_state_no_leak)."""
+        if self.hand_over and self._frozen_hand_state is not None:
+            return self._frozen_view_for(seat)
+        return self._serialize_live_state_for(seat)
+
+    def _frozen_view_for(self, seat):
+        """The captured end-of-hand view for `seat`, with the few fields
+        that legitimately keep changing while the popup is up patched in
+        live: cumulative score, log, and the popup flags. The table
+        itself (hands, trick history, bids, trump) stays frozen."""
+        frozen = dict(self._frozen_hand_state.get(
+            seat, self._serialize_live_state_for(seat)))
+        pts = self.game.points or {}
+        ns = pts.get(0, 0) if isinstance(pts, dict) else 0
+        ew = pts.get(1, 0) if isinstance(pts, dict) else 0
+        frozen.update({
+            "points": {"ns": ns, "ew": ew},
+            "log": self.log[-40:],
+            "hand_over": self.hand_over and not self.game_over,
+            "hand_summary": self.last_hand_summary,
+            "game_over": self.game_over,
+            "is_human_turn": False,
+            "legal_actions": [],
+        })
+        return frozen
+
+    def _serialize_live_state_for(self, seat):
+        """The live game state as seen by `seat`. ONLY this seat's hand is
+        included; every other seat is reduced to a card COUNT. Hidden-
+        information boundary — never leak another seat's cards here
+        (regression test: tests/test_state_no_leak.py)."""
         game = self.game
 
         def _hand(i):
@@ -305,6 +350,7 @@ class GameSession:
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
             self.hand_over = False  # game-over overlay takes precedence
+            self._frozen_hand_state = None
             return False
 
         if self.hand_over:
@@ -328,6 +374,7 @@ class GameSession:
         self.hand_over = False
         self.last_hand_summary = None
         self._last_hand_result = None
+        self._frozen_hand_state = None  # reveal the new hand
 
     def take_human_action(self, action):
         """Back-compat: act for the solo human seat."""
@@ -381,6 +428,7 @@ class GameSession:
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
             self.hand_over = False  # game-over overlay takes precedence
+            self._frozen_hand_state = None
 
         return None
 
