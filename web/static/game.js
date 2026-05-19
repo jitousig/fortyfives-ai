@@ -417,7 +417,20 @@ function render() {
   renderActions();
   renderLog();
 
-  if (state.game_over) {
+  // The frozen "completed trick" frame the server sends for the
+  // fly-to-winner animation is built from the normal serialized state,
+  // so it ALREADY carries hand_over / game_over when the trick ends the
+  // hand. Popping the summary on that frame buries the final card before
+  // the animation even runs (this is the bug #21 tried — but failed — to
+  // fix by only stretching the server delay). Defer every end-of-hand /
+  // end-of-game overlay until a non-animating state arrives: the server
+  // re-sends one ~HAND_END_TRICK_SECS after the freeze (server.py),
+  // i.e. ~5s after the client animation (startTrickAnimation) finishes.
+  // Cross-file coupling: server.py HAND_END_TRICK_SECS, game.js
+  // startTrickAnimation, server.py _trick_complete_state.
+  if (state.trick_animating) {
+    /* hold the table; the deferred non-animating state pops the popup */
+  } else if (state.game_over) {
     showGameOver();
   } else if (state.hand_over) {
     showHandOver();
