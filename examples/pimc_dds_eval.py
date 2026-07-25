@@ -31,7 +31,9 @@ def worker(agent_name, seed, n, out, payoff='delta'):
         agent = PIMCAgent(n_worlds=20)
     else:
         from fortyfives_pimc_dds import PIMCDDSAgent
-        agent = PIMCDDSAgent(n_worlds=20, payoff=payoff)
+        # 'dc' = lever 1: discard-count-constrained determinization
+        agent = PIMCDDSAgent(n_worlds=20, payoff=payoff,
+                             discard_counts=(agent_name == 'dc'))
     r = evaluate_paired(agent, num_hands=n, seed=seed,
                         name=f'{agent_name}-{seed}', silent=True)
     assert len(r.diff) == n, f'timeouts in chunk {agent_name}-{seed}'
@@ -54,9 +56,9 @@ def _load(dir_, agent_name, seed_base, n_total):
     return diff
 
 
-def merge(seed_base, n_total, dir_):
+def merge(seed_base, n_total, dir_, agents=('v3', 'dds')):
     out = {}
-    for name in ('v3', 'dds'):
+    for name in agents:
         d = _load(dir_, name, seed_base, n_total)
         m, se = d.mean(), d.std(ddof=1) / len(d) ** 0.5
         print(f'pimc-{name:3s} seed_base={seed_base} n={len(d)}: '
@@ -64,9 +66,10 @@ def merge(seed_base, n_total, dir_):
               f'{m + 1.96 * se:+.3f}) beats-base '
               f'{(d > 0).mean() * 100:.1f}%')
         out[name] = d
-    g = out['dds'] - out['v3']
+    a, b = agents[0], agents[1]
+    g = out[b] - out[a]
     m, se = g.mean(), g.std(ddof=1) / len(g) ** 0.5
-    print(f'per-hand gap dds - v3: {m:+.3f} '
+    print(f'per-hand gap {b} - {a}: {m:+.3f} '
           f'(95% CI {m - 1.96 * se:+.3f} to {m + 1.96 * se:+.3f})')
 
 
@@ -74,7 +77,7 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest='mode', required=True)
     w = sub.add_parser('worker')
-    w.add_argument('--agent', choices=['v3', 'dds'], required=True)
+    w.add_argument('--agent', choices=['v3', 'dds', 'dc'], required=True)
     w.add_argument('--seed', type=int, required=True)
     w.add_argument('--n', type=int, required=True)
     w.add_argument('--out', required=True)
@@ -83,8 +86,10 @@ if __name__ == '__main__':
     m.add_argument('--seed-base', type=int, required=True)
     m.add_argument('--n-total', type=int, required=True)
     m.add_argument('--dir', required=True)
+    m.add_argument('--agents', default='v3,dds',
+                   help='comma-separated pair; gap = second - first')
     a = p.parse_args()
     if a.mode == 'worker':
         worker(a.agent, a.seed, a.n, a.out, a.payoff)
     else:
-        merge(a.seed_base, a.n_total, a.dir)
+        merge(a.seed_base, a.n_total, a.dir, tuple(a.agents.split(',')))
