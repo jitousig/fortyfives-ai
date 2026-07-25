@@ -374,7 +374,7 @@ class OracleAgent:
     env.game directly.
     """
 
-    def __init__(self, env, opponent='rulebased', payoff='delta',
+    def __init__(self, env=None, opponent='rulebased', payoff='delta',
                  num_actions=18):
         self.env = env
         self.opponent = opponent
@@ -382,6 +382,10 @@ class OracleAgent:
         self.num_actions = num_actions
         self.use_raw = True
         self.rb_fallbacks = 0
+
+    def attach_env(self, env):
+        """play_eval binds the driving env here before each run."""
+        self.env = env
 
     def step(self, state):
         g = self.env.game

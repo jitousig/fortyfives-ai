@@ -214,6 +214,8 @@ def evaluate(play_agent, num_hands=200, seed=0, name='agent', silent=False):
     fair head-to-head where luck is controlled.
     """
     env = rlcard.make('fortyfives')
+    if hasattr(play_agent, 'attach_env'):
+        play_agent.attach_env(env)
     payoffs, tricks, timeouts = [], [], 0
 
     with greedy(play_agent):
@@ -315,6 +317,12 @@ def evaluate_paired(play_agent, baseline=None, num_hands=200, seed=0,
 
     env_a = rlcard.make('fortyfives')
     env_b = rlcard.make('fortyfives')
+    # Oracle-style agents read true hands from env.game and must be
+    # bound to the env instance that drives their hands.
+    if hasattr(play_agent, 'attach_env'):
+        play_agent.attach_env(env_a)
+    if hasattr(baseline, 'attach_env'):
+        baseline.attach_env(env_b)
     diffs, agent_pts, agent_tricks, wins, timeouts = [], [], [], 0, 0
 
     for i in range(num_hands):
