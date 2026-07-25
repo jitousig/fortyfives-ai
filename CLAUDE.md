@@ -13,6 +13,18 @@ The project includes:
 - Comprehensive test suite covering game rules and card mechanics
 - Training examples with self-play and evaluation utilities
 
+## Where the current plan lives (read this first)
+
+- **Live research plan / backlog:** `RESEARCH.md` (Track A) on the research
+  branch `reconcile-bidding-engine`. It is the *plan*, not the record —
+  start there for what's actively being built and why.
+- **Durable conclusions + the "why":** the auto-memory index `MEMORY.md`
+  (loaded every session). `project-dds-handoff` holds the current active
+  plan; `project-play-phase-ceiling` / `project-bidding-arc` hold the
+  measured results behind it.
+- Active focus (2026-07): build one exact **double-dummy solver** →
+  play-phase oracle (upper bound) + a PIMC-DDS superhuman play agent.
+
 ## Installation & Setup
 
 ```bash
@@ -27,7 +39,7 @@ The project requires Python 3.6+, RLCard (>=1.0.7), NumPy, and Matplotlib.
 
 ## Running the Web GUI
 
-The web GUI requires FastAPI and uvicorn. These live in the shared venv at `../fortyfives-venv/` (a standalone venv, NOT inside any git worktree — Python 3.9.6). `uvicorn` is not on the system PATH, so activate the venv first:
+The web GUI requires FastAPI and uvicorn. These live in the shared venv at `../fortyfives-venv/`. `uvicorn` is not on the system PATH, so activate the venv first:
 
 ```bash
 source ../fortyfives-venv/bin/activate
@@ -201,11 +213,52 @@ Card evaluation uses `get_card_rank()` in card.py—modify this for ranking chan
 
 ## Important Notes
 
-- **State Representation**: Game state is converted to fixed-size vectors for RL (267 features). Changing state representation requires updates to `FortyfivesEnv._get_observation()`.
+- **State Representation**: Game state is a fixed-size vector (`state_shape`, currently **410**) built by `FortyfivesEnv._get_observation()`. Legacy non-card features are based at `52*5` (=260); enriched features (trick history, highest trump, trick standing, seat one-hots) are appended at index 295+. See invariants below before changing it.
 - **Action Space**: 18 actions total (5 bid + 4 trump + 8 card play + 1 done). Actions are phase-dependent; illegal actions are filtered by `_get_legal_actions()`.
 - **Random Seeding**: Use `env.seed()` for reproducible games; `game.np_random` controls shuffling.
 - **Partnership Structure**: Always players 0/2 (North/South) vs 1/3 (East/West); hardcoded in payoff calculation.
 - **Kitty Management**: 3 cards dealt to kitty; highest bidder gets them and must discard back to ≤5 cards.
+
+## Hard-Won Invariants — READ BEFORE TOUCHING `fortyfives/` OR `examples/play_eval.py`
+
+A long debugging session produced confident but **completely false** conclusions
+because the measurement was silently broken. These invariants exist so that
+never happens again. Treat a violation as "stop everything," not "investigate later."
+
+### 1. Import shadowing (silent and severe)
+`python examples/<script>.py` puts `examples/` on `sys.path[0]`, so bare
+`import fortyfives` resolves to the **editable install in the shared venv**,
+which points at the SIBLING repo `../fortyfives`, NOT this repo's package.
+- The trainer/eval scripts prepend this repo's root to `sys.path[0]` to fix this. Do **not** remove that shim.
+- Do **not** `pip install -e .` from this repo into the shared venv (breaks the sibling project).
+- Before trusting ANY engine/env edit: confirm `fortyfives.__file__` resolves under `.../fortyfives-rl-training/` (or check `env.state_shape == 410`).
+
+### 2. Evaluation canary (run after every env/eval change)
+`play_eval.evaluate_paired(RuleBasedAgent(18))` (agent == baseline) MUST return
+**diff 0.0000 / win 0.0%** — pure ties. If not, the eval is not actually paired
+and every number it produces is noise. The rule-based agent MUST stay
+deterministic (no `np.random`; use `min(legal_actions)` tie-break) because
+`env.seed()` only seeds the dealer, never the global RNG.
+
+### 3. Yardstick (how to judge an agent)
+Trust `avg_diff` from `evaluate_paired` with its paired CI; ignore raw/unpaired
+point means. Reference points: **random-legal ≈ −0.50, rule-based = 0.00.**
+"Better than rule-based" = `avg_diff` significantly > 0 (CI excludes 0).
+
+### 4. Observation correctness
+Legacy non-card features start at `52*5` (=260), AFTER hand + 4 trick-card
+blocks (0..259). Basing them at `52*4` collides with the 4th trick card and
+corrupts phase/trump. The observation MUST encode trump suit and lead suit,
+and (since the 410-wide enrichment) trick history / highest trump / trick
+standing / seat one-hots — all decisive for play. Existing offsets 0..294 are
+load-bearing for prior reasoning; ALWAYS append new features past 294 and bump
+`state_shape` to match (never disturb 0..294, or the canary's meaning shifts).
+
+### 5. Process
+One change at a time, `git commit` per change, **plan-first** for non-trivial
+work, and re-run invariant #2 after any `env`/`eval` edit. A result you cannot
+trust is worse than no result.
+
 
 ## Repository Workflow & Branching Discipline — READ BEFORE ANY GIT OP
 
