@@ -14,11 +14,13 @@ from fortyfives.games.fortyfives.game import (
 
 # ── SOTA opponent (composite, wired exactly like play_eval._run_hand) ──
 # Phases 1/2/3 (bid/declare/discard) -> RuleBasedAgent
-# Phase  4     (card play)           -> PIMCAgent  (v3: constrained +
-#                                       rule-based rollout, defaults)
+# Phase  4     (card play)           -> PIMCDDSAgent (PIMC determinization
+#                                       + exact per-world double-dummy
+#                                       solve; validated best fair agent,
+#                                       PR #25: +3.19/+2.81 vs rule-based,
+#                                       beats PIMC v3 on both seeds)
 # Both agents are use_raw=True, consume the rlcard env's extracted state
-# and return ENV action ids fed straight to env.step(). The agents and
-# this branch's fortyfives engine come from agent-sota (commit 8345df7).
+# and return ENV action ids fed straight to env.step().
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _EXAMPLES = os.path.join(_REPO_ROOT, "examples")
 for _p in (_REPO_ROOT, _EXAMPLES):
@@ -26,7 +28,7 @@ for _p in (_REPO_ROOT, _EXAMPLES):
         sys.path.insert(0, _p)
 
 from fortyfives_rule_based import RuleBasedAgent  # noqa: E402
-from fortyfives_pimc import PIMCAgent  # noqa: E402
+from fortyfives_pimc_dds import PIMCDDSAgent  # noqa: E402
 
 if 'fortyfives' not in registry.env_specs:
     register(
@@ -34,7 +36,7 @@ if 'fortyfives' not in registry.env_specs:
         entry_point='fortyfives.envs.fortyfives_env:FortyfivesEnv',
     )
 
-PLAYER_NAMES = ["You (South)", "West", "North", "East"]
+PLAYER_NAMES = ["South", "West", "North", "East"]
 SUIT_SYMBOLS = {'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣'}
 PHASE_NAMES = {
     PHASE_AUCTION: 'Bidding',
@@ -79,6 +81,10 @@ class GameSession:
         # env wraps the same FortyfivesGame instance.
         self.game = self.env.game
         self.human_player = human_player
+        # Seats controlled by humans; every other seat is a bot. Solo
+        # (default) = {human_player}. Multiplayer (PR-B) grows this set;
+        # all per-seat logic keys off membership here, not human_player.
+        self.human_seats = {human_player}
         self.log = []
         self.game_over = False
         self.hand_over = False
@@ -89,6 +95,17 @@ class GameSession:
         # rlcard env's own game instance; main's pause/dismiss flow is
         # untouched, only the popup payload is enriched).
         self._last_hand_result = None
+        # Per-seat table view captured at the end-of-hand boundary, BEFORE
+        # the engine atomically deals the next hand. While hand_over is
+        # true this is served instead of the live state so the next hand
+        # stays hidden behind the summary popup until "Next Hand" is
+        # clicked (the engine has no post-trick/pre-deal pause to read).
+        self._frozen_hand_state = None
+        # Discards in 45s are face down: never name a discarded card in
+        # the broadcast log. Count per player instead, then log a single
+        # aggregate ("West: discards 3 cards") on DISCARD_DONE. Reset on
+        # entering each hand's discard phase (see _log_phase).
+        self._discard_counts = {}
         _orig_end_hand = self.game.end_hand
 
         def _capturing_end_hand():
@@ -99,6 +116,14 @@ class GameSession:
             ht_player = g.highest_trump_player
             ht_card = (str(g.highest_trump_played)
                        if g.highest_trump_played else None)
+            # The finished hand is fully intact here (trick history, bids,
+            # trump set; hands empty) and start_new_hand() has NOT run yet.
+            # Snapshot each seat's view so the next deal stays hidden until
+            # the player dismisses the summary (continue_after_hand()).
+            self._frozen_hand_state = {
+                i: self._serialize_live_state_for(i)
+                for i in range(g.num_players)
+            }
             _orig_end_hand()  # scores, updates points, resets trump fields
             bid_team_idx = (g.highest_bidder % 2
                             if g.highest_bidder is not None else None)
@@ -122,14 +147,20 @@ class GameSession:
 
         self.game.end_hand = _capturing_end_hand
 
-        # Composite SOTA opponent. PIMC n_worlds=10: documented as
-        # statistically indistinguishable from 20 and ~2x faster — picked
-        # for interactive latency. PIMCAgent() defaults = v3 (constrained,
-        # rule-based rollout); do not override.
+        # Composite SOTA opponent. PIMC-DDS n_worlds=10 measured latency
+        # (2026-07-25): median 4 ms, p90 149 ms, max ~1.7 s on
+        # opening-trick decisions — acceptable interactive "think" time.
+        # PIMCDDSAgent() defaults = constrained determinization +
+        # exact minimax per-world solve; do not override.
         self._rule_agent = RuleBasedAgent(num_actions=18)
-        self._pimc_agent = PIMCAgent(num_actions=18, n_worlds=10)
+        self._pimc_agent = PIMCDDSAgent(num_actions=18, n_worlds=10)
 
-        self.log.append("Game started! You are South (partner: North).")
+        # Neutral, seat-correct transcript: the log is broadcast
+        # identically to every connection, so it must NOT be written
+        # from one seat's "you" POV (was a multiplayer bug). The
+        # rotated UI still shows "You"/Partner per client.
+        self.log.append(
+            "New game — North/South vs East/West. First to 125.")
         self._log_phase()
 
     def _agent_for_phase(self, phase):
@@ -146,12 +177,54 @@ class GameSession:
             val = BID_VALUES.get(game.highest_bid, '?')
             self.log.append(f"{bidder} won bid ({val}). Select trump suit.")
         elif phase == PHASE_DISCARD:
+            self._discard_counts = {}  # fresh count for this hand
             self.log.append("Discard — remove unwanted cards, then click Done.")
         elif phase == PHASE_GAMEPLAY:
             trump = SUIT_SYMBOLS.get(game.trump_suit, '?')
             self.log.append(f"Play begins. Trump: {trump}")
 
     def serialize_state(self):
+        """Back-compat: the solo human's view. Identical output to the
+        pre-multiplayer implementation (delegates to serialize_state_for
+        with the single human seat)."""
+        return self.serialize_state_for(self.human_player)
+
+    def serialize_state_for(self, seat):
+        """State as seen by `seat`. While the hand-over popup is up, the
+        end-of-hand snapshot is served so the freshly dealt next hand
+        stays hidden until "Next Hand" is clicked; otherwise the live
+        state. Hidden-info boundary preserved either way (the snapshot is
+        built from per-seat live views; regression: test_state_no_leak)."""
+        if self.hand_over and self._frozen_hand_state is not None:
+            return self._frozen_view_for(seat)
+        return self._serialize_live_state_for(seat)
+
+    def _frozen_view_for(self, seat):
+        """The captured end-of-hand view for `seat`, with the few fields
+        that legitimately keep changing while the popup is up patched in
+        live: cumulative score, log, and the popup flags. The table
+        itself (hands, trick history, bids, trump) stays frozen."""
+        frozen = dict(self._frozen_hand_state.get(
+            seat, self._serialize_live_state_for(seat)))
+        pts = self.game.points or {}
+        ns = pts.get(0, 0) if isinstance(pts, dict) else 0
+        ew = pts.get(1, 0) if isinstance(pts, dict) else 0
+        frozen.update({
+            "points": {"ns": ns, "ew": ew},
+            "log": self.log[-40:],
+            "hand_over": self.hand_over and not self.game_over,
+            "hand_summary": self.last_hand_summary,
+            "game_over": self.game_over,
+            "is_human_turn": False,
+            "legal_actions": [],
+        })
+        return frozen
+
+    def _serialize_live_state_for(self, seat):
+        """The live game state as seen by `seat`. ONLY this seat's hand is
+        included; every other seat is reduced to a card COUNT. Hidden-
+        information boundary — never leak another seat's cards here
+        (regression test: tests/test_state_no_leak.py)."""
         game = self.game
 
         def _hand(i):
@@ -160,7 +233,7 @@ class GameSession:
                 return h.get(i, [])
             return h[i] if i < len(h) else []
 
-        hand = [card_to_str(c) for c in _hand(self.human_player)]
+        hand = [card_to_str(c) for c in _hand(seat)]
 
         current_trick = [None] * game.num_players
         if game.current_trick:
@@ -178,7 +251,10 @@ class GameSession:
         ew_points = pts.get(1, 0) if isinstance(pts, dict) else 0
 
         legal_actions = []
-        if not self.game_over and game.current_player_id == self.human_player:
+        is_seat_turn = (not self.game_over
+                        and game.current_player_id == seat
+                        and seat in self.human_seats)
+        if is_seat_turn:
             legal_actions = game.get_legal_actions()
 
         bids = _bids_to_dict(game.bids, game.num_players)
@@ -188,9 +264,10 @@ class GameSession:
             "type": "state",
             "phase": game.phase,
             "phase_name": PHASE_NAMES.get(game.phase, "Unknown"),
-            "human_player": self.human_player,
+            "human_player": seat,
+            "your_seat": seat,
             "current_player": game.current_player_id,
-            "is_human_turn": not self.game_over and game.current_player_id == self.human_player,
+            "is_human_turn": is_seat_turn,
             "hand": hand,
             "legal_actions": legal_actions,
             "current_trick": current_trick,
@@ -218,7 +295,7 @@ class GameSession:
     def run_ai_turn(self):
         """Run one AI turn. Returns True if more AI turns are needed."""
         game = self.game
-        if game.current_player_id == self.human_player:
+        if game.current_player_id in self.human_seats:
             return False
         if self.game_over:
             return False
@@ -252,7 +329,8 @@ class GameSession:
         name = PLAYER_NAMES[player_id]
 
         self._state, self._pid = self.env.step(env_action)
-        self.log.append(f"{name}: {action_desc}")
+        if action_desc is not None:  # None = silent (per-card discard)
+            self.log.append(f"{name}: {action_desc}")
 
         post_phase = game.phase
         if pre_phase != post_phase:
@@ -275,12 +353,13 @@ class GameSession:
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
             self.hand_over = False  # game-over overlay takes precedence
+            self._frozen_hand_state = None
             return False
 
         if self.hand_over:
             return False  # pause for the hand-summary popup
 
-        return game.current_player_id != self.human_player
+        return game.current_player_id not in self.human_seats
 
     def _compose_hand_summary(self, ns, ew, d_ns, d_ew):
         """Main's score line ({ns,ew,d_ns,d_ew}) plus the rich
@@ -298,13 +377,23 @@ class GameSession:
         self.hand_over = False
         self.last_hand_summary = None
         self._last_hand_result = None
+        self._frozen_hand_state = None  # reveal the new hand
 
     def take_human_action(self, action):
-        """Process human action. Returns error dict or None on success."""
+        """Back-compat: act for the solo human seat."""
+        return self.take_seat_action(self.human_player, action)
+
+    def take_seat_action(self, seat, action):
+        """Process an action submitted for `seat`. Validates it is that
+        seat's turn AND that seat is human-controlled (a connection
+        cannot act for a bot seat or another player's seat). Returns an
+        error dict or None on success."""
         game = self.game
         if self.game_over:
             return {"error": "Game is over"}
-        if game.current_player_id != self.human_player:
+        if seat not in self.human_seats:
+            return {"error": f"Seat {seat} is not human-controlled"}
+        if game.current_player_id != seat:
             return {"error": "Not your turn"}
 
         legal = game.get_legal_actions()
@@ -313,12 +402,13 @@ class GameSession:
 
         pre_phase = game.phase
         pre_points = dict(game.points) if isinstance(game.points, dict) else {}
-        action_desc = self._describe_action(action, game.phase, self.human_player)
+        action_desc = self._describe_action(action, game.phase, seat)
 
         # Frontend speaks raw game ids; the env expects env ids.
         env_action = self.env._game_to_env_action(action, pre_phase)
         self._state, self._pid = self.env.step(env_action)
-        self.log.append(f"You: {action_desc}")
+        if action_desc is not None:  # None = silent (per-card discard)
+            self.log.append(f"{PLAYER_NAMES[seat]}: {action_desc}")
 
         post_phase = game.phase
         if pre_phase != post_phase:
@@ -341,6 +431,7 @@ class GameSession:
             self.log.append(f"=== GAME OVER === {winner} wins! NS: {ns}, EW: {ew}")
             self.game_over = True
             self.hand_over = False  # game-over overlay takes precedence
+            self._frozen_hand_state = None
 
         return None
 
@@ -356,11 +447,18 @@ class GameSession:
 
         if phase == PHASE_DISCARD:
             if action == DISCARD_DONE:
-                return "done discarding"
-            hand = self._get_hand(player_id)
-            if 0 <= action < len(hand):
-                return f"discards {format_card(hand[action])}"
-            return f"discards card {action}"
+                # Discards are face down — reveal only the COUNT, never
+                # the cards (the log is broadcast to every seat).
+                k = self._discard_counts.pop(player_id, 0)
+                if k == 0:
+                    return "keeps all cards"
+                return f"discards {k} card{'s' if k != 1 else ''}"
+            # An individual card discard: tally it, emit NOTHING (the
+            # aggregate is logged on DISCARD_DONE). None tells the caller
+            # to skip the log line entirely.
+            self._discard_counts[player_id] = (
+                self._discard_counts.get(player_id, 0) + 1)
+            return None
 
         if phase == PHASE_GAMEPLAY:
             hand = self._get_hand(player_id)

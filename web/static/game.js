@@ -5,26 +5,161 @@ const SUIT_SYM = { S: '♠', H: '♥', D: '♦', C: '♣' };
 const BID_LABEL = { 0: 'Pass', 1: '20', 2: '25', 3: '30', 4: 'Hold' };
 const BID_VALUES = { 0: null, 1: 20, 2: 25, 3: 30, 4: null };
 const PHASE = { AUCTION: 1, DECLARATION: 2, DISCARD: 3, GAMEPLAY: 4 };
-const PLAYER_NAMES = ['You', 'West', 'North', 'East'];
-// Player 0 = South (human), 1 = West, 2 = North, 3 = East
+// Screen positions around the table, index 0 = bottom (always "you").
+const POS = ['south', 'west', 'north', 'east'];
+const REL_NAMES = ['You', 'West', 'North', 'East'];
+
+// Rotate an absolute seat to the local player's view: your seat is
+// always at the bottom ('south'). Solo (your_seat 0 / undefined) → the
+// identity, so single-player rendering is byte-identical to before.
+function _you() {
+  return (state && state.your_seat != null) ? state.your_seat : 0;
+}
+function posOf(seat) { return POS[(seat - _you() + 4) % 4]; }
+function nameOf(seat) { return REL_NAMES[(seat - _you() + 4) % 4]; }
+// Actual player/bot name for a seat (multiplayer); solo has no
+// seat_names so this falls back to the rotated compass label →
+// single-player display is unchanged.
+function playerLabel(seat) {
+  const n = state && state.seat_names;
+  return (n && n[String(seat)]) || nameOf(seat);
+}
 
 let ws = null;
 let state = null;
+let roomCode = null;        // null = solo; set = multiplayer room
+let lobby = null;           // last lobby payload (multiplayer only)
+let playerName = null;      // multiplayer display name
+let curScreen = 'landing';  // 'landing' | 'lobby' | 'game'
 let discardSelections = new Set();
 let trickAnimTimer = null;
 
 // ── Connection ──
 
+function _wsPath() {
+  return roomCode ? `/ws/${roomCode}` : '/ws';
+}
+
+function _tokKey() { return 'ff_tok_' + (roomCode || ''); }
+
+// Set true on a FATAL room error (room gone / stale token on a
+// cold-start resume) so ws.onclose stops the 2s reconnect loop instead
+// of hammering a dead room forever.
+let abandon = false;
+
+// Remember which room we have a live seat in, so a cold start (app
+// killed & relaunched) can OFFER to resume it. Token itself is under
+// _tokKey(); these point at it.
+function _rememberActiveRoom() {
+  if (!roomCode) return;
+  try {
+    localStorage.setItem('ff_active_room', roomCode);
+    localStorage.setItem('ff_active_name', playerName || '');
+  } catch (_) {}
+}
+
+function _forgetActiveRoom() {
+  try {
+    if (roomCode) localStorage.removeItem(_tokKey());
+    const saved = localStorage.getItem('ff_active_room');
+    if (saved) localStorage.removeItem('ff_tok_' + saved);
+    localStorage.removeItem('ff_active_room');
+    localStorage.removeItem('ff_active_name');
+  } catch (_) {}
+}
+
+// Landing-screen "Resume game ABCD" affordance: visible only when a
+// paused game is saved on this device.
+function renderResume() {
+  const row = document.getElementById('resume-row');
+  if (!row) return;
+  let code = '';
+  try { code = localStorage.getItem('ff_active_room') || ''; } catch (_) {}
+  if (code && localStorage.getItem('ff_tok_' + code)) {
+    document.getElementById('resume-code').textContent = code;
+    row.style.display = '';
+  } else {
+    row.style.display = 'none';
+  }
+}
+
+function resumeGame() {
+  let code = '';
+  try { code = localStorage.getItem('ff_active_room') || ''; } catch (_) {}
+  if (!code) { renderResume(); return; }
+  abandon = false;
+  roomCode = code;
+  playerName = (localStorage.getItem('ff_active_name') || 'Player');
+  connect();                 // onopen rejoins via ff_tok_<code>
+  showScreen('lobby');       // server pushes state → game, or lobby
+}
+
+function forgetSavedGame() {
+  const saved = (() => {
+    try { return localStorage.getItem('ff_active_room'); } catch (_) { return null; }
+  })();
+  if (saved) { try { localStorage.removeItem('ff_tok_' + saved); } catch (_) {} }
+  try {
+    localStorage.removeItem('ff_active_room');
+    localStorage.removeItem('ff_active_name');
+  } catch (_) {}
+  renderResume();
+}
+
+// In-game "Leave": forget the game ON THIS DEVICE and go back to the
+// landing screen. The seat stays reserved server-side (PR-C: the game
+// waits for that player) — this just stops THIS device auto-returning.
+function leaveGame() {
+  abandon = true;
+  _forgetActiveRoom();
+  try { if (ws) ws.close(); } catch (_) {}
+  roomCode = null; playerName = null; state = null; lobby = null;
+  showScreen('landing');
+  renderResume();
+}
+
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  ws = new WebSocket(`${proto}://${location.host}/ws`);
+  ws = new WebSocket(`${proto}://${location.host}${_wsPath()}`);
 
-  ws.onopen = () => setConn(true);
-  ws.onclose = () => { setConn(false); setTimeout(connect, 2000); };
+  ws.onopen = () => {
+    setConn(true);
+    if (!roomCode) return;            // solo: server pushes state
+    // Prefer reconnecting to our existing seat (survives phone-lock /
+    // network blips — the server keeps the seat & game paused). Fall
+    // back to a fresh lobby join if we have no token yet.
+    const tok = localStorage.getItem(_tokKey());
+    if (tok) {
+      ws.send(JSON.stringify({ type: 'rejoin', token: tok }));
+    } else if (playerName) {
+      ws.send(JSON.stringify({ type: 'join', name: playerName }));
+    }
+  };
+  ws.onclose = () => {
+    setConn(false);
+    if (abandon) return;          // dead room / left — stop retrying
+    setTimeout(connect, 2000);
+  };
   ws.onerror = () => setConn(false);
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
+    if (data.type === 'seat') {
+      // Persist the reconnect token so a phone-lock/refresh rejoins
+      // the same seat instead of starting over, and mark this as the
+      // saved game so a cold start can offer to resume it.
+      try { localStorage.setItem(_tokKey(), data.token); } catch (_) {}
+      _rememberActiveRoom();
+      return;
+    }
+    if (data.type === 'lobby') {
+      lobby = data;
+      updateWaiting(data.waiting_for);
+      showScreen(data.started ? 'game' : 'lobby');
+      if (!data.started) renderLobby();
+      return;
+    }
     if (data.type === 'state') {
+      showScreen('game');
       if (!state || state.phase !== data.phase || data.game_over) {
         discardSelections.clear();
       }
@@ -34,6 +169,7 @@ function connect() {
         trickAnimTimer = null;
       }
       state = data;
+      updateWaiting(data.waiting_for);
       render();
       if (data.trick_animating && data.last_trick_winner != null) {
         const winner = data.last_trick_winner;
@@ -44,8 +180,40 @@ function connect() {
       }
     } else if (data.type === 'error') {
       console.warn('Server error:', data.error);
+      if (data.error === 'Room not found') {
+        // The room is gone (server restarted / reaped after a week).
+        // Don't loop-reconnect into a dead room — forget it and go
+        // back to landing.
+        abandon = true;
+        _forgetActiveRoom();
+        try { if (ws) ws.close(); } catch (_) {}
+        roomCode = null;
+        showScreen('landing');
+        renderResume();
+        alert('That game is no longer available — it ended or expired.');
+      } else if (data.error === 'reconnect_failed') {
+        // Stale token but the room still exists — drop the token and
+        // re-enter the lobby fresh.
+        try { localStorage.removeItem(_tokKey()); } catch (_) {}
+        if (roomCode && playerName) {
+          ws.send(JSON.stringify({ type: 'join', name: playerName }));
+        }
+      }
     }
   };
+}
+
+// "Waiting for <names> to reconnect…" banner — shown whenever a
+// claimed seat is disconnected (the game is paused, not frozen).
+function updateWaiting(list) {
+  const el = document.getElementById('waiting-banner');
+  if (!el) return;
+  if (list && list.length) {
+    el.textContent = `Waiting for ${list.join(', ')} to reconnect…`;
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 function setConn(ok) {
@@ -66,6 +234,95 @@ function newGame() {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: 'new_game' }));
   }
+}
+
+// ── Screens: landing → (lobby) → game ──
+
+function showScreen(name) {
+  curScreen = name;
+  const set = (id, on) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = on ? '' : 'none';
+  };
+  set('landing', name === 'landing');
+  set('lobby', name === 'lobby');
+  set('app', name === 'game');
+  // "Leave" only matters in a multiplayer game (solo just uses New Game).
+  set('leave-btn', name === 'game' && !!roomCode);
+}
+
+function _send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
+  }
+}
+
+function playSolo() {
+  abandon = false;
+  roomCode = null;            // → connects to /ws (unchanged solo flow)
+  connect();
+  showScreen('game');
+}
+
+async function createRoom() {
+  try {
+    const r = await fetch('/room', { method: 'POST' });
+    const { code } = await r.json();
+    _enterRoom(code);
+  } catch (e) {
+    alert('Could not create room. Try again.');
+  }
+}
+
+function joinRoom() {
+  const code = (document.getElementById('join-code').value || '')
+    .trim().toUpperCase();
+  if (code.length < 3) { alert('Enter a room code.'); return; }
+  _enterRoom(code);
+}
+
+function _enterRoom(code) {
+  abandon = false;
+  roomCode = code;
+  playerName = (document.getElementById('player-name')
+    && document.getElementById('player-name').value || '').trim()
+    || 'Player';
+  connect();
+  showScreen('lobby');
+  // join announced in ws.onopen once the socket is open
+}
+
+function claimSeat(seat) { _send({ type: 'claim_seat', seat }); }
+function leaveSeat() { _send({ type: 'leave_seat' }); }
+function startGame() { _send({ type: 'start' }); }
+
+function copyRoomLink() {
+  const link = `${location.origin}/?room=${roomCode}`;
+  if (navigator.clipboard) navigator.clipboard.writeText(link);
+}
+
+function renderLobby() {
+  if (!lobby) return;
+  const codeEl = document.getElementById('lobby-code');
+  if (codeEl) codeEl.textContent = lobby.code;
+  const grid = document.getElementById('seat-grid');
+  if (grid) {
+    grid.innerHTML = lobby.seats.map(s => {
+      const taken = s.claimed_by != null;
+      const mine = s.is_you;
+      const who = taken ? s.claimed_by : '<em>open</em>';
+      const cls = ['seat-card', `pship-${s.partnership.toLowerCase()}`,
+        mine ? 'mine' : '', taken && !mine ? 'taken' : ''].filter(Boolean).join(' ');
+      const act = mine
+        ? `<button onclick="leaveSeat()">Leave</button>`
+        : (taken ? '' : `<button onclick="claimSeat(${s.seat})">Sit here</button>`);
+      return `<div class="${cls}">
+        <div class="seat-pos">${s.name} <span class="pship">${s.partnership}</span></div>
+        <div class="seat-who">${who}</div>${act}</div>`;
+    }).join('');
+  }
+  const startBtn = document.getElementById('lobby-start');
+  if (startBtn) startBtn.disabled = !lobby.can_start;
 }
 
 // ── Card helpers ──
@@ -108,8 +365,7 @@ function toggleDiscardSelection(index) {
 
 function startTrickAnimation(winnerIdx) {
   const slotIds = ['trick-south', 'trick-west', 'trick-north', 'trick-east'];
-  const handIds = ['south-hand', 'west-hand', 'north-hand', 'east-hand'];
-  const winnerEl = document.getElementById(handIds[winnerIdx]);
+  const winnerEl = document.getElementById(`${posOf(winnerIdx)}-hand`);
   if (!winnerEl) return;
 
   const wr = winnerEl.getBoundingClientRect();
@@ -161,7 +417,20 @@ function render() {
   renderActions();
   renderLog();
 
-  if (state.game_over) {
+  // The frozen "completed trick" frame the server sends for the
+  // fly-to-winner animation is built from the normal serialized state,
+  // so it ALREADY carries hand_over / game_over when the trick ends the
+  // hand. Popping the summary on that frame buries the final card before
+  // the animation even runs (this is the bug #21 tried — but failed — to
+  // fix by only stretching the server delay). Defer every end-of-hand /
+  // end-of-game overlay until a non-animating state arrives: the server
+  // re-sends one ~HAND_END_TRICK_SECS after the freeze (server.py),
+  // i.e. ~5s after the client animation (startTrickAnimation) finishes.
+  // Cross-file coupling: server.py HAND_END_TRICK_SECS, game.js
+  // startTrickAnimation, server.py _trick_complete_state.
+  if (state.trick_animating) {
+    /* hold the table; the deferred non-animating state pops the popup */
+  } else if (state.game_over) {
     showGameOver();
   } else if (state.hand_over) {
     showHandOver();
@@ -253,41 +522,43 @@ function continueHand() {
 
 function renderPlayerZones() {
   const cp = state.current_player;
-  const zones = { 0: 'south-zone', 1: 'west-zone', 2: 'north-zone', 3: 'east-zone' };
-  for (const [p, id] of Object.entries(zones)) {
-    const el = document.getElementById(id);
+  for (let seat = 0; seat < 4; seat++) {
+    const el = document.getElementById(`${posOf(seat)}-zone`);
     if (el) {
-      el.classList.toggle('active-player', parseInt(p) === cp && !state.game_over);
+      el.classList.toggle('active-player', seat === cp && !state.game_over);
     }
   }
 
-  // Dealer tags — show for whichever player is dealer
-  document.getElementById('dealer-tag').style.display = state.dealer === 0 ? 'inline' : 'none';
+  // Your dealer tag (the south/bottom position is always you)
+  const dt = document.getElementById('dealer-tag');
+  if (dt) dt.style.display = state.dealer === _you() ? 'inline' : 'none';
 
-  // Update other player labels with dealer indicator
-  const labelIds = { 1: 'west-label', 2: 'north-label', 3: 'east-label' };
-  const labelBase = { 1: 'West', 2: 'North', 3: 'East' };
-  for (const [p, id] of Object.entries(labelIds)) {
-    const el = document.getElementById(id);
+  // The three non-you positions (west/north/east, relative to you)
+  const labelBase = { west: 'West', north: 'North', east: 'East' };
+  for (let seat = 0; seat < 4; seat++) {
+    if (seat === _you()) continue;
+    const pos = posOf(seat);
+    const el = document.getElementById(`${pos}-label`);
     if (!el) continue;
-    const dealerMark = parseInt(p) === state.dealer
+    const dealerMark = seat === state.dealer
       ? ' <span class="dealer-tag">Dealer</span>' : '';
-    const partnerMark = parseInt(p) === 2
+    const partnerMark = pos === 'north'
       ? ' <span class="partner-tag">Partner</span>' : '';
-    el.innerHTML = labelBase[p] + dealerMark + partnerMark;
+    el.innerHTML = playerLabel(seat) + dealerMark + partnerMark;
   }
 }
 
 // ── Hands ──
 
 function renderHands() {
-  // Other players: face-down cards
-  renderBackHand('north-hand', state.hand_counts['2']);
-  renderBackHand('west-hand', state.hand_counts['1']);
-  renderBackHand('east-hand', state.hand_counts['3']);
+  // Other players: face-down cards, rotated to your view
+  for (let seat = 0; seat < 4; seat++) {
+    if (seat === _you()) continue;
+    renderBackHand(`${posOf(seat)}-hand`, state.hand_counts[String(seat)]);
+  }
 
-  // Human hand
-  const el = document.getElementById('south-hand');
+  // Your hand is always the bottom (south) position
+  const el = document.getElementById(`${posOf(_you())}-hand`);
   el.innerHTML = '';
   const ph = state.phase;
   const legal = state.legal_actions || [];
@@ -323,13 +594,11 @@ function renderBackHand(id, count) {
 
 function renderTrick() {
   const trick = state.current_trick || [null, null, null, null];
-  // Player 0 = south, 1 = west, 2 = north, 3 = east
-  const slots = { 'trick-south': 0, 'trick-west': 1, 'trick-north': 2, 'trick-east': 3 };
-
-  for (const [slotId, playerIdx] of Object.entries(slots)) {
-    const el = document.getElementById(slotId);
+  // Each seat's played card goes to its rotated screen slot.
+  for (let seat = 0; seat < 4; seat++) {
+    const el = document.getElementById(`trick-${posOf(seat)}`);
     if (!el) continue;
-    const cs = trick[playerIdx];
+    const cs = trick[seat];
     el.innerHTML = cs ? cardHTML(cs, false, -1) : emptySlotHTML();
   }
 }
@@ -344,7 +613,14 @@ function renderTrumpBadge() {
     badge.innerHTML = '';
   }
   if (state.phase === PHASE.GAMEPLAY) {
-    num.textContent = `Trick ${state.trick_count + 1}/5`;
+    // While the trick-winning animation plays, the engine has already
+    // advanced trick_count — hold the displayed number on the trick
+    // being animated; it advances once the next (non-animating) state
+    // arrives. (Was a solo bug too.)
+    const shown = state.trick_animating
+      ? state.trick_count
+      : state.trick_count + 1;
+    num.textContent = `Trick ${Math.min(Math.max(shown, 1), 5)}/5`;
   } else {
     num.textContent = '';
   }
@@ -362,12 +638,19 @@ function renderInfo() {
     turnEl.textContent = 'Your turn ▶';
     turnEl.style.color = '#fdd835';
   } else {
-    turnEl.textContent = `${PLAYER_NAMES[state.current_player]}'s turn…`;
+    turnEl.textContent = `${playerLabel(state.current_player)}'s turn…`;
     turnEl.style.color = '';
   }
 
   document.getElementById('score-ns').textContent = state.points.ns;
   document.getElementById('score-ew').textContent = state.points.ew;
+  // Partnership member names (NS = seats 0&2, EW = 1&3 — absolute, not
+  // rotated). Multiplayer → real names via seat_names; solo → falls
+  // back to "You & North" / "West & East" (unchanged).
+  const tns = document.getElementById('team-ns');
+  const tew = document.getElementById('team-ew');
+  if (tns) tns.textContent = `(${playerLabel(0)} & ${playerLabel(2)})`;
+  if (tew) tew.textContent = `(${playerLabel(1)} & ${playerLabel(3)})`;
 
   renderBidBlock();
   renderTricksBlock();
@@ -376,11 +659,16 @@ function renderInfo() {
 function renderBidBlock() {
   const el = document.getElementById('bid-block');
   if (state.phase !== PHASE.AUCTION && state.phase !== PHASE.DECLARATION) {
-    // Show final bid result during play phases
+    // Persistent through the whole hand: who won the bid, the value,
+    // and trump (the user wants this visible the entire hand).
     if (state.highest_bidder !== null && state.highest_bidder !== undefined) {
-      const name = PLAYER_NAMES[state.highest_bidder];
+      const name = playerLabel(state.highest_bidder);
       const val = state.highest_bid_value || '?';
-      el.innerHTML = `Bid: ${name} at ${val}`;
+      const sixty = val === 30 ? ' <span class="bb-bonus">(30→60)</span>' : '';
+      const tr = state.trump_display
+        ? ` · Trump <strong>${state.trump_display}</strong>` : '';
+      el.innerHTML =
+        `Bid: <strong>${name}</strong> won at <strong>${val}</strong>${sixty}${tr}`;
     } else {
       el.innerHTML = '';
     }
@@ -393,7 +681,7 @@ function renderBidBlock() {
   const lines = [];
 
   for (let i = 0; i < 4; i++) {
-    const name = PLAYER_NAMES[i];
+    const name = playerLabel(i);
     const isDealer = i === dealer;
     const hasPassed = passed[i];
     const bid = bids[String(i)];
@@ -419,9 +707,26 @@ function renderSeatBids() {
   const bids = state.bids || {};
   const passed = state.passed || [];
   for (let p = 0; p < 4; p++) {
-    const el = document.getElementById(`bid-chip-${p}`);
+    // The chip element lives in the fixed zone; rotate seat p to its
+    // on-screen chip so pills line up with the rotated board (#2).
+    // Solo (your_seat 0) → identity → unchanged.
+    const cid = (p - _you() + 4) % 4;
+    const el = document.getElementById(`bid-chip-${cid}`);
     if (!el) continue;
-    if (!show) { el.textContent = ''; el.className = 'bid-chip'; continue; }
+    if (!show) {
+      // After the auction: keep ONLY the winning bidder's pill on
+      // their seat for the whole hand; clear everyone else.
+      if (p === state.highest_bidder && state.highest_bid != null) {
+        el.textContent = state.highest_bid === 4
+          ? 'Hold'
+          : (BID_LABEL[state.highest_bid] || state.highest_bid_value || '');
+        el.className = 'bid-chip active';
+      } else {
+        el.textContent = '';
+        el.className = 'bid-chip';
+      }
+      continue;
+    }
     const bid = bids[String(p)];
     if (passed[p]) {
       el.textContent = 'Pass';
@@ -504,6 +809,20 @@ function renderActions() {
 
 // ── Log ──
 
+// The broadcast log is built server-side with absolute compass labels
+// (South/West/North/East = seats 0/1/2/3). In multiplayer, swap them
+// for the real lobby names so the log reads "Alice bids 20". Solo has
+// no seat_names → returned unchanged (single-player log byte-identical).
+// Single regex pass so an injected name can't be re-matched as another
+// compass word; escHtml still runs AFTER, so names stay XSS-safe.
+const _ABS_SEAT = { South: 0, West: 1, North: 2, East: 3 };
+function _personalizeLog(line) {
+  const names = state && state.seat_names;
+  if (!names) return line;
+  return line.replace(/\b(South|West|North|East)\b/g,
+    (w) => names[String(_ABS_SEAT[w])] || w);
+}
+
 function renderLog() {
   const el = document.getElementById('game-log');
   const log = state.log || [];
@@ -512,7 +831,7 @@ function renderLog() {
     const isSep = line.startsWith('Hand over') || line.startsWith('===');
     const cls = isLatest ? 'latest' : isSep ? 'hand-sep' : '';
     const gameEnd = line.startsWith('===');
-    return `<div class="log-entry ${gameEnd ? 'game-end' : cls}">${escHtml(line)}</div>`;
+    return `<div class="log-entry ${gameEnd ? 'game-end' : cls}">${escHtml(_personalizeLog(line))}</div>`;
   }).join('');
   el.scrollTop = el.scrollHeight;
 }
@@ -578,7 +897,24 @@ _mq.addEventListener('change', syncResponsiveLayout);
 // ── Boot ──
 window.addEventListener('load', () => {
   syncResponsiveLayout();
-  connect();
+  // Multiplayer app: start on the landing screen instead of
+  // auto-connecting. A ?room=CODE deep link jumps straight to that
+  // room's lobby. Solo connects only when "Play Solo" is clicked
+  // (then the game flow is exactly as before).
+  const params = new URLSearchParams(location.search);
+  const deepRoom = (params.get('room') || '').trim().toUpperCase();
+  if (deepRoom) {
+    showScreen('lobby');
+    document.getElementById('join-code').value = deepRoom;
+    // name still entered on landing; prefill then join
+    _enterRoom(deepRoom);
+  } else {
+    // Cold start with no deep link: stay on landing, but OFFER to
+    // resume a saved paused game (PR-D) — never auto-rejoin, so the
+    // player can always choose to start fresh instead.
+    showScreen('landing');
+    renderResume();
+  }
   initInstall();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

@@ -230,6 +230,18 @@ body {
   height: var(--back-h);
 }
 
+/* A kitty winner briefly holds 8 cards. Stacked vertically at full
+   height, a side hand (West/East) is ~600px tall and forces the
+   fixed-height table grid past 100dvh, clipping the human hand and
+   the discard button off the bottom (#table-area is overflow:hidden).
+   Overlap the face-down backs so side-hand height stays bounded for
+   any count. Mobile uses a horizontal strip instead (see media query,
+   which resets this margin). */
+#middle-row { min-height: 0; }
+.hand-area.vertical .card.back:not(:first-child) {
+  margin-top: calc(28px - var(--back-h));
+}
+
 /* Playable (human can click) */
 .card.playable {
   border: 2px solid #fdd835;
@@ -594,8 +606,28 @@ body {
 /* Drawer is mobile-only; hidden entirely on desktop. */
 #drawer, #drawer-toggle, #drawer-backdrop { display: none; }
 
-/* Per-seat bid pills are mobile-only; desktop uses the right-panel list. */
-.bid-chip { display: none; }
+/* Per-seat bid pills next to each player (auction/declaration, then the
+   winner's pill persists). Shared by desktop and mobile; :empty so a
+   seat with no bid takes no space and never disturbs the table layout. */
+.bid-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.16);
+  color: #fff;
+}
+.bid-chip:empty { display: none; }
+.bid-chip.active {
+  background: #fdd835;
+  color: #1a1a1a;
+}
+.bid-chip.pass {
+  background: rgba(0,0,0,0.35);
+  opacity: 0.6;
+}
 
 /* Touch press feedback (hover doesn't exist on touch) */
 .card.playable:active { transform: translateY(-12px); }
@@ -666,7 +698,9 @@ body {
     padding: 0;
   }
   #score-card .score-row { flex-direction: column; align-items: center; padding: 0; gap: 0; }
-  #score-card .score-row small,
+  /* Keep partnership names visible on mobile (the user wants them);
+     only the "first to 125" target is dropped for space. */
+  #score-card .score-row small { font-size: 9px; opacity: 0.7; }
   #score-card .score-target { display: none; }
   #score-card .score-val { font-size: 20px; line-height: 1; }
 
@@ -706,7 +740,7 @@ body {
   }
   #north-hand .card,
   #west-hand .card,
-  #east-hand .card { margin-left: -16px; }
+  #east-hand .card { margin-left: -16px; margin-top: 0; }
   #north-hand .card:first-child,
   #west-hand .card:first-child,
   #east-hand .card:first-child { margin-left: 0; }
@@ -769,26 +803,7 @@ body {
   .trick-slot { min-width: var(--card-w); min-height: var(--card-h); }
   #trump-badge { font-size: 17px; padding: 2px 6px; }
 
-  /* Per-seat bid pills (visible during auction/declaration) */
-  .bid-chip {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-    padding: 4px 9px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.16);
-    color: #fff;
-  }
-  .bid-chip:empty { display: none; }
-  .bid-chip.active {
-    background: #fdd835;
-    color: #1a1a1a;
-  }
-  .bid-chip.pass {
-    background: rgba(0,0,0,0.35);
-    opacity: 0.6;
-  }
+  /* Bid pills use the shared base rule (now applies on desktop too). */
 
   /* Game-over overlay sized for phone */
   #overlay-box { padding: 28px 24px; }
@@ -906,3 +921,80 @@ body {
 }
 #hand-overlay-msg .hr-verdict.made { color: #81c784; }
 #hand-overlay-msg .hr-verdict.fail { color: #e57373; }
+
+/* ── Landing / Lobby screens (PR-B2) ── */
+.screen {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  background: #14342b; padding: 20px;
+}
+.screen-box {
+  background: rgba(0,0,0,0.30); border-radius: 14px;
+  padding: 26px 22px; width: min(420px, 92vw); text-align: center;
+  color: #f3f3f3;
+}
+.screen-box h1, .screen-box h2 { margin: 0 0 16px; }
+.screen-box input {
+  width: 100%; box-sizing: border-box; padding: 11px 12px;
+  margin: 8px 0; border-radius: 8px; border: 1px solid #3a5a4c;
+  background: #0e241d; color: #fff; font-size: 15px;
+}
+.big-btn {
+  display: block; width: 100%; box-sizing: border-box;
+  padding: 13px; margin: 8px 0; border: 0; border-radius: 9px;
+  background: #ffee58; color: #1a1a1a; font-size: 15px;
+  font-weight: 700; cursor: pointer;
+}
+.big-btn:disabled { background: #6b6b4a; color: #333; cursor: default; }
+.big-btn:hover:not(:disabled) { background: #fff176; }
+.screen-or { margin: 14px 0 6px; opacity: 0.6; font-size: 13px; }
+.join-row { display: flex; gap: 8px; }
+.join-row input { flex: 1; text-transform: uppercase; }
+.join-row button {
+  padding: 0 16px; border: 0; border-radius: 8px;
+  background: #ffee58; font-weight: 700; cursor: pointer;
+}
+.code { font-family: monospace; letter-spacing: 2px; color: #ffe082; }
+.lobby-hint { font-size: 13px; opacity: 0.75; margin-bottom: 14px; }
+.lobby-hint a { color: #ffe082; }
+#seat-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 16px;
+}
+.seat-card {
+  background: rgba(255,255,255,0.06); border: 2px solid transparent;
+  border-radius: 10px; padding: 12px 8px;
+}
+.seat-card.pship-ns { border-left: 4px solid #4fc3f7; }
+.seat-card.pship-ew { border-left: 4px solid #ff8a65; }
+.seat-card.mine { border-color: #ffee58; }
+.seat-card.taken { opacity: 0.6; }
+.seat-pos { font-weight: 700; font-size: 14px; }
+.seat-pos .pship { font-size: 11px; opacity: 0.6; margin-left: 4px; }
+.seat-who { font-size: 13px; margin: 6px 0 8px; min-height: 1.2em; }
+.seat-card button {
+  padding: 6px 12px; border: 0; border-radius: 7px;
+  background: #ffee58; font-weight: 700; cursor: pointer; font-size: 13px;
+}
+
+/* Game paused on a disconnected player (PR-C: no bot takeover). */
+#waiting-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  background: #b71c1c; color: #fff;
+  font-weight: 700; font-size: 14px; text-align: center;
+  padding: 9px 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Cold-start "Resume game ABCD" affordance on the landing screen. */
+#resume-row { margin-bottom: 14px; }
+#resume-row #resume-btn { background: #2e7d32; color: #fff; }
+#resume-row #resume-forget {
+  display: inline-block; margin-top: 6px;
+  font-size: 12px; opacity: 0.7;
+}
+/* In-game "Leave" button (multiplayer only). */
+#leave-btn {
+  margin-left: 8px;
+  background: #555; color: #fff;
+}
