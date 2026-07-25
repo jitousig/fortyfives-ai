@@ -303,6 +303,27 @@ class TestSearchVsBruteForce(unittest.TestCase):
                 self.assertEqual(agg(rv.values()), want)
                 self.assertEqual(s.rb_fallbacks, 0)
 
+    def test_move_reduction_is_exact(self):
+        """Equivalence-class move reduction must not change any value:
+        full 5-card deals, reduce=True vs reduce=False, both modes,
+        including all root_values entries."""
+        rng = random.Random(23)
+        for trial in range(12):
+            deck = list(range(52))
+            rng.shuffle(deck)
+            hands = tuple(tuple(sorted(deck[5 * s:5 * s + 5]))
+                          for s in range(4))
+            trump = rng.randrange(4)
+            bt, bk = rng.randrange(2), rng.choice([1, 2, 3])
+            mode = 'minimax' if trial % 2 == 0 else 'rulebased'
+            leader = rng.randrange(4)
+            rv = {}
+            for red in (True, False):
+                s = DDSolver(trump, bt, bk, opponent=mode, reduce=red)
+                rv[red] = s.root_values(hands, leader)
+            self.assertEqual(rv[True], rv[False],
+                             f'trial {trial} mode={mode}')
+
     def test_partial_trick_entry(self):
         rng = random.Random(11)
         for _ in range(25):

@@ -81,10 +81,59 @@ _BID_VALUE = {1: 20, 2: 25, 3: 30}   # BID_20/25/30 action ids -> value
 
 _INF = float('inf')
 
+# --- Equivalence-class tables (move reduction) -----------------------------
+# Cards partition into pools per trump: the trump pool (trump suit +
+# A-hearts) and the three-or-four non-trump suit pools (minus A-hearts).
+# Within a pool, two cards with NO live card ranked strictly between
+# them are interchangeable for the play-out — except A-hearts (its
+# SUIT differs from the rest of the trump pool, and leading it sets a
+# different lead suit), and except a trump pair straddling the current
+# highest-trump-played rank (the +5 bonus threshold distinguishes them).
+# _POOL_OF[t][c]: pool id (0 = trump pool). _BETWEEN[t][(a, b)]: bitmask
+# of pool cards ranked strictly between a and b (a, b same pool).
+
+_BIT = [1 << c for c in range(52)]
+_POOL_OF = []
+_BETWEEN = []
+for _t in range(4):
+    pool_of = [None] * 52
+    pools = {0: [c for c in range(52) if _ISTRUMP[_t][c]]}
+    for _s in range(4):
+        if _s != _t:
+            pools[1 + _s] = [c for c in range(52)
+                             if _SUIT_OF[c] == _s and c != _AH]
+    between = {}
+    for pid, cards in pools.items():
+        cards.sort(key=lambda c: _RANK[_t][c])
+        for i, c in enumerate(cards):
+            pool_of[c] = pid
+        for i in range(len(cards)):
+            m = 0
+            for j in range(i + 1, len(cards)):
+                between[(cards[i], cards[j])] = m
+                between[(cards[j], cards[i])] = m
+                m |= _BIT[cards[j]]
+    _POOL_OF.append(pool_of)
+    _BETWEEN.append(between)
+
 
 def card_id(card):
     """FortyfivesCard -> int id (identity on .id, kept for clarity)."""
     return card.id
+
+
+def _live_mask(hands, trick):
+    """Bitmask of cards that can still influence play: unplayed cards
+    plus the current (incomplete) trick's cards — those still decide
+    this trick's winner and gate move-equivalence merging."""
+    m = 0
+    for h in hands:
+        for c in h:
+            m |= _BIT[c]
+    for c in trick:
+        if c >= 0:
+            m |= _BIT[c]
+    return m
 
 
 def legal_plays(hand, lead_card, trump):
@@ -161,13 +210,14 @@ class DDSolver:
     """
 
     def __init__(self, trump, bid_team, bid_kind,
-                 opponent='minimax', payoff='delta'):
+                 opponent='minimax', payoff='delta', reduce=True):
         assert trump in (0, 1, 2, 3)
         assert bid_team in (0, 1)
         assert bid_kind in _BID_VALUE, (
             'highest_bid must be a real level (holds resolve to one)')
         assert opponent in ('minimax', 'rulebased')
         assert payoff in ('delta', 'raw')
+        self._reduce = reduce
         self._trump = trump
         self._bid_team = bid_team
         self._bid_kind = bid_kind
@@ -195,7 +245,8 @@ class DDSolver:
         """
         self._prepare(hands, trick, ns_tricks, ew_tricks)
         return self._search(hands, trick, leader, ns_tricks,
-                            best_rank, best_par, -_INF, _INF)
+                            best_rank, best_par, _live_mask(hands, trick),
+                            -_INF, _INF)
 
     def root_values(self, hands, leader, trick=_EMPTY_TRICK,
                     ns_tricks=0, ew_tricks=0, best_rank=-1, best_par=-1):
@@ -207,14 +258,22 @@ class DDSolver:
         seat = (leader + played) % 4
         lead_card = trick[leader] if played else None
         legal = legal_plays(hands[seat], lead_card, self._trump)
+        live = _live_mask(hands, trick)
         if self._forced and seat % 2 == 1:
             # Forced seat: the position has exactly one continuation.
-            legal = (self._rb_choice(hands[seat], trick, legal),)
+            classes = ((self._rb_choice(hands[seat], trick, legal),),)
+        elif self._reduce:
+            classes = self._move_classes(hands[seat], legal, best_rank,
+                                         live)
+        else:
+            classes = tuple((i,) for i in legal)
         out = {}
-        for i in legal:
-            out[i] = self._child_value(hands, trick, leader, seat, i,
-                                       ns_tricks, best_rank, best_par,
-                                       -_INF, _INF)
+        for cls in classes:
+            v = self._child_value(hands, trick, leader, seat, cls[0],
+                                  ns_tricks, best_rank, best_par, live,
+                                  -_INF, _INF)
+            for i in cls:   # equivalent moves share the exact value
+                out[i] = v
         return out
 
     def best_move(self, *args, **kwargs):
@@ -271,8 +330,42 @@ class DDSolver:
             return min(legal)
         return choice
 
+    def _move_classes(self, hand, legal, best_rank, live):
+        """Group legal moves into equivalence classes (see table notes
+        above): same pool, no live card ranked strictly between, never
+        merging A-hearts, and trump pairs must not straddle the current
+        highest-trump rank (the +5 bonus threshold)."""
+        if len(legal) == 1:
+            return (legal,)
+        t = self._trump
+        own = 0
+        for c in hand:
+            own |= _BIT[c]
+        other = live & ~own
+        pool_of, between, rank_t = _POOL_OF[t], _BETWEEN[t], _RANK[t]
+        by_pool = {}
+        for i in legal:
+            by_pool.setdefault(pool_of[hand[i]], []).append(i)
+        classes = []
+        for pid, idxs in by_pool.items():
+            idxs.sort(key=lambda i: rank_t[hand[i]])
+            cur = [idxs[0]]
+            for prev, nxt in zip(idxs, idxs[1:]):
+                a, b = hand[prev], hand[nxt]
+                if (a != _AH and b != _AH
+                        and not (other & between[(a, b)])
+                        and (pid != 0
+                             or (rank_t[a] > best_rank)
+                             == (rank_t[b] > best_rank))):
+                    cur.append(nxt)
+                else:
+                    classes.append(tuple(cur))
+                    cur = [nxt]
+            classes.append(tuple(cur))
+        return classes
+
     def _child_value(self, hands, trick, leader, seat, i,
-                     ns_tricks, best_rank, best_par, alpha, beta):
+                     ns_tricks, best_rank, best_par, live, alpha, beta):
         """Value after seat plays hand index i. Shared by search and
         root_values so move semantics can never diverge."""
         hand = hands[seat]
@@ -289,13 +382,16 @@ class DDSolver:
         if sum(1 for c in ntrick if c >= 0) == 4:
             w = trick_winner(ntrick, leader, self._trump)
             nns = ns_tricks + (1 if w % 2 == 0 else 0)
+            nlive = live
+            for c in ntrick:        # completed trick's cards go dead
+                nlive &= ~_BIT[c]
             return self._search(nh, _EMPTY_TRICK, w, nns,
-                                nbr, nbp, alpha, beta)
+                                nbr, nbp, nlive, alpha, beta)
         return self._search(nh, ntrick, leader, ns_tricks,
-                            nbr, nbp, alpha, beta)
+                            nbr, nbp, live, alpha, beta)
 
     def _search(self, hands, trick, leader, ns_tricks,
-                best_rank, best_par, alpha, beta):
+                best_rank, best_par, live, alpha, beta):
         if not any(hands):
             return self._leaf(ns_tricks, best_par)
 
@@ -326,7 +422,12 @@ class DDSolver:
         else:
             rank_t = _RANK[self._trump]
             hand = hands[seat]
-            order = sorted(legal, key=lambda i: -rank_t[hand[i]])
+            if self._reduce:
+                classes = self._move_classes(hand, legal, best_rank, live)
+                order = sorted((cls[0] for cls in classes),
+                               key=lambda i: -rank_t[hand[i]])
+            else:
+                order = sorted(legal, key=lambda i: -rank_t[hand[i]])
 
         maximizing = (seat % 2 == 0)
         a0, b0 = alpha, beta
@@ -334,7 +435,7 @@ class DDSolver:
         for i in order:
             v = self._child_value(hands, trick, leader, seat, i,
                                   ns_tricks, best_rank, best_par,
-                                  alpha, beta)
+                                  live, alpha, beta)
             if maximizing:
                 if v > best:
                     best = v
