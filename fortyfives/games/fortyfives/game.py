@@ -172,6 +172,7 @@ class FortyfivesGame:
         self.highest_trump_played = None  # Highest trump card played
         self.highest_trump_player = None  # Player who played the highest trump
         self.trick_count = 0  # Number of tricks played in the current hand
+        self.replenish_counts = None  # Cards each player drew after discard (public at a real table)
 
         # Initialize hands and trick pile
         for i in range(self.num_players):
@@ -246,6 +247,11 @@ class FortyfivesGame:
         state['current_player_id'] = self.current_player_id
         state['points'] = self.points.copy() if self.points else []
         state['hand_points'] = self.hand_points.copy() if self.hand_points else []
+        # Public at a real table (each player's post-discard draw count);
+        # None until the discard phase completes.
+        state['replenish_counts'] = (self.replenish_counts.copy()
+                                     if getattr(self, 'replenish_counts', None) is not None
+                                     else None)
         
         # Add legal actions
         state['legal_actions'] = self.get_legal_actions()
@@ -698,6 +704,7 @@ class FortyfivesGame:
         Replenish all player hands to 5 cards after the discard phase
         '''
         # Deal cards to players who have fewer than 5 cards
+        self.replenish_counts = [0] * self.num_players
         for player_id in range(self.num_players):
             cards_needed = 5 - len(self.hands[player_id])
             if cards_needed > 0 and self.dealer.deck:
@@ -713,6 +720,7 @@ class FortyfivesGame:
                     print(f"{player_names[player_id]} received {len(new_cards)} card(s): {cards_str}")
                 
                 self.hands[player_id].extend(new_cards)
+                self.replenish_counts[player_id] = len(new_cards)
 
     def process_play(self, action):
         '''
@@ -1127,6 +1135,7 @@ class FortyfivesGame:
         self.trick_winners = []
         self.current_trick = [None] * self.num_players
         self.trick_lead_suit = None
+        self.replenish_counts = None
         self.trick_starter = None
         self.trump_suit = None
         self.hand_points = [0, 0]
