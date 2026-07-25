@@ -152,8 +152,13 @@ class GameSession:
         # opening-trick decisions — acceptable interactive "think" time.
         # PIMCDDSAgent() defaults = constrained determinization +
         # exact minimax per-world solve; do not override.
+        # discard_counts=True (lever 1, 2026-07-25): worlds respect each
+        # seat's public post-discard draw count (+0.37 pooled vs flag
+        # off, n=4000 paired). Not cheating — draw counts are visible
+        # at a real table.
         self._rule_agent = RuleBasedAgent(num_actions=18)
-        self._pimc_agent = PIMCDDSAgent(num_actions=18, n_worlds=10)
+        self._pimc_agent = PIMCDDSAgent(num_actions=18, n_worlds=10,
+                                        discard_counts=True)
 
         # Neutral, seat-correct transcript: the log is broadcast
         # identically to every connection, so it must NOT be written

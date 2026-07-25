@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+"""
+EV-search bidding agent for Fortyfives (faithful engine rollout).
+
+Categorically the PIMC paradigm lifted to the BID decision. At phase 1,
+for each legal bid action it:
+  1. clones the live env,
+  2. re-determinizes the hidden cards (the 3 other hands + kitty + deck)
+     from the cards not in our hand, keeping our real hand fixed,
+  3. forces our seat to play the candidate bid,
+  4. lets the held-constant rule-based policy finish the auction,
+     declaration, discard, and (fast) play,
+  5. reads the real engine NS game-point delta for the hand.
+The mean delta over N worlds is EV(candidate); we bid the argmax.
+
+This deliberately uses the REAL engine + real scoring for every rollout
+(no hand-rolled P(make)/strength model) so the estimator cannot become a
+silently-wrong instrument (project rule: a result you cannot trust is
+worse than no result).
+
+Single-variable design vs RuleBasedAgent: ONLY the phase-1 bid level is
+chosen by lookahead. Declaration (phase 2), discard, and play are
+delegated unchanged to RuleBasedAgent, so a bid_eval A/B isolates
+"bid level by EV rollout" vs "bid level by the crude top-3-trump table".
+
+Payoff context (engine, memory project-scoring-rule): made 20->+20,
+25->+25, 30->+60; miss-> -bid. Under the bid_eval NS-delta metric,
+passing is never negative for NS, so the rollout naturally learns to
+bid only when the simulated make-EV beats collecting raw trick points.
+"""
+
+import copy
+import os
+import sys
+
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if sys.path[0] != _REPO_ROOT:
+    sys.path.insert(0, _REPO_ROOT)
+
+import numpy as np
+import rlcard
+from rlcard.envs.registration import register, registry
+
+from fortyfives.games.fortyfives.card import FortyfivesCard
+
+if 'fortyfives' not in registry.env_specs:
+    register(env_id='fortyfives',
+             entry_point='fortyfives.envs.fortyfives_env:FortyfivesEnv')
+
+sys.path.insert(0, os.path.dirname(__file__))
+from fortyfives_rule_based import RuleBasedAgent
+
+
+def _clone_game(game):
+    """Deep-copy a FortyfivesGame WITHOUT copying card objects.
+    FortyfivesCard instances are immutable value objects and are never
+    mutated during a hand (only moved between lists), so a clone may
+    safely share them with the original. We pre-seed deepcopy's memo so
+    every reachable card maps to itself: deepcopy still faithfully copies
+    every other field (no manual field enumeration -> no silent-divergence
+    risk), it just skips the ~1.6k-object-per-rollout card recursion that
+    profiling showed was 56% of runtime. Result-preserving: verified
+    byte-identical against a captured reference + the bidding canary."""
+    memo = {}
+    d = game.dealer
+    for c in d.deck:
+        memo[id(c)] = c
+    for c in d.pot:
+        memo[id(c)] = c
+    for h in game.hands:
+        for c in h:
+            memo[id(c)] = c
+    for c in (game.current_trick or []):
+        if c is not None:
+            memo[id(c)] = c
+    for tr in (game.trick_history or []):
+        for c in tr:
+            if c is not None:
+                memo[id(c)] = c
+    for c in getattr(game, 'discard_pile', None) or []:
+        memo[id(c)] = c
+    return copy.deepcopy(game, memo)
+
+_DECK_BY_RS = {(c.rank, c.suit): c for c in (FortyfivesCard(i) for i in range(52))}
+
+
+class EVBidder:
+    """Faithful-rollout EV bidder. NS phase-1 only differs from
+    RuleBasedAgent; everything else delegates to it."""
+
+    def __init__(self, num_actions=18, n_worlds=20, seed=0,
+                 ev_declare=False):
+        self.num_actions = num_actions
+        self.n_worlds = n_worlds
+        # ev_declare=True ALSO EV-chooses the phase-2 trump declaration.
+        # FALSIFIED 2026-05-16 (n=2000): vs rule-bidder it scored
+        # seed2024 +0.050 CI[-0.60,+0.70] — strictly WORSE than the
+        # level-only +0.527 on the same seed (the rule-based discard
+        # nuke+redeal drowns the trump-choice signal). Default reverts
+        # to False = level-only (best-known config, byte-identical to
+        # the original committed EVBidder). Flag kept for ablation only.
+        self.ev_declare = ev_declare
+        self.use_raw = True
+        self._rb = RuleBasedAgent(num_actions)       # delegate + rollout policy
+        self._rng = np.random.RandomState(seed)
+        self._env = None
+        # One persistent shadow env reused for every rollout. Its
+        # translation helpers (_extract_state/_decode_action) only read
+        # self.game, so swapping in a cloned game is sufficient and
+        # avoids deep-copying the whole env object each rollout.
+        self._shadow = rlcard.make('fortyfives')
+
+    # bid_eval injects the live env so we can clone the true position.
+    def set_env(self, env):
+        self._env = env
+
+    # --- determinization -------------------------------------------------
+    def _redeterminize(self, game, our_seat):
+        """Re-deal the hidden cards in `game` (a clone) consistent with
+        our observed hand. Phase-1 only: nothing is revealed except our
+        hand (no plays; bids reveal no cards; kitty hidden). Preserves
+        every container's size so engine invariants hold."""
+        our_keys = {(c.rank, c.suit) for c in game.hands[our_seat]}
+        pool = [_DECK_BY_RS[k] for k in _DECK_BY_RS if k not in our_keys]
+        self._rng.shuffle(pool)
+        i = 0
+        for seat in range(len(game.hands)):
+            if seat == our_seat:
+                continue
+            n = len(game.hands[seat])
+            game.hands[seat] = pool[i:i + n]
+            i += n
+        n_pot = len(game.dealer.pot)
+        game.dealer.pot = pool[i:i + n_pot]
+        i += n_pot
+        game.dealer.deck = pool[i:]
+
+    # --- one rollout -----------------------------------------------------
+    def _rollout(self, base_env, our_seat, forced_env_action):
+        """Clone base_env, re-determinize, force our candidate bid, then
+        drive the held-constant rule-based (incl. fast play) to the end
+        of THIS hand. Returns NS (team 0/2) game-point delta."""
+        g = _clone_game(base_env.game)
+        cenv = self._shadow
+        cenv.game = g
+        self._redeterminize(g, our_seat)
+        init_pts = g.points.get(0, 0) if g.points else 0
+
+        # apply our forced action first (we are the current player)
+        g.step(cenv._decode_action(forced_env_action))
+
+        in_play = False
+        step = 0
+        while step < 500:
+            step += 1
+            if g.is_over():
+                break
+            phase = g.phase
+            if phase == 4:
+                in_play = True
+            pid = g.current_player_id
+            st = cenv._extract_state(g.get_state(pid))
+            a_env = self._rb.step(st)             # rule-based for ALL seats
+            g.step(cenv._decode_action(a_env))
+            if in_play and phase == 4 and g.phase == 1:
+                break
+        pts_now = g.points.get(0, 0) if g.points else 0
+        return pts_now - init_pts
+
+    # --- agent API -------------------------------------------------------
+    def step(self, state):
+        raw = state['raw_obs']
+        phase = raw.get('phase')
+
+        # Phase-1 bid level is always EV-chosen; phase-2 trump
+        # declaration is EV-chosen only when ev_declare. Discard/play
+        # always delegate to rule-based (held constant). The rollout
+        # machinery is phase-agnostic (_decode_action is phase-aware),
+        # so the same argmax loop drives both.
+        ev_phase = (phase == 1) or (phase == 2 and self.ev_declare)
+        if not ev_phase or self._env is None:
+            return self._rb.step(state)
+
+        legal = sorted(state['legal_actions'].keys())
+        if len(legal) <= 1:
+            return legal[0] if legal else 0
+
+        our_seat = raw['current_player']
+        best_a, best_ev = legal[0], -1e18
+        for a in legal:
+            total = 0.0
+            for _ in range(self.n_worlds):
+                total += self._rollout(self._env, our_seat, a)
+            ev = total / self.n_worlds
+            if ev > best_ev:
+                best_ev, best_a = ev, a
+        return best_a
+
+    def eval_step(self, state):
+        return self.step(state), {}

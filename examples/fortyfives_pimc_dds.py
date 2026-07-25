@@ -41,14 +41,15 @@ if sys.path[0] != _REPO_ROOT:
 from fortyfives.games.fortyfives.card import SUITS, get_card_rank
 
 sys.path.insert(0, os.path.dirname(__file__))
-from fortyfives_pimc import PIMCAgent
+from fortyfives_pimc import PIMCAgent, _is_trump, _BY_RS
 from fortyfives_dds import DDSolver
 
 
 class PIMCDDSAgent(PIMCAgent):
 
     def __init__(self, num_actions=18, n_worlds=20, seed=0,
-                 constrained=True, opponent='minimax', payoff='delta'):
+                 constrained=True, opponent='minimax', payoff='delta',
+                 discard_counts=False):
         # rollout is irrelevant here (no heuristic playout); pass
         # 'cheap' so the parent doesn't build a rule-based picker.
         super().__init__(num_actions=num_actions, n_worlds=n_worlds,
@@ -56,6 +57,69 @@ class PIMCDDSAgent(PIMCAgent):
                          rollout='cheap')
         self.opponent = opponent
         self.payoff = payoff
+        # Estimator lever 1: constrain sampled worlds by each seat's
+        # post-discard draw count (public at a real table). Rule-based
+        # seats keep ONLY trump at discard, so kept = 5 - drawn is that
+        # seat's trump count at replenish; minus trumps it has since
+        # publicly played, it lower-bounds trumps still in hand.
+        # Near-exact vs rule-based discarders; a heuristic prior vs
+        # humans.
+        self.discard_counts = discard_counts
+        self._min_trumps = None   # per-step context for _determinize
+        self._trump_str = None
+
+    def _played_trumps(self, raw, trump_str):
+        counts = {s: 0 for s in range(4)}
+        for tr in (raw.get('trick_history') or []):
+            for s, c in enumerate(tr):
+                if c is not None and _is_trump(c, trump_str):
+                    counts[s] += 1
+        for s, c in enumerate(raw.get('current_trick') or []):
+            if c is not None and _is_trump(c, trump_str):
+                counts[s] += 1
+        return counts
+
+    def _determinize(self, seen, sizes, voids=None):
+        """With discard-count constraints active, deal each seat at
+        least its inferred minimum trump count, then fill the remaining
+        slots from the full unseen pool (replenished cards are random,
+        so trump stays in the fill pool). Greedy with reshuffled
+        retries; falls back to the parent's sampler if over-constrained
+        (e.g. a void conflict — rare/impossible vs rule-based)."""
+        mt = self._min_trumps
+        if not mt or not any(mt.get(s, 0) for s in sizes):
+            return super()._determinize(seen, sizes, voids)
+        trump = self._trump_str
+        unseen = [_BY_RS[k] for k in _BY_RS if k not in seen]
+        for _ in range(8):
+            self._rng.shuffle(unseen)
+            pool, out, ok = list(unseen), {}, True
+            for seat, n in sizes.items():
+                vs = voids.get(seat, ()) if voids else ()
+                need = min(mt.get(seat, 0), n)
+                picked = []
+                if need:
+                    avail = [c for c in pool
+                             if _is_trump(c, trump) and c.suit not in vs]
+                    if len(avail) < need:
+                        ok = False
+                        break
+                    picked = avail[:need]
+                fill = n - len(picked)
+                if fill:
+                    pids = {id(c) for c in picked}
+                    avail = [c for c in pool
+                             if id(c) not in pids and c.suit not in vs]
+                    if len(avail) < fill:
+                        ok = False
+                        break
+                    picked = picked + avail[:fill]
+                pids = {id(c) for c in picked}
+                pool = [c for c in pool if id(c) not in pids]
+                out[seat] = picked
+            if ok:
+                return out
+        return super()._determinize(seen, sizes, voids)
 
     def step(self, state):
         raw = state['raw_obs']
@@ -83,6 +147,17 @@ class PIMCDDSAgent(PIMCAgent):
         voids = self._voids(raw, trump_str, leader) if self.constrained \
             else None
         seen = self._seen(hand, ct, raw.get('trick_history'))
+
+        # Discard-count constraint context (lever 1), consumed by our
+        # _determinize override. kept_s = 5 - drawn_s is all trump for
+        # rule-based discarders; subtract trumps seat s already showed.
+        self._trump_str = trump_str
+        self._min_trumps = None
+        rc = raw.get('replenish_counts')
+        if self.discard_counts and rc is not None:
+            pt = self._played_trumps(raw, trump_str)
+            self._min_trumps = {s: max(0, (5 - rc[s]) - pt[s])
+                                for s in sizes}
 
         # Hand context for the bid-aware payoff.
         bid_team = raw['highest_bidder'] % 2

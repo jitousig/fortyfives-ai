@@ -1,0 +1,20 @@
+
+================ seed 0, n=2000 ================
+canary: +0.0000 / 0.0%  OK
+pimc-v3         avg_diff +1.968 (95% CI +1.500 to +2.435) beats-base 31.6%  [83s]
+oracle-br       avg_diff +8.615 (95% CI +8.090 to +9.140) beats-base 72.5%  [71s]
+oracle-minimax  avg_diff +4.258 (95% CI +3.792 to +4.723) beats-base 43.2%  [475s]
+per-hand paired gaps:
+  oracle-br  - pimc-v3 : +6.647  (95% CI +6.206 to +7.089)
+  oracle-mm  - pimc-v3 : +2.290  (95% CI +1.922 to +2.658)
+seed total: 10.5 min
+
+================ seed 100000, n=2000 ================
+canary: +0.0000 / 0.0%  OK
+pimc-v3         avg_diff +1.760 (95% CI +1.277 to +2.243) beats-base 34.2%  [278s]
+oracle-br       avg_diff +8.250 (95% CI +7.758 to +8.742) beats-base 73.7%  [235s]
+oracle-minimax  avg_diff +4.395 (95% CI +3.947 to +4.843) beats-base 45.2%  [1057s]
+per-hand paired gaps:
+  oracle-br  - pimc-v3 : +6.490  (95% CI +6.053 to +6.927)
+  oracle-mm  - pimc-v3 : +2.635  (95% CI +2.186 to +3.084)
+seed total: 26.2 min
