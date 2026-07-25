@@ -79,16 +79,19 @@ profile solves/sec before committing to n=2000×2; if PIMC-DDS
 disappoints, pre-registered suspects = strategy fusion / non-locality.
 Working branch: `dds-play-oracle` (off reconcile-bidding-engine).
 
-Status 2026-07-25: solver + 4-layer gate DONE (all pass; canary clean);
-oracle numbers DONE (see "Where things stand"); PIMC-DDS seed 0 DONE
-(+3.19, sig. > v3). REMAINING: (a) PIMC-DDS seed 100000 (in flight),
-(b) bid-blind payoff='raw' ablation n=1000 (in flight) to decompose
-exact-solve vs bid-aware value, (c) optional per-world rule-based-EW
-ablation, (d) promote validated results: small PR to main (solver +
-tests + agent), memory finalization, then decide next lever (PIMC-DDS
-still ~5 pts under the cheating ceiling — remaining gap = information;
-candidates: discard-count determinization (lever 1), auction-
-conditioned worlds (lever 2 of estimator list)).
+Status 2026-07-25 (COMPLETE except promotion): solver + 4-layer gate
+DONE; oracle numbers DONE; PIMC-DDS CONFIRMED both seeds (+3.19/+2.81
+vs rule; per-hand gap over v3 +1.22/+1.05, CIs clear 0) — new best
+fair agent. Ablation: bid-aware leaves ≈ 0 effect (−0.02 CI[−0.43,
++0.39], n=1000 paired) — the win is the exact per-world solve; keep
+delta default, don't re-test. Numbers in `project_play_phase_ceiling`
++ `experiments/`. REMAINING: (a) promote validated code to main via
+small PR off main (NOT a reconcile merge): fortyfives_dds.py,
+fortyfives_pimc_dds.py, pimc_dds_eval.py, test_dds_vs_engine.py,
+play_eval attach_env hook (+ any missing deps main lacks, e.g.
+fortyfives_pimc/play_eval themselves — check main first);
+(b) next lever for the ~5-pt info gap: discard-count-constrained
+determinization, then auction-conditioned worlds (estimator levers).
 
 ## Decision gate (do this BEFORE any new method)
 No "capped / near-optimal" conclusion for **either phase** without a
