@@ -24,14 +24,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 
 
-def worker(agent_name, seed, n, out):
+def worker(agent_name, seed, n, out, payoff='delta'):
     from play_eval import evaluate_paired
     if agent_name == 'v3':
         from fortyfives_pimc import PIMCAgent
         agent = PIMCAgent(n_worlds=20)
     else:
         from fortyfives_pimc_dds import PIMCDDSAgent
-        agent = PIMCDDSAgent(n_worlds=20)
+        agent = PIMCDDSAgent(n_worlds=20, payoff=payoff)
     r = evaluate_paired(agent, num_hands=n, seed=seed,
                         name=f'{agent_name}-{seed}', silent=True)
     assert len(r.diff) == n, f'timeouts in chunk {agent_name}-{seed}'
@@ -78,12 +78,13 @@ if __name__ == '__main__':
     w.add_argument('--seed', type=int, required=True)
     w.add_argument('--n', type=int, required=True)
     w.add_argument('--out', required=True)
+    w.add_argument('--payoff', default='delta', choices=['delta', 'raw'])
     m = sub.add_parser('merge')
     m.add_argument('--seed-base', type=int, required=True)
     m.add_argument('--n-total', type=int, required=True)
     m.add_argument('--dir', required=True)
     a = p.parse_args()
     if a.mode == 'worker':
-        worker(a.agent, a.seed, a.n, a.out)
+        worker(a.agent, a.seed, a.n, a.out, a.payoff)
     else:
         merge(a.seed_base, a.n_total, a.dir)

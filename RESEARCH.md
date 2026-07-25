@@ -11,8 +11,12 @@ mode already cost this project days). Keep it short; prune done items.
 - Bidding: EV bid-level is **not a confirmed win** on the trustworthy
   engine (net, n=2000 ×2, CIs straddle 0). EV-trump falsified. Net
   yardstick: random ≈ −28, rule = 0.00. → see `project_bidding_arc`.
-- Play: PIMC v3 robustly > rule-based, but **"play capped" is
-  UNMEASURED** (no oracle). → see `project_play_phase_ceiling`.
+- Play: **ORACLE MEASURED 2026-07-25 — play NOT capped.** Best-response
+  oracle +8.62/+8.25 vs PIMC v3 +1.97/+1.76 (n=2000, seeds 0/100000);
+  paranoid-minimax oracle only +4.3 (≈half the true ceiling — vindicates
+  using best-response as the gate ruler). PIMC-DDS seed 0: +3.19, gap
+  over v3 +1.22 CI[+0.82,+1.63]. → `project_play_phase_ceiling`,
+  `experiments/oracle_gap_2026-07-25.log`.
 - Engine on this branch == `main`'s (all 4 fixes); instrument
   trustworthy (both canaries +0.0000).
 
@@ -74,6 +78,17 @@ gap itself); ablation PIMC-DDS with per-world rule-based EW model;
 profile solves/sec before committing to n=2000×2; if PIMC-DDS
 disappoints, pre-registered suspects = strategy fusion / non-locality.
 Working branch: `dds-play-oracle` (off reconcile-bidding-engine).
+
+Status 2026-07-25: solver + 4-layer gate DONE (all pass; canary clean);
+oracle numbers DONE (see "Where things stand"); PIMC-DDS seed 0 DONE
+(+3.19, sig. > v3). REMAINING: (a) PIMC-DDS seed 100000 (in flight),
+(b) bid-blind payoff='raw' ablation n=1000 (in flight) to decompose
+exact-solve vs bid-aware value, (c) optional per-world rule-based-EW
+ablation, (d) promote validated results: small PR to main (solver +
+tests + agent), memory finalization, then decide next lever (PIMC-DDS
+still ~5 pts under the cheating ceiling — remaining gap = information;
+candidates: discard-count determinization (lever 1), auction-
+conditioned worlds (lever 2 of estimator list)).
 
 ## Decision gate (do this BEFORE any new method)
 No "capped / near-optimal" conclusion for **either phase** without a
