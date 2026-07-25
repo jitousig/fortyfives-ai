@@ -48,6 +48,33 @@ evaluate_paired` is the yardstick, `fortyfives_pimc.PIMCAgent` the shell
 to fork. Short-lived branch off `reconcile-bidding-engine`; promote only
 validated results to `main` via small PR.
 
+Plan review (Fable 5, 2026-07-25) — three upgrades, verified vs code:
+1. **Minimax DDS is NOT an upper bound on the yardstick.** avg_diff is
+   vs a FIXED deterministic rule-based EW; paranoid minimax forgoes
+   exploiting its mistakes, so a fair agent can exceed it → "PIMC ≈
+   minimax oracle" would NOT prove "capped". The decision-gate ruler is
+   a **best-response oracle**: same solver, EW nodes FORCED to the real
+   `RuleBasedAgent._play_strategy` move (import the real code; validate
+   predicted == actual on replayed hands). Keep minimax mode for
+   PIMC-DDS's per-world solves (opponent unknown there).
+2. **Bid-aware leaves.** The yardstick is NS game-point delta after
+   `end_hand` bid adjustments (`game.py` L947–1005: fail → −bid, made
+   30 → flat 60; 100+ pegging rule unreachable in eval, hands start
+   0-0 — assert). Per-world argmax is unchanged (monotone transform)
+   but PIMC's cross-world AVERAGE is not: E[delta] ≠ f(E[raw]) exactly
+   at make-vs-set decisions. Leaves return delta directly — also a
+   plausible independent edge for PIMC-DDS over v3.
+3. **Test the search, not just the state machine:** (a) brute-force
+   minimax vs alpha-beta+TT on random endgames; (b) engine-grounded
+   best-response cross-check on a subsample (roll the REAL env over NS
+   move trees; exact by construction, validation-only); (c) forced-move
+   fidelity (predicted rule-based moves == actual).
+Minor: pair oracle vs PIMC v3 per-hand on identical seeds (CI on the
+gap itself); ablation PIMC-DDS with per-world rule-based EW model;
+profile solves/sec before committing to n=2000×2; if PIMC-DDS
+disappoints, pre-registered suspects = strategy fusion / non-locality.
+Working branch: `dds-play-oracle` (off reconcile-bidding-engine).
+
 ## Decision gate (do this BEFORE any new method)
 No "capped / near-optimal" conclusion for **either phase** without a
 perfect-information **oracle upper bound**. Two diagnostics:
