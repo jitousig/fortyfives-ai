@@ -1,0 +1,8 @@
+### DC chunks complete ###
+pimc-dds seed_base=0 n=2000: avg_diff +3.190 (95% CI +2.721 to +3.659) beats-base 35.0%
+pimc-dc  seed_base=0 n=2000: avg_diff +3.405 (95% CI +2.932 to +3.878) beats-base 38.6%
+per-hand gap dc - dds: +0.215 (95% CI -0.133 to +0.563)
+pimc-dds seed_base=100000 n=2000: avg_diff +2.812 (95% CI +2.349 to +3.276) beats-base 37.0%
+pimc-dc  seed_base=100000 n=2000: avg_diff +3.330 (95% CI +2.872 to +3.788) beats-base 40.9%
+per-hand gap dc - dds: +0.517 (95% CI +0.153 to +0.882)
+### DC eval complete ###
