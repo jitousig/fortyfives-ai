@@ -14,11 +14,13 @@ from fortyfives.games.fortyfives.game import (
 
 # ── SOTA opponent (composite, wired exactly like play_eval._run_hand) ──
 # Phases 1/2/3 (bid/declare/discard) -> RuleBasedAgent
-# Phase  4     (card play)           -> PIMCAgent  (v3: constrained +
-#                                       rule-based rollout, defaults)
+# Phase  4     (card play)           -> PIMCDDSAgent (PIMC determinization
+#                                       + exact per-world double-dummy
+#                                       solve; validated best fair agent,
+#                                       PR #25: +3.19/+2.81 vs rule-based,
+#                                       beats PIMC v3 on both seeds)
 # Both agents are use_raw=True, consume the rlcard env's extracted state
-# and return ENV action ids fed straight to env.step(). The agents and
-# this branch's fortyfives engine come from agent-sota (commit 8345df7).
+# and return ENV action ids fed straight to env.step().
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _EXAMPLES = os.path.join(_REPO_ROOT, "examples")
 for _p in (_REPO_ROOT, _EXAMPLES):
@@ -26,7 +28,7 @@ for _p in (_REPO_ROOT, _EXAMPLES):
         sys.path.insert(0, _p)
 
 from fortyfives_rule_based import RuleBasedAgent  # noqa: E402
-from fortyfives_pimc import PIMCAgent  # noqa: E402
+from fortyfives_pimc_dds import PIMCDDSAgent  # noqa: E402
 
 if 'fortyfives' not in registry.env_specs:
     register(
@@ -145,12 +147,13 @@ class GameSession:
 
         self.game.end_hand = _capturing_end_hand
 
-        # Composite SOTA opponent. PIMC n_worlds=10: documented as
-        # statistically indistinguishable from 20 and ~2x faster — picked
-        # for interactive latency. PIMCAgent() defaults = v3 (constrained,
-        # rule-based rollout); do not override.
+        # Composite SOTA opponent. PIMC-DDS n_worlds=10 measured latency
+        # (2026-07-25): median 4 ms, p90 149 ms, max ~1.7 s on
+        # opening-trick decisions — acceptable interactive "think" time.
+        # PIMCDDSAgent() defaults = constrained determinization +
+        # exact minimax per-world solve; do not override.
         self._rule_agent = RuleBasedAgent(num_actions=18)
-        self._pimc_agent = PIMCAgent(num_actions=18, n_worlds=10)
+        self._pimc_agent = PIMCDDSAgent(num_actions=18, n_worlds=10)
 
         # Neutral, seat-correct transcript: the log is broadcast
         # identically to every connection, so it must NOT be written
