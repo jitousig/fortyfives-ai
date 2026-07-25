@@ -13,6 +13,18 @@ The project includes:
 - Comprehensive test suite covering game rules and card mechanics
 - Training examples with self-play and evaluation utilities
 
+## Where the current plan lives (read this first)
+
+- **Live research plan / backlog:** `RESEARCH.md` (Track A) on the research
+  branch `reconcile-bidding-engine`. It is the *plan*, not the record —
+  start there for what's actively being built and why.
+- **Durable conclusions + the "why":** the auto-memory index `MEMORY.md`
+  (loaded every session). `project-dds-handoff` holds the current active
+  plan; `project-play-phase-ceiling` / `project-bidding-arc` hold the
+  measured results behind it.
+- Active focus (2026-07): build one exact **double-dummy solver** →
+  play-phase oracle (upper bound) + a PIMC-DDS superhuman play agent.
+
 ## Installation & Setup
 
 ```bash
