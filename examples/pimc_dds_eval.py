@@ -3,7 +3,7 @@
 PIMC-DDS full evaluation, chunked for multi-core wall-clock.
 
 worker mode (one chunk of paired hands, saved as .npz):
-    python pimc_dds_eval.py worker --agent {v3|dds} --seed S --n N --out F
+    python pimc_dds_eval.py worker --agent {v3|dds|dc|ac} --seed S --n N --out F
 merge mode (combine chunks, print per-agent stats + per-hand DDS-v3 gap):
     python pimc_dds_eval.py merge --seed-base S --n-total N --dir D
 
@@ -32,8 +32,10 @@ def worker(agent_name, seed, n, out, payoff='delta'):
     else:
         from fortyfives_pimc_dds import PIMCDDSAgent
         # 'dc' = lever 1: discard-count-constrained determinization
+        # 'ac' = lever 2: + auction-conditioned worlds (control = dc)
         agent = PIMCDDSAgent(n_worlds=20, payoff=payoff,
-                             discard_counts=(agent_name == 'dc'))
+                             discard_counts=(agent_name in ('dc', 'ac')),
+                             auction=(agent_name == 'ac'))
     r = evaluate_paired(agent, num_hands=n, seed=seed,
                         name=f'{agent_name}-{seed}', silent=True)
     assert len(r.diff) == n, f'timeouts in chunk {agent_name}-{seed}'
@@ -41,6 +43,8 @@ def worker(agent_name, seed, n, out, payoff='delta'):
              seed=seed, n=n)
     print(f'chunk {agent_name} seed={seed} n={n}: '
           f'avg_diff {r.diff.mean():+.3f}')
+    if agent_name == 'ac':
+        print(f'  auction sampler stats: {agent.auction_stats}')
 
 
 def _load(dir_, agent_name, seed_base, n_total):
@@ -77,7 +81,7 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest='mode', required=True)
     w = sub.add_parser('worker')
-    w.add_argument('--agent', choices=['v3', 'dds', 'dc'], required=True)
+    w.add_argument('--agent', choices=['v3', 'dds', 'dc', 'ac'], required=True)
     w.add_argument('--seed', type=int, required=True)
     w.add_argument('--n', type=int, required=True)
     w.add_argument('--out', required=True)
