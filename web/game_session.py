@@ -156,9 +156,15 @@ class GameSession:
         # seat's public post-discard draw count (+0.37 pooled vs flag
         # off, n=4000 paired). Not cheating — draw counts are visible
         # at a real table.
+        # auction=True (lever 2, 2026-08-22): worlds must also reproduce
+        # the public bids/passes under the rule-based bid model (+0.25
+        # pooled vs lever 1 alone, n=4000 paired). Exact vs the
+        # rule-based seats; a heuristic prior for human seats (a human
+        # bid no rule-based hand explains -> sampler falls back to
+        # lever 1; a dealer HOLD -> lever 2 off for that decision).
         self._rule_agent = RuleBasedAgent(num_actions=18)
         self._pimc_agent = PIMCDDSAgent(num_actions=18, n_worlds=10,
-                                        discard_counts=True)
+                                        discard_counts=True, auction=True)
 
         # Neutral, seat-correct transcript: the log is broadcast
         # identically to every connection, so it must NOT be written
