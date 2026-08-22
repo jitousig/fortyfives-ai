@@ -164,25 +164,34 @@ class PIMCDDSAgent(PIMCAgent):
 
     # ---- lever 2: auction-conditioned determinization -----------------
     _LEVEL = {1: 20, 2: 25, 3: 30}
+    _KITTY = 4          # game id offset: BID_xx_KITTY == BID_xx + 4
+    _HOLD = 4
 
     @staticmethod
-    def _legal_levels(highest):
-        if highest is None:
-            return (20, 25, 30)
-        return tuple(l for l in (20, 25, 30) if l > highest)
+    def _legal_bid_actions(highest, is_dealer):
+        """Game-id legal auction set, mirroring game.get_legal_bids:
+        PASS, open levels, HOLD (dealer, once there is a bid), and the
+        kitty variant of every open level. Sorted tuple."""
+        levels = [l for l in (1, 2, 3) if highest is None or l > highest]
+        acts = [0] + levels
+        if is_dealer and highest is not None:
+            acts.append(4)
+        acts += [l + 4 for l in levels]
+        return tuple(sorted(acts))
 
     def _auction_turns(self, raw):
         """Replay the auction from the public record (bids / passed /
-        dealer). Rule-based seats bid their level the first time it is
-        legal and pass otherwise, so the turn sequence is determined by
-        the final record. Returns {seat: [(legal_levels, action_level)]}
-        with action_level 0 = pass, or None if the replay does not
+        on_kitty / dealer). Rule-based seats bid their level the first
+        time it is legal and pass otherwise, so the turn sequence is
+        determined by the final record. Returns {seat: [(legal_game_ids,
+        action_game_id)]} with 0 = pass, or None if the replay does not
         reproduce highest_bidder/highest_bid (e.g. a dealer HOLD, which
         rule-based never chooses) — the caller then skips lever 2."""
         bids = raw.get('bids')
         if bids is None:
             return None
         passed = raw.get('passed') or []
+        on_kitty = raw.get('on_kitty') or [False] * 4
         dealer = raw.get('dealer')
         hb, hbid = raw.get('highest_bidder'), raw.get('highest_bid')
         if dealer is None or hb is None or hbid is None or len(passed) != 4:
@@ -194,17 +203,18 @@ class PIMCDDSAgent(PIMCAgent):
                 v = bids[s]
             except (KeyError, IndexError, TypeError):
                 return 0
-            return self._LEVEL.get(int(v), 0) if v else 0
+            return int(v) if v else 0
         level = {s: _bid(s) for s in range(4)}
         turns = {s: [] for s in range(4)}
         highest, bidder, done = None, None, set()
         sim_passed = [False] * 4
         cur = (dealer + 1) % 4
         for _ in range(16):
-            legal = self._legal_levels(highest)
+            legal = self._legal_bid_actions(highest, cur == dealer)
             L = level[cur]
             if cur not in done and L and L in legal:
-                turns[cur].append((legal, L))
+                act = L + self._KITTY if on_kitty[cur] else L
+                turns[cur].append((legal, act))
                 highest, bidder = L, cur
                 done.add(cur)
             else:
@@ -218,23 +228,25 @@ class PIMCDDSAgent(PIMCAgent):
                 cur = (cur + 1) % 4
         else:
             return None
-        if bidder != hb or highest != self._LEVEL.get(hbid):
+        if bidder != hb or highest != int(hbid):
             return None
         if any(bool(p) != sp for p, sp in zip(passed, sim_passed)):
             return None
         return turns
 
-    def _bid_consistent(self, hand, turns, is_bidder, trump_str):
+    def _bid_consistent(self, hand, turns, is_bidder, trump_str,
+                        bidder_on_kitty=False):
         """Would RuleBasedAgent holding pre-discard `hand` have produced
-        exactly these auction actions (and, if bidder, declared
-        trump_str)?"""
-        suit, level = self._rb._supported_bid(hand)
+        exactly these auction actions (and, if it declared from that
+        hand, declared trump_str)? A kitty declarer declares from the
+        kitty, so its suit is not a constraint on `hand`."""
         for legal, act in turns:
-            want = level if level in legal else 0
-            if want != act:
+            if self._rb.desired_bid(hand, legal) != act:
                 return False
-        if is_bidder and suit != trump_str:
-            return False
+        if is_bidder and not bidder_on_kitty:
+            suit, _ = self._rb._supported_bid(hand)
+            if suit != trump_str:
+                return False
         return True
 
     def _played_cards(self, raw):
@@ -288,6 +300,17 @@ class PIMCDDSAgent(PIMCAgent):
             rng.shuffle(dead_tr)
             meta, ok = {}, True
             for s in order:
+                if s == bidder and ctx['kitty_declarer']:
+                    # Declared from the kitty: the auction constrains
+                    # only the thrown-in (dead) cards -> no constraint on
+                    # this seat's live hand beyond lever 1.
+                    continue
+                if s in ctx['unmodelled']:
+                    # Seat made a kitty bid the bot policy never makes
+                    # (a human at a real table): no hand explains it ->
+                    # lever 1 only for that seat instead of rejecting
+                    # every world.
+                    continue
                 k = 5 - rc[s]                      # kept (all trump)
                 R = list(cur[s]) + list(played[s])  # post-replenish hand
                 tr = [c for c in R if _is_trump(c, trump)]
@@ -393,8 +416,15 @@ class PIMCDDSAgent(PIMCAgent):
                     pt = self._played_trumps(raw, trump_str)
                     self._min_trumps = {s: max(0, (5 - rc[s]) - pt[s])
                                         for s in sizes}
+                ok = raw.get('on_kitty') or [False] * 4
+                unmodelled = set()
+                if not self._rb.kitty:
+                    unmodelled = {s for s in range(4)
+                                  if any(a >= 5 for _, a in turns[s])}
                 self._ac_ctx = {'turns': turns, 'rc': list(rc),
                                 'bidder': raw['highest_bidder'],
+                                'kitty_declarer': bool(ok[raw['highest_bidder']]),
+                                'unmodelled': unmodelled,
                                 'played': self._played_cards(raw)}
 
         # Hand context for the bid-aware payoff.
