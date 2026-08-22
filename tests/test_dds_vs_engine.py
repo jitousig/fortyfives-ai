@@ -118,6 +118,16 @@ def leaf_ref(bid_team, bid_kind, total_tricks, ns_tricks, best_par,
               + (5 if best_par == 1 else 0))
     if payoff == 'raw':
         return ns_raw - ew_raw
+    if payoff == 'net':
+        if bid_team == 0:
+            d_ns = ((60 if bid_kind == 3 else ns_raw)
+                    if ns_raw >= bid_value else -bid_value)
+            d_ew = ew_raw
+        else:
+            d_ew = ((60 if bid_kind == 3 else ew_raw)
+                    if ew_raw >= bid_value else -bid_value)
+            d_ns = ns_raw
+        return d_ns - d_ew
     if bid_team == 0:
         if ns_raw >= bid_value:
             return 60 if bid_kind == 3 else ns_raw
@@ -236,6 +246,7 @@ class TestEngineParity(unittest.TestCase):
         self.assertEqual(my_ns + my_ew, 5)
         for payoff, expected in (
             ('delta', game.points[0]),
+            ('net', game.points[0] - game.points[1]),
         ):
             got = leaf_ref(bid_team, bid_kind, 5, my_ns, my_bp, payoff)
             self.assertEqual(got, expected,
@@ -285,7 +296,7 @@ class TestSearchVsBruteForce(unittest.TestCase):
                     self._random_case(rng, k)
                 leader = rng.randrange(4)
                 mode = rng.choice(['minimax', 'rulebased'])
-                payoff = rng.choice(['delta', 'raw'])
+                payoff = rng.choice(['delta', 'raw', 'net'])
                 s = DDSolver(ctx['trump'], ctx['bid_team'],
                              ctx['bid_kind'], opponent=mode,
                              payoff=payoff)
