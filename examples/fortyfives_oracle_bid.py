@@ -74,7 +74,7 @@ class OracleBidder:
 
     def __init__(self, num_actions=21, n_worlds=40, seed=0, declare=True,
                  kitty=False, conditioned=True, payoff='net',
-                 cond_tries=200, rb_kitty=False):
+                 cond_tries=200, rb_kitty=False, declarer_penalty=0.0):
         self.num_actions = num_actions
         self.n_worlds = n_worlds
         self.declare = declare
@@ -82,6 +82,14 @@ class OracleBidder:
         self.conditioned = conditioned  # auction-condition the worlds
         self.payoff = payoff
         self.cond_tries = cond_tries
+        # Double-dummy calibration: a perfect-information solve overrates
+        # the DECLARER (controls trump, saw the kitty, plays with full
+        # knowledge) relative to hidden-information play. Diagnosed
+        # 2026-08-22: uncalibrated (0) the oracle over-declared (dealer
+        # PASS->HOLD -4.6, PASS->25 -19.6 net/hand vs rb). Subtract
+        # `declarer_penalty` points from whichever side declares in every
+        # valuation (we declare: v - d; they declare: v + d).
+        self.declarer_penalty = float(declarer_penalty)
         self.use_raw = True
         # Table model: how the OTHER seats bid/declare/discard. The
         # bid_eval / web tables run RuleBasedAgent with kitty=False.
@@ -296,7 +304,11 @@ class OracleBidder:
         ids = tuple(tuple(c.id for c in post[s]) for s in range(4))
         solver = self._solver(trump, declarer % 2, level)
         self.stats['solves'] += 1
-        return solver.solve(ids, (declarer + 1) % 4)
+        v = solver.solve(ids, (declarer + 1) % 4)
+        if self.declarer_penalty:
+            v = v - self.declarer_penalty if declarer % 2 == 0 \
+                else v + self.declarer_penalty
+        return v
 
     # ------------------------------------------------------------------
     # decisions
@@ -352,12 +364,14 @@ class OracleBidder:
                         suit_sums[g][t] += self._value(
                             me, my_hand, hands, kitty, stock, me, level, t, False)
         best_g, best_v = None, -1e18
+        self.last_evs = {}
         for g in cands:
             if any(suit_sums[g]):
                 v = max(suit_sums[g])       # declaration chosen once
             else:
                 v = sums[g]
             v /= self.n_worlds
+            self.last_evs[g] = v
             if v > best_v + 1e-9:
                 best_v, best_g = v, g
         return best_g
