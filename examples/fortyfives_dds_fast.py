@@ -94,7 +94,7 @@ def _legal(hand, lead_card, trump):
         return hand
     tm = hand & _TRUMPMASK[trump]
     lead_suit = _SUIT_OF[lead_card]
-    if lead_suit == trump:
+    if (_TRUMPMASK[trump] >> lead_card) & 1:   # trump led (A-hearts incl.)
         if tm == 0:
             return hand
         led_rank = _RANK[trump, lead_card]
