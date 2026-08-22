@@ -484,15 +484,19 @@ class FortyfivesGame:
                      if (card.suit == self.trump_suit and card.rank in ['5', 'J']) or 
                         (not test_mode and card.rank == 'A' and card.suit == 'H')]
         
-        # Special rules for when trump is led
-        if self.trick_lead_suit == self.trump_suit:
+        # Special rules for when trump is led. A♥ is always trump, so an
+        # A♥ lead is a TRUMP lead even when hearts are not trump (issue
+        # #37): followers holding trump must follow with trump (renege
+        # rule applies; 5/J outrank A♥ and may be withheld).
+        lead_card = self.current_trick[self.trick_starter]
+        trump_led = self.trick_lead_suit == self.trump_suit or (
+            not test_mode and lead_card is not None
+            and lead_card.rank == 'A' and lead_card.suit == 'H')
+        if trump_led:
             # When trump is led, must follow suit with trump cards
             if trump_cards:
                 # Has trump cards, must follow with trump
                 # But high trumps (5, J, AH) can be withheld if low trump was led
-                
-                # Check if a low trump was led
-                lead_card = self.current_trick[self.trick_starter]
                 
                 # Different behavior depending on test mode
                 if test_mode:
@@ -595,9 +599,10 @@ class FortyfivesGame:
         
         # If bidding is over, move to declaration phase
         if self.is_bidding_over():
-            # If all passed, start a new hand
+            # If all passed, throw the hand in and redeal — by the SAME
+            # dealer (the deal does not rotate on an all-pass; issue #28).
             if self.highest_bidder is None:
-                return self.start_new_hand()
+                return self.start_new_hand(rotate_dealer=False)
             
             self.phase = PHASE_DECLARATION
             self.current_player_id = self.highest_bidder
@@ -1102,12 +1107,13 @@ class FortyfivesGame:
             # Explain game score calculation
             print(f"Hand points (trick points + bonuses): {player_names[0]}: {self.hand_points[0]}, {player_names[1]}: {self.hand_points[1]}")
 
-    def start_new_hand(self):
+    def start_new_hand(self, rotate_dealer=True):
         '''
-        Start a new hand, rotating dealer, dealing cards, and resetting hand state
+        Start a new hand: rotate the dealer (unless this is an all-pass
+        redeal, which keeps the same dealer), deal cards, reset hand state
         '''
-        # Rotate the dealer
-        self.dealer_id = (self.dealer_id + 1) % self.num_players
+        if rotate_dealer:
+            self.dealer_id = (self.dealer_id + 1) % self.num_players
         
         # Deal new cards
         self.dealer = FortyfivesDealer(self.np_random)

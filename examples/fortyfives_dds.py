@@ -38,8 +38,9 @@ side without re-running that gate):
     trump is led, must follow with trump EXCEPT that a top-3 trump
     (rank >= 1001: 5/J/A-hearts) outranking the LED trump may be
     withheld; if every trump in hand is withholdable, any card goes.
-    "Trump led" means the led CARD's suit == trump suit (an A-hearts
-    lead under a non-hearts trump is a HEARTS lead, per the engine).
+    "Trump led" means the led CARD is a trump — A-hearts included, so
+    an A-hearts lead under any trump is a TRUMP lead (engine fix for
+    issue #37; followers must follow with trump, 5/J withholdable).
   - Trick winner: highest-rank trump played, else highest-rank card of
     the lead suit (unique ranks within each pool; game.wins_over).
   - High-trump bonus goes to the team that PLAYED the highest-ranked
@@ -154,9 +155,10 @@ def legal_plays(hand, lead_card, trump):
     lead_suit = _SUIT_OF[lead_card]
     trump_idx = tuple(i for i in range(n) if istr_t[hand[i]])
 
-    if lead_suit == trump:
-        # Trump led: must follow with trump unless every trump in hand
-        # is a withholdable top-3 trump outranking the led card.
+    if istr_t[lead_card]:
+        # Trump led (A-hearts counts): must follow with trump unless
+        # every trump in hand is a withholdable top-3 trump outranking
+        # the led card.
         if not trump_idx:
             return tuple(range(n))
         led_rank = rank_t[lead_card]

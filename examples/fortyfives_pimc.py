@@ -155,7 +155,7 @@ def _simulate(hands, leader, trump, our_parity, pick,
                 continue
             if lead_suit is None and not trick:
                 card = pick(hands[seat], {}, [], None, trump)
-                lead_suit = card.suit
+                lead_suit = trump if _is_trump(card, trump) else card.suit
             else:
                 card = pick(hands[seat], trick, order_cards, lead_suit, trump)
             hands[seat].remove(card)
@@ -229,7 +229,10 @@ class PIMCAgent:
         def scan(trick, leader):
             if leader is None or leader >= len(trick) or trick[leader] is None:
                 return
-            lead = trick[leader].suit
+            # A trump lead (A-hearts included) is a lead in the TRUMP
+            # suit: a non-trump follow then means no trump, not no hearts.
+            lead = trump if _is_trump(trick[leader], trump) \
+                else trick[leader].suit
             for s, c in enumerate(trick):
                 if c is None or s == leader:
                     continue
@@ -301,7 +304,10 @@ class PIMCAgent:
         played = {s: c for s, c in enumerate(ct) if c is not None}
         k = len(played)
         leader = (our - k) % 4
-        lead_suit = ct[leader].suit if k > 0 else None
+        lead_suit = None
+        if k > 0:
+            lead_suit = trump if _is_trump(ct[leader], trump) \
+                else ct[leader].suit
         t = len(raw.get('trick_history') or [])
 
         sizes = {}
@@ -328,7 +334,8 @@ class PIMCAgent:
                 # carry the in-progress trick + our just-played card
                 partial = dict(played)
                 partial[our] = cand
-                p_lead = lead_suit if lead_suit is not None else cand.suit
+                p_lead = lead_suit if lead_suit is not None else (
+                    trump if _is_trump(cand, trump) else cand.suit)
                 # after we play, the trick continues from our+1; once it
                 # completes _simulate computes the winner and continues.
                 total += _simulate(hands, leader, trump, our_parity,
