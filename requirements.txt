@@ -3,3 +3,6 @@ numpy>=1.16.3
 matplotlib>=3.0.3
 fastapi>=0.100.0
 uvicorn[standard]>=0.22.0
+# FastDDSolver (numba/bitboard DDS port) — optional; PIMCDDSAgent falls back
+# to the pure-Python reference solver if numba is unavailable.
+numba>=0.60
