@@ -30,7 +30,7 @@ from fortyfives_rule_based import RuleBasedAgent
 from fortyfives_pimc import _is_trump
 from fortyfives_pimc_dds import PIMCDDSAgent
 
-def _drive(seed, agent=None, on_play=None):
+def _drive(seed, agent=None, on_play=None, kitty=False):
     """Run one hand with rule-based everywhere (agent.step is called for
     seat 0's phase-4 decisions when `agent` is given, purely to exercise
     the sampler; rule-based still picks the action). Returns
@@ -39,7 +39,7 @@ def _drive(seed, agent=None, on_play=None):
     env = rlcard.make('fortyfives')
     env.seed(seed)
     state, pid = env.reset()
-    rb = RuleBasedAgent(18)
+    rb = RuleBasedAgent(21, kitty=kitty)
     transcript = {s: [] for s in range(4)}
     pre = None
     first_raw = None
@@ -81,7 +81,7 @@ class TestAuctionReplay(unittest.TestCase):
         agent = PIMCDDSAgent(n_worlds=1, discard_counts=True, auction=True)
         checked = 0
         for seed in range(60):
-            transcript, _, raw = _drive(seed)
+            transcript, _, raw = _drive(seed, kitty=(seed % 2 == 0))
             self.assertIsNotNone(raw)
             turns = agent._auction_turns(raw)
             self.assertIsNotNone(turns, f'seed {seed}: replay failed')
@@ -90,10 +90,13 @@ class TestAuctionReplay(unittest.TestCase):
         self.assertEqual(checked, 60)
 
     def test_ground_truth_never_rejected(self):
+        # Table bots WITH the kitty policy so kitty bids appear in the
+        # record; the agent's bid model is set to match the table.
         agent = PIMCDDSAgent(n_worlds=1, discard_counts=True, auction=True)
+        agent._rb.kitty = True
         n_bid_seats = n_kitty = 0
         for seed in range(150):
-            _, pre, raw = _drive(seed)
+            _, pre, raw = _drive(seed, kitty=True)
             turns = agent._auction_turns(raw)
             self.assertIsNotNone(turns)
             trump = raw['trump_suit']
@@ -220,13 +223,16 @@ class TestAuctionReplay(unittest.TestCase):
         self.assertFalse(agent._bid_consistent(
             H(('J', 'S'), ('A', 'H'), ('3', 'D'), ('4', 'C'), ('7', 'C')),
             open_t, False, 'H'))
-        # passer holding A♥ with nothing else would go 20 ON THE KITTY
+        # with the kitty policy ON, a passer holding A♥ with nothing
+        # else would have gone 20 ON THE KITTY (default policy is off)
+        agent._rb.kitty = True
         self.assertFalse(agent._bid_consistent(
             H(('A', 'H'), ('2', 'S'), ('3', 'D'), ('4', 'C'), ('7', 'C')),
             open_t, False, 'S'))
         self.assertTrue(agent._bid_consistent(
             H(('A', 'H'), ('2', 'S'), ('3', 'D'), ('4', 'C'), ('7', 'C')),
             [((0, 1, 2, 3, 5, 6, 7), 5)], True, 'S', bidder_on_kitty=True))
+        agent._rb.kitty = False
         # bidder: 5♥+J♥ no A♥ -> 25 on hearts
         t25 = [((0, 1, 2, 3, 5, 6, 7), 2)]
         self.assertTrue(agent._bid_consistent(

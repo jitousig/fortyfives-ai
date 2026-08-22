@@ -191,7 +191,7 @@ class TestKittyBidEnv(unittest.TestCase):
 class TestRuleBasedKittyPolicy(unittest.TestCase):
 
     def test_policy(self):
-        rb = RuleBasedAgent(21)
+        rb = RuleBasedAgent(21, kitty=True)
         OPEN = {0, 1, 2, 3, 5, 6, 7}
         # hopeless hand with A♥ -> 20 on the kitty
         h = [C('A', 'H'), C('2', 'S'), C('3', 'D'), C('4', 'C'), C('7', 'C')]
@@ -204,8 +204,10 @@ class TestRuleBasedKittyPolicy(unittest.TestCase):
         # a hand that supports a bid never goes on the kitty
         h3 = [C('5', 'S'), C('A', 'H'), C('3', 'D'), C('4', 'C'), C('7', 'C')]
         self.assertEqual(rb.desired_bid(h3, OPEN), BID_20)
-        # flag off reproduces the pre-#36 bidder
-        self.assertEqual(RuleBasedAgent(21, kitty=False).desired_bid(h, OPEN), BID_PASS)
+        # default (flag off) reproduces the pre-#36 bidder — the policy
+        # measured as losing (see RuleBasedAgent.__init__)
+        self.assertEqual(RuleBasedAgent(21).desired_bid(h, OPEN), BID_PASS)
+        self.assertFalse(RuleBasedAgent(21).kitty)
         # env-id plumbing: _bid_strategy returns env id 18
         self.assertEqual(rb._bid_strategy({'hand': h}, {a: None for a in (0, 1, 2, 3, 18, 19, 20)}), 18)
 

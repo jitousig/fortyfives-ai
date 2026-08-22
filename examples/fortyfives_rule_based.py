@@ -20,7 +20,7 @@ class RuleBasedAgent:
     # Game-id of "20 on the kitty" (fortyfives.games.fortyfives.game.BID_20_KITTY)
     _BID_20_KITTY = 5
 
-    def __init__(self, num_actions, kitty=True):
+    def __init__(self, num_actions, kitty=False):
         '''
         Initialize the agent
         
@@ -28,8 +28,11 @@ class RuleBasedAgent:
             num_actions (int): Size of the action space
             kitty (bool): use the "going on the kitty" policy (#36): with a
                 hand that supports no bid but holds A♥, bid 20 on the kitty
-                when 20 is still open. Deterministic. kitty=False reproduces
-                the pre-#36 bidder exactly.
+                when 20 is still open. Deterministic. DEFAULT OFF: measured
+                2026-08-22 with bid_eval (NS kitty on vs off, PIMC-DDS play,
+                n=2000 x 2 seeds, net metric): -0.347 (CI -0.549..-0.146)
+                and -0.338 (CI -0.562..-0.113) — the policy loses. The rule
+                is available to humans; a +EV bot policy is open research.
         '''
         self.use_raw = True
         self.num_actions = num_actions

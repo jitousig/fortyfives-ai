@@ -305,6 +305,12 @@ class PIMCDDSAgent(PIMCAgent):
                     # only the thrown-in (dead) cards -> no constraint on
                     # this seat's live hand beyond lever 1.
                     continue
+                if s in ctx['unmodelled']:
+                    # Seat made a kitty bid the bot policy never makes
+                    # (a human at a real table): no hand explains it ->
+                    # lever 1 only for that seat instead of rejecting
+                    # every world.
+                    continue
                 k = 5 - rc[s]                      # kept (all trump)
                 R = list(cur[s]) + list(played[s])  # post-replenish hand
                 tr = [c for c in R if _is_trump(c, trump)]
@@ -411,9 +417,14 @@ class PIMCDDSAgent(PIMCAgent):
                     self._min_trumps = {s: max(0, (5 - rc[s]) - pt[s])
                                         for s in sizes}
                 ok = raw.get('on_kitty') or [False] * 4
+                unmodelled = set()
+                if not self._rb.kitty:
+                    unmodelled = {s for s in range(4)
+                                  if any(a >= 5 for _, a in turns[s])}
                 self._ac_ctx = {'turns': turns, 'rc': list(rc),
                                 'bidder': raw['highest_bidder'],
                                 'kitty_declarer': bool(ok[raw['highest_bidder']]),
+                                'unmodelled': unmodelled,
                                 'played': self._played_cards(raw)}
 
         # Hand context for the bid-aware payoff.

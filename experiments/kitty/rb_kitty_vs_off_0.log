@@ -1,0 +1,11 @@
+  [kitty-on-vs-off@0] 500/2000  running avg_diff=-0.250  n=500
+  [kitty-on-vs-off@0] 1000/2000  running avg_diff=-0.185  n=1000
+  [kitty-on-vs-off@0] 1500/2000  running avg_diff=-0.260  n=1500
+  [kitty-on-vs-off@0] 2000/2000  running avg_diff=-0.347  n=2000
+Agent: kitty-on-vs-off@0  (paired vs baseline)
+  Hands:      2000
+  Avg diff:   -0.347  (95% CI -0.549 to -0.146)
+  Beats base: 0.4% of hands
+  Avg points: +21.25
+  Avg tricks: 0.00 / ~4 (last trick not counted)
+DONE -0.3475 (np.float64(-0.5485900295763007), np.float64(-0.14640997042369924)) nonzero hands 44
