@@ -1,0 +1,2 @@
+chunk ac seed=100000 n=500: avg_diff +2.960
+  auction sampler stats: {'worlds': 100000, 'accepted': 96305, 'tries': 826466, 'fallback': 3695, 'ctx_skipped': 0}
