@@ -44,12 +44,19 @@ sys.path.insert(0, os.path.dirname(__file__))
 from fortyfives_pimc import PIMCAgent, _is_trump, _BY_RS
 from fortyfives_dds import DDSolver
 
+try:
+    # Numba/bitboard port — bit-identical to DDSolver for the minimax
+    # model (gated by tests/test_dds_fast_equivalence.py), ~25x faster.
+    from fortyfives_dds_fast import FastDDSolver
+except ImportError:            # numba not installed: reference solver
+    FastDDSolver = None
+
 
 class PIMCDDSAgent(PIMCAgent):
 
     def __init__(self, num_actions=18, n_worlds=20, seed=0,
                  constrained=True, opponent='minimax', payoff='delta',
-                 discard_counts=False):
+                 discard_counts=False, fast=True):
         # rollout is irrelevant here (no heuristic playout); pass
         # 'cheap' so the parent doesn't build a rule-based picker.
         super().__init__(num_actions=num_actions, n_worlds=n_worlds,
@@ -57,6 +64,13 @@ class PIMCDDSAgent(PIMCAgent):
                          rollout='cheap')
         self.opponent = opponent
         self.payoff = payoff
+        # fast=True is NOT an A/B lever: FastDDSolver is bit-identical
+        # to DDSolver (equivalence-gated), so results cannot differ.
+        # It only applies to the minimax model; falls back silently
+        # when numba is unavailable.
+        self._solver_cls = (
+            FastDDSolver if (fast and FastDDSolver is not None
+                             and opponent == 'minimax') else DDSolver)
         # Estimator lever 1: constrain sampled worlds by each seat's
         # post-discard draw count (public at a real table). Rule-based
         # seats keep ONLY trump at discard, so kept = 5 - drawn is that
@@ -182,8 +196,9 @@ class PIMCDDSAgent(PIMCAgent):
                 our_ids if s == our
                 else tuple(c.id for c in opp.get(s, []))
                 for s in range(4))
-            solver = DDSolver(trump, bid_team, bid_kind,
-                              opponent=self.opponent, payoff=self.payoff)
+            solver = self._solver_cls(trump, bid_team, bid_kind,
+                                      opponent=self.opponent,
+                                      payoff=self.payoff)
             vals = solver.root_values(hands, leader, trick_ids,
                                       ns_tr, ew_tr, best_rank, best_par)
             for a in totals:
