@@ -20,6 +20,15 @@ BID_20 = 1  # Changed from 20 to 1
 BID_25 = 2  # Changed from 25 to 2
 BID_30 = 3  # Changed from 30 to 3
 BID_HOLD = 4  # Dealer taking highest bid
+# Rule variant "going on the kitty" (issue #36): a bid at a level made on
+# the strength of the unseen kitty. Auction rules are the normal ones
+# (must beat the high bid, can be outbid, dealer may hold). If it WINS,
+# the bidder throws in their hand (keeping A♥ if held), takes the kitty,
+# declares trump after seeing it, then discards/draws like everyone else.
+BID_20_KITTY = 5
+BID_25_KITTY = 6
+BID_30_KITTY = 7
+KITTY_BIDS = {BID_20_KITTY: BID_20, BID_25_KITTY: BID_25, BID_30_KITTY: BID_30}
 
 # Trump declarations
 SUIT_SPADES = 0
@@ -89,6 +98,7 @@ class FortyfivesGame:
         self.highest_bidder = None  # Player with the highest bid
         self.highest_bid = None  # The highest bid
         self.passed = None  # Whether each player has passed
+        self.on_kitty = None  # Whether each player's standing bid is "on the kitty"
         self.trump_suit = None  # The suit declared as trump
         self.current_trick = None  # Cards played in the current trick
         self.trick_lead_suit = None  # The lead suit for the current trick
@@ -130,9 +140,9 @@ class FortyfivesGame:
         Returns:
             (int): Number of possible actions
         '''
-        # Bid actions (5) + Trump declaration (4) + Max cards in hand (8) + Done discarding (1)
-        # 5 + 4 + 8 + 1 = 18
-        return 18
+        # Bid actions (5) + Trump declaration (4) + Max cards in hand (8)
+        # + Done discarding (1) + kitty bids (3) = 21
+        return 21
         
     def init_game(self):
         '''
@@ -164,6 +174,7 @@ class FortyfivesGame:
         self.game_over = False  # Whether the game is over (renamed from is_over)
         self.tricks_won = [0, 0, 0, 0]  # Number of tricks won by each player
         self.passed = [False] * self.num_players  # Whether each player has passed
+        self.on_kitty = [False] * self.num_players  # Standing bid is "on the kitty"
         self.trick_winners = []  # Winners of each trick
         self.trick_history = []  # History of tricks played
         self.hand_points = [0, 0]  # Points for current hand
@@ -241,6 +252,8 @@ class FortyfivesGame:
         
         state['bids'] = self.bids.copy() if self.bids else []
         state['passed'] = self.passed.copy() if self.passed else []
+        # Public: which seats' standing bid was made "on the kitty" (#36).
+        state['on_kitty'] = list(self.on_kitty) if self.on_kitty else [False] * self.num_players
         state['trump_suit'] = self.trump_suit
         state['dealer'] = self.dealer_id
         state['current_player'] = self.current_player_id
@@ -391,7 +404,11 @@ class FortyfivesGame:
             # Hold is only available to the dealer, and only if there's already a bid
             if self.current_player_id == self.dealer_id:
                 actions.append(BID_HOLD)
-        
+
+        # Every legal level may also be bid "on the kitty" (#36).
+        for level in [a for a in actions if a in (BID_20, BID_25, BID_30)]:
+            actions.append(level + 4)   # BID_xx_KITTY == BID_xx + 4
+
         return actions
     
     def get_legal_declarations(self):
@@ -585,10 +602,14 @@ class FortyfivesGame:
         '''
         if action == BID_PASS:
             self.passed[self.current_player_id] = True
-        elif action in [BID_20, BID_25, BID_30]:
+        elif action in [BID_20, BID_25, BID_30] or action in KITTY_BIDS:
+            # A kitty bid is a normal bid at its level; only the
+            # standing "on the kitty" flag differs (#36).
+            level = KITTY_BIDS.get(action, action)
             self.highest_bidder = self.current_player_id
-            self.highest_bid = action
-            self.bids[self.current_player_id] = action
+            self.highest_bid = level
+            self.bids[self.current_player_id] = level
+            self.on_kitty[self.current_player_id] = action in KITTY_BIDS
         elif action == BID_HOLD:
             self.highest_bidder = self.current_player_id
             # When holding, the dealer takes the highest bid
@@ -596,6 +617,7 @@ class FortyfivesGame:
                 # If somehow no one bid, default to 20
                 self.highest_bid = BID_20
             self.bids[self.current_player_id] = self.highest_bid
+            self.on_kitty[self.current_player_id] = False
         
         # If bidding is over, move to declaration phase
         if self.is_bidding_over():
@@ -604,6 +626,11 @@ class FortyfivesGame:
             if self.highest_bidder is None:
                 return self.start_new_hand(rotate_dealer=False)
             
+            # Winning bid was "on the kitty": the bidder throws in their
+            # hand (keeping A♥) and takes the kitty BEFORE declaring.
+            if self.on_kitty[self.highest_bidder]:
+                self._take_kitty_blind()
+
             self.phase = PHASE_DECLARATION
             self.current_player_id = self.highest_bidder
         else:
@@ -614,6 +641,25 @@ class FortyfivesGame:
                 next_player = (next_player + 1) % self.num_players
             self.current_player_id = next_player
     
+    def _take_kitty_blind(self):
+        '''
+        "Going on the kitty" (#36): the winning bidder discards their whole
+        hand except the Ace of Hearts (always trump, always kept), takes
+        the 3 kitty cards, and will declare trump after seeing them. The
+        normal discard/draw phase follows.
+        '''
+        p = self.highest_bidder
+        hand = self.hands[p]
+        kept = [c for c in hand if c.rank == 'A' and c.suit == 'H']
+        thrown = [c for c in hand if not (c.rank == 'A' and c.suit == 'H')]
+        self.discard_pile.extend(thrown)
+        self.hands[p] = kept + list(self.dealer.pot)
+        self.dealer.pot = []
+        if hasattr(self, 'verbose') and self.verbose:
+            player_names = ['North', 'East', 'South', 'West']
+            print(f"{player_names[p]} goes on the kitty: throws in "
+                  f"{len(thrown)} card(s), keeps {len(kept)} (A♥), takes the kitty")
+
     def process_declaration(self, action):
         '''
         Process a trump declaration action
@@ -1135,6 +1181,7 @@ class FortyfivesGame:
         self.highest_bid = None
         self.bids = [None] * self.num_players
         self.passed = [False] * self.num_players
+        self.on_kitty = [False] * self.num_players
         self.trick_count = 0
         self.tricks_won = [0, 0, 0, 0]
         self.trick_history = []

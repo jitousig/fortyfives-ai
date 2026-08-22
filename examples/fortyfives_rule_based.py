@@ -17,15 +17,23 @@ class RuleBasedAgent:
     A rule-based agent that follows basic Fortyfives strategy
     '''
     
-    def __init__(self, num_actions):
+    # Game-id of "20 on the kitty" (fortyfives.games.fortyfives.game.BID_20_KITTY)
+    _BID_20_KITTY = 5
+
+    def __init__(self, num_actions, kitty=True):
         '''
         Initialize the agent
         
         Args:
             num_actions (int): Size of the action space
+            kitty (bool): use the "going on the kitty" policy (#36): with a
+                hand that supports no bid but holds A♥, bid 20 on the kitty
+                when 20 is still open. Deterministic. kitty=False reproduces
+                the pre-#36 bidder exactly.
         '''
         self.use_raw = True
         self.num_actions = num_actions
+        self.kitty = kitty
         
     def step(self, state):
         '''
@@ -111,20 +119,41 @@ class RuleBasedAgent:
             return None, 0
         return best[1], best[2]
 
-    def _bid_strategy(self, raw_obs, legal_actions):
-        '''Bid exactly the level the hand's top trumps support; if that
-        level is unavailable (already outbid), pass.'''
-        _, level = self._supported_bid(raw_obs['hand'])
+    def desired_bid(self, hand, legal_actions):
+        '''The auction action (GAME id; bid ids coincide with env ids
+        0-4, kitty bids are game 5-7 / env 18-20) this bidder takes with
+        `hand` given the legal set. Single source of truth for the
+        bidding policy — PIMC-DDS lever 2 replays it as a constraint.
+
+        Bid exactly the level the hand's top trumps support; if that
+        level is unavailable (already outbid), pass. Kitty policy (#36,
+        `self.kitty`): a hand supporting no bid that holds A♥ bids 20 on
+        the kitty while 20 is open (A♥ is kept through the swap and is
+        the 3rd-best trump whatever the kitty dictates).'''
+        _, level = self._supported_bid(hand)
         desired = {30: 3, 25: 2, 20: 1, 0: 0}[level]
-        if desired in legal_actions:
+        if desired and desired in legal_actions:
             return desired
+        if (self.kitty and level == 0
+                and any(c.rank == 'A' and c.suit == 'H' for c in hand)
+                and self._BID_20_KITTY in legal_actions):
+            return self._BID_20_KITTY
         # Supported bid taken / illegal -> pass; hold only if forced;
         # deterministic fallback (rule-based must stay reproducible).
         if 0 in legal_actions:
             return 0
         if 4 in legal_actions:
             return 4
-        return min(legal_actions.keys())
+        return min(legal_actions)
+
+    def _bid_strategy(self, raw_obs, legal_actions):
+        '''legal_actions here are ENV ids (a dict); bid env ids equal game
+        ids except kitty bids (env 18-20 == game 5-7).'''
+        legal_game = set()
+        for a in legal_actions:
+            legal_game.add(a - 13 if a >= 18 else a)
+        g = self.desired_bid(raw_obs['hand'], legal_game)
+        return g + 13 if g >= 5 else g
 
     def _choose_trump(self, raw_obs, legal_actions):
         '''Declare the suit the bid was based on (same model as the bid,

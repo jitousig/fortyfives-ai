@@ -2,8 +2,16 @@
 
 // ── Constants ──
 const SUIT_SYM = { S: '♠', H: '♥', D: '♦', C: '♣' };
-const BID_LABEL = { 0: 'Pass', 1: '20', 2: '25', 3: '30', 4: 'Hold' };
-const BID_VALUES = { 0: null, 1: 20, 2: 25, 3: 30, 4: null };
+const BID_LABEL = { 0: 'Pass', 1: '20', 2: '25', 3: '30', 4: 'Hold',
+                    5: '20 kitty', 6: '25 kitty', 7: '30 kitty' };
+const BID_VALUES = { 0: null, 1: 20, 2: 25, 3: 30, 4: null, 5: 20, 6: 25, 7: 30 };
+// state.bids holds the LEVEL (1-3); state.on_kitty[seat] says whether that
+// standing bid was made "on the kitty" (rule variant #36).
+function bidText(seat, bid) {
+  const base = bid === 4 ? 'Hold' : (BID_LABEL[bid] || '');
+  const onKitty = (state.on_kitty || [])[seat];
+  return onKitty && base ? `${base} 🂠 kitty` : base;
+}
 const PHASE = { AUCTION: 1, DECLARATION: 2, DISCARD: 3, GAMEPLAY: 4 };
 // Screen positions around the table, index 0 = bottom (always "you").
 const POS = ['south', 'west', 'north', 'east'];
@@ -667,8 +675,10 @@ function renderBidBlock() {
       const sixty = val === 30 ? ' <span class="bb-bonus">(30→60)</span>' : '';
       const tr = state.trump_display
         ? ` · Trump <strong>${state.trump_display}</strong>` : '';
+      const kitty = (state.on_kitty || [])[state.highest_bidder]
+        ? ' <span class="bb-bonus">(on the kitty)</span>' : '';
       el.innerHTML =
-        `Bid: <strong>${name}</strong> won at <strong>${val}</strong>${sixty}${tr}`;
+        `Bid: <strong>${name}</strong> won at <strong>${val}</strong>${sixty}${kitty}${tr}`;
     } else {
       el.innerHTML = '';
     }
@@ -690,7 +700,7 @@ function renderBidBlock() {
     if (hasPassed) {
       status = '<span style="opacity:0.45">Pass</span>';
     } else if (bid && BID_LABEL[bid]) {
-      status = `<strong>${bid === 4 ? 'Hold' : BID_LABEL[bid]}</strong>`;
+      status = `<strong>${bidText(i, bid)}</strong>`;
     } else {
       status = '—';
     }
@@ -717,9 +727,7 @@ function renderSeatBids() {
       // After the auction: keep ONLY the winning bidder's pill on
       // their seat for the whole hand; clear everyone else.
       if (p === state.highest_bidder && state.highest_bid != null) {
-        el.textContent = state.highest_bid === 4
-          ? 'Hold'
-          : (BID_LABEL[state.highest_bid] || state.highest_bid_value || '');
+        el.textContent = bidText(p, state.highest_bid) || state.highest_bid_value || '';
         el.className = 'bid-chip active';
       } else {
         el.textContent = '';
@@ -732,7 +740,7 @@ function renderSeatBids() {
       el.textContent = 'Pass';
       el.className = 'bid-chip pass';
     } else if (bid && BID_LABEL[bid]) {
-      el.textContent = bid === 4 ? 'Hold' : BID_LABEL[bid];
+      el.textContent = bidText(p, bid);
       el.className = 'bid-chip active';
     } else {
       el.textContent = '';
@@ -770,6 +778,11 @@ function renderActions() {
       { a: 2, label: 'Bid 25', cls: 'btn-bid'  },
       { a: 3, label: 'Bid 30', cls: 'btn-bid'  },
       { a: 4, label: 'Hold',   cls: 'btn-hold' },
+      // "Going on the kitty" (#36): game ids 5/6/7 — bid blind on the
+      // kitty; if it wins you throw in your hand (keeping A♥) and take it.
+      { a: 5, label: '20 on kitty', cls: 'btn-kitty' },
+      { a: 6, label: '25 on kitty', cls: 'btn-kitty' },
+      { a: 7, label: '30 on kitty', cls: 'btn-kitty' },
     ];
     el.innerHTML = defs
       .filter(d => legal.includes(d.a))

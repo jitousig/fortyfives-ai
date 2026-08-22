@@ -151,8 +151,14 @@ Key methods:
 ### Bidding System
 - Players bid 20, 25, 30, or pass
 - Dealer can "hold" (accept previous high bid)
-- Auction ends when 3 players pass or all pass
-- Highest bidder declares trump; others get 3 kitty cards
+- "Going on the kitty" (#36): any level may be bid *on the kitty* (game
+  ids 5/6/7, env 18/19/20) under the normal auction rules; if it wins,
+  the bidder throws in their hand (keeping A♥), takes the kitty, declares
+  after seeing it, then discards/draws as normal. Public flag
+  `game.on_kitty[seat]` / raw `on_kitty`.
+- Auction ends when 3 players pass or all pass (all-pass = redeal by the
+  SAME dealer, #28)
+- Highest bidder declares trump and takes the 3 kitty cards
 
 ### Scoring Rules
 - **30 for 60**: Making a 30 bid = 60 points (instead of standard 30)
@@ -163,7 +169,7 @@ Key methods:
 ### Card Playing Constraints
 - **Suit Following**: Must follow suit if possible (except trump)
 - **Trump Playable**: Trump always playable if in hand
-- **Renege Rules**: High trump (5, J, A♥) must be played in some situations
+- **Renege Rules**: when trump is led (A♥ led counts as trump led, #37), holders must follow with trump, except a 5/J/A♥ outranking the led trump may be withheld
 - **Trick Winning**: Highest trump wins; highest suit card wins if no trump
 
 ## Development Workflow
@@ -213,8 +219,8 @@ Card evaluation uses `get_card_rank()` in card.py—modify this for ranking chan
 
 ## Important Notes
 
-- **State Representation**: Game state is a fixed-size vector (`state_shape`, currently **410**) built by `FortyfivesEnv._get_observation()`. Legacy non-card features are based at `52*5` (=260); enriched features (trick history, highest trump, trick standing, seat one-hots) are appended at index 295+. See invariants below before changing it.
-- **Action Space**: 18 actions total (5 bid + 4 trump + 8 card play + 1 done). Actions are phase-dependent; illegal actions are filtered by `_get_legal_actions()`.
+- **State Representation**: Game state is a fixed-size vector (`state_shape`, currently **414**) built by `FortyfivesEnv._get_observation()`. Legacy non-card features are based at `52*5` (=260); enriched features (trick history, highest trump, trick standing, seat one-hots) are appended at index 295+; per-seat "on the kitty" flags at 410..413. See invariants below before changing it.
+- **Action Space**: 21 env actions total (5 bid + 4 trump + 8 card play + 1 done + 3 kitty bids appended at 18..20). Actions are phase-dependent; illegal actions are filtered by `_get_legal_actions()`. Ids 0..17 keep their historical meaning.
 - **Random Seeding**: Use `env.seed()` for reproducible games; `game.np_random` controls shuffling.
 - **Partnership Structure**: Always players 0/2 (North/South) vs 1/3 (East/West); hardcoded in payoff calculation.
 - **Kitty Management**: 3 cards dealt to kitty; highest bidder gets them and must discard back to ≤5 cards.
@@ -231,7 +237,7 @@ never happens again. Treat a violation as "stop everything," not "investigate la
 which points at the SIBLING repo `../fortyfives`, NOT this repo's package.
 - The trainer/eval scripts prepend this repo's root to `sys.path[0]` to fix this. Do **not** remove that shim.
 - Do **not** `pip install -e .` from this repo into the shared venv (breaks the sibling project).
-- Before trusting ANY engine/env edit: confirm `fortyfives.__file__` resolves under `.../fortyfives-rl-training/` (or check `env.state_shape == 410`).
+- Before trusting ANY engine/env edit: confirm `fortyfives.__file__` resolves under `.../fortyfives-rl-training/` (or check `env.state_shape == 414`).
 
 ### 2. Evaluation canary (run after every env/eval change)
 `play_eval.evaluate_paired(RuleBasedAgent(18))` (agent == baseline) MUST return

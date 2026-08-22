@@ -10,6 +10,7 @@ from fortyfives.games.fortyfives.game import (
     PHASE_AUCTION, PHASE_DECLARATION, PHASE_DISCARD, PHASE_GAMEPLAY,
     BID_VALUES, BID_SUCCESS_VALUES,
     BID_PASS, BID_20, BID_25, BID_30, BID_HOLD, DISCARD_DONE,
+    BID_20_KITTY, BID_25_KITTY, BID_30_KITTY,
 )
 
 # ── SOTA opponent (composite, wired exactly like play_eval._run_hand) ──
@@ -143,6 +144,8 @@ class GameSession:
                                     else None),
                 "high_trump_card": ht_card,
                 "trump_suit": g.trump_suit,
+                "on_kitty": bool((g.on_kitty or [False] * 4)[g.highest_bidder])
+                            if g.highest_bidder is not None else False,
             }
 
         self.game.end_hand = _capturing_end_hand
@@ -186,7 +189,14 @@ class GameSession:
         elif phase == PHASE_DECLARATION:
             bidder = PLAYER_NAMES[game.highest_bidder]
             val = BID_VALUES.get(game.highest_bid, '?')
-            self.log.append(f"{bidder} won bid ({val}). Select trump suit.")
+            on_kitty = (game.on_kitty or [False] * 4)[game.highest_bidder]
+            if on_kitty:
+                self.log.append(
+                    f"{bidder} won bid ({val}) on the kitty — throws in "
+                    f"their hand (keeping A♥ if held) and takes the kitty. "
+                    f"Select trump suit.")
+            else:
+                self.log.append(f"{bidder} won bid ({val}). Select trump suit.")
         elif phase == PHASE_DISCARD:
             self._discard_counts = {}  # fresh count for this hand
             self.log.append("Discard — remove unwanted cards, then click Done.")
@@ -287,6 +297,7 @@ class GameSession:
             "trump_display": SUIT_SYMBOLS.get(game.trump_suit) if game.trump_suit else None,
             "bids": bids,
             "passed": (game.passed or [False] * game.num_players),
+            "on_kitty": list(game.on_kitty or [False] * game.num_players),
             "highest_bid": game.highest_bid,
             "highest_bid_value": BID_VALUES.get(game.highest_bid) if game.highest_bid is not None else None,
             "highest_bidder": game.highest_bidder,
@@ -449,7 +460,10 @@ class GameSession:
     def _describe_action(self, action, phase, player_id):
         if phase == PHASE_AUCTION:
             labels = {BID_PASS: "passes", BID_20: "bids 20", BID_25: "bids 25",
-                      BID_30: "bids 30", BID_HOLD: "holds"}
+                      BID_30: "bids 30", BID_HOLD: "holds",
+                      BID_20_KITTY: "bids 20 on the kitty",
+                      BID_25_KITTY: "bids 25 on the kitty",
+                      BID_30_KITTY: "bids 30 on the kitty"}
             return labels.get(action, f"bid {action}")
 
         if phase == PHASE_DECLARATION:

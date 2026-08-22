@@ -8,15 +8,17 @@ from rlcard.envs import Env
 from fortyfives.games.fortyfives.game import (
     FortyfivesGame,
     PHASE_AUCTION, PHASE_DECLARATION, PHASE_DISCARD, PHASE_GAMEPLAY,
-    DISCARD_DONE,
+    DISCARD_DONE, KITTY_BIDS,
 )
 from fortyfives.games.fortyfives.card import SUITS, RANKS
 
-# Env action ID layout (18 total, non-overlapping across all phases):
+# Env action ID layout (21 total, non-overlapping across all phases):
 # Bid actions:        0=PASS, 1=BID_20, 2=BID_25, 3=BID_30, 4=HOLD
 # Trump declaration:  5=SPADES, 6=HEARTS, 7=DIAMONDS, 8=CLUBS
 # Card play/discard:  9=card0 … 16=card7
 # Discard done:       17
+# Kitty bids (#36):   18=BID_20_KITTY, 19=BID_25_KITTY, 20=BID_30_KITTY
+#                     (game ids 5/6/7; appended so 0..17 keep their meaning)
 
 class FortyfivesEnv(Env):
     '''
@@ -43,12 +45,13 @@ class FortyfivesEnv(Env):
         #   + current trick standing [none/NS/EW]          (3)   [399..401]
         #   + dealer one-hot                               (4)   [402..405]
         #   + current player one-hot                       (4)   [406..409]
+        #   + "on the kitty" flag per seat (#36)           (4)   [410..413]
         # Trick history + winner + categorical seats were absent; with only
         # the current trick visible the policy was card-counting-blind, which
         # matched the flat ~rule-based plateau. New features go strictly past
         # 294 so existing offsets (and the rule-vs-rule canary) are unchanged.
         self.state_shape = [52 * 5 + 5 + 4 * 4 + 2 + 2 + 2 + 4 + 4
-                            + 52 + 52 + 3 + 4 + 4]
+                            + 52 + 52 + 3 + 4 + 4 + 4]
         self.action_shape = []  # No additional action features
         
     def _extract_state(self, state):
@@ -168,6 +171,11 @@ class FortyfivesEnv(Env):
         if isinstance(cur, int) and 0 <= cur < 4:
             obs[base + 111 + cur] = 1
 
+        # Seats whose standing bid is "on the kitty" (public; #36).
+        for i, flag in enumerate(state.get('on_kitty') or []):
+            if flag and i < 4:
+                obs[base + 115 + i] = 1
+
         return obs
     
     def _encode_cards(self, obs, cards, start_idx):
@@ -186,6 +194,8 @@ class FortyfivesEnv(Env):
     def _game_to_env_action(self, game_action, phase):
         '''Map a game-internal action ID to its env action ID.'''
         if phase == PHASE_AUCTION:
+            if game_action in KITTY_BIDS:
+                return game_action + 13  # 5-7 → 18-20
             return game_action          # 0-4 → 0-4
         elif phase == PHASE_DECLARATION:
             return game_action + 5      # 0-3 → 5-8
@@ -329,6 +339,8 @@ class FortyfivesEnv(Env):
         '''
         phase = self.game.phase
         if phase == PHASE_AUCTION:
+            if action_id >= 18:
+                return action_id - 13   # 18-20 → 5-7
             return action_id            # 0-4 → 0-4
         elif phase == PHASE_DECLARATION:
             return action_id - 5        # 5-8 → 0-3
@@ -347,9 +359,9 @@ class FortyfivesEnv(Env):
         Returns:
             (int): Number of possible actions
         '''
-        # Bid actions (5) + Trump declaration (4) + Max cards in hand (8) + Done discarding (1)
-        # 5 + 4 + 8 + 1 = 18
-        return 18
+        # Bid actions (5) + Trump declaration (4) + Max cards in hand (8)
+        # + Done discarding (1) + kitty bids (3) = 21
+        return 21
     
     def seed(self, seed=None):
         '''
