@@ -74,7 +74,7 @@ class OracleBidder:
 
     def __init__(self, num_actions=21, n_worlds=40, seed=0, declare=True,
                  kitty=False, conditioned=True, payoff='net',
-                 cond_tries=200, rb_kitty=False, declarer_penalty=0.0):
+                 cond_tries=200, rb_kitty=False, declarer_penalty=15.0):
         self.num_actions = num_actions
         self.n_worlds = n_worlds
         self.declare = declare
@@ -89,6 +89,10 @@ class OracleBidder:
         # PASS->HOLD -4.6, PASS->25 -19.6 net/hand vs rb). Subtract
         # `declarer_penalty` points from whichever side declares in every
         # valuation (we declare: v - d; they declare: v + d).
+        # CONFIRMED 2026-08-22 (bid_eval, n=2000 x 2 seeds, PIMC-DDS
+        # lever-1 play, net metric, vs RuleBasedAgent bidder):
+        #   d=10 pooled +1.51 (CI +0.97..+2.04); d=15 pooled +1.65
+        #   (CI +1.10..+2.20); d15-d10 +0.14 n.s. Default 15.
         self.declarer_penalty = float(declarer_penalty)
         self.use_raw = True
         # Table model: how the OTHER seats bid/declare/discard. The
