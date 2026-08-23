@@ -1,0 +1,15 @@
+  [confirm-d10@0] 250/2000  running avg_diff=+2.660  n=250
+  [confirm-d10@0] 500/2000  running avg_diff=+1.240  n=500
+  [confirm-d10@0] 750/2000  running avg_diff=+1.673  n=750
+  [confirm-d10@0] 1000/2000  running avg_diff=+1.380  n=1000
+  [confirm-d10@0] 1250/2000  running avg_diff=+1.740  n=1250
+  [confirm-d10@0] 1500/2000  running avg_diff=+1.777  n=1500
+  [confirm-d10@0] 1750/2000  running avg_diff=+1.666  n=1750
+  [confirm-d10@0] 2000/2000  running avg_diff=+1.417  n=2000
+Agent: confirm-d10@0  (paired vs baseline)
+  Hands:      2000
+  Avg diff:   +1.417  (95% CI +0.660 to +2.175)
+  Beats base: 17.8% of hands
+  Avg points: +22.16
+  Avg tricks: 0.00 / ~4 (last trick not counted)
+DONE d=10 seed=0 1.4175 (np.float64(0.6600068366636894), np.float64(2.1749931633363104)) beats 0.178 stats {'decisions': 5138, 'worlds': 205520, 'cond_fallback': 1292, 'solves': 2226142}
