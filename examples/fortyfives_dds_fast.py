@@ -176,10 +176,22 @@ def _winner(trickp, leader, trump):
 
 @njit(cache=False)
 def _leaf(ns, bp, bid_team, bid_kind, payoff_raw, total):
+    # payoff_raw: 0 = 'delta' (NS game-point delta), 1 = 'raw'
+    # (ns_raw - ew_raw), 2 = 'net' (ΔNS - ΔEW per end_hand).
     ns_raw = 5 * ns + (5 if bp == 0 else 0)
-    if payoff_raw != 0:
+    if payoff_raw == 1:
         ew_raw = 5 * (total - ns) + (5 if bp == 1 else 0)
         return ns_raw - ew_raw
+    if payoff_raw == 2:
+        ew_raw = 5 * (total - ns) + (5 if bp == 1 else 0)
+        bv = 20 if bid_kind == 1 else (25 if bid_kind == 2 else 30)
+        if bid_team == 0:
+            d_ns = (60 if bid_kind == 3 else ns_raw) if ns_raw >= bv else -bv
+            d_ew = ew_raw
+        else:
+            d_ew = (60 if bid_kind == 3 else ew_raw) if ew_raw >= bv else -bv
+            d_ns = ns_raw
+        return d_ns - d_ew
     if bid_team == 0:
         bv = 20 if bid_kind == 1 else (25 if bid_kind == 2 else 30)
         if ns_raw >= bv:
@@ -413,12 +425,12 @@ class FastDDSolver:
         assert bid_team in (0, 1)
         assert bid_kind in _BID_VALUE
         assert opponent == 'minimax', 'FastDDSolver: minimax only'
-        assert payoff in ('delta', 'raw')
+        assert payoff in ('delta', 'raw', 'net')
         assert reduce, 'FastDDSolver: reduce=True only'
         self._trump = trump
         self._bid_team = bid_team
         self._bid_kind = bid_kind
-        self._payoff_raw = 1 if payoff == 'raw' else 0
+        self._payoff_raw = {'delta': 0, 'raw': 1, 'net': 2}[payoff]
         self._tt = Dict.empty(_KEY_T, types.int64)
         self._total_tricks = None
         self.rb_fallbacks = 0                   # API parity; always 0

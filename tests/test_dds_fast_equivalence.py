@@ -35,7 +35,7 @@ def _playout_compare(test, rng, hand_size, deals):
         trump = rng.randrange(4)
         bid_team = rng.randrange(2)
         bid_kind = rng.choice([1, 2, 3])
-        payoff = rng.choice(['delta', 'raw'])
+        payoff = rng.choice(['delta', 'raw', 'net'])
         ref = DDSolver(trump, bid_team, bid_kind, payoff=payoff)
         fast = FastDDSolver(trump, bid_team, bid_kind, payoff=payoff)
 

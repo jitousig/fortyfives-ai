@@ -109,6 +109,8 @@ def _run_hand_bid(env, bid_agent, play_agent, rule_agent, seed,
     env.seed(seed)
     if hasattr(play_agent, '_rng'):
         play_agent._rng = np.random.RandomState(seed)
+    if hasattr(bid_agent, '_rng'):
+        bid_agent._rng = np.random.RandomState(seed)
     # EV-style bidders need the live env to clone the true position.
     if hasattr(bid_agent, 'set_env'):
         bid_agent.set_env(env)

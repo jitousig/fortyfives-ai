@@ -209,6 +209,8 @@ class DDSolver:
 
     Payoff (payoff='delta', default): final NS game-point delta per
     end_hand — the play_eval yardstick. payoff='raw': ns_raw - ew_raw.
+    payoff='net': (ΔNS - ΔEW) per end_hand — the bid_eval 'net'
+    yardstick; unlike 'delta' it sees an EW contract's make/fail.
     """
 
     def __init__(self, trump, bid_team, bid_kind,
@@ -218,7 +220,7 @@ class DDSolver:
         assert bid_kind in _BID_VALUE, (
             'highest_bid must be a real level (holds resolve to one)')
         assert opponent in ('minimax', 'rulebased')
-        assert payoff in ('delta', 'raw')
+        assert payoff in ('delta', 'raw', 'net')
         self._reduce = reduce
         self._trump = trump
         self._bid_team = bid_team
@@ -308,6 +310,18 @@ class DDSolver:
             ew_raw = (5 * (self._total_tricks - ns_tricks)
                       + (5 if best_par == 1 else 0))
             return ns_raw - ew_raw
+        if self._payoff == 'net':
+            ew_raw = (5 * (self._total_tricks - ns_tricks)
+                      + (5 if best_par == 1 else 0))
+            if self._bid_team == 0:
+                d_ns = ((60 if self._bid_kind == 3 else ns_raw)
+                        if ns_raw >= self._bid_value else -self._bid_value)
+                d_ew = ew_raw
+            else:
+                d_ew = ((60 if self._bid_kind == 3 else ew_raw)
+                        if ew_raw >= self._bid_value else -self._bid_value)
+                d_ns = ns_raw
+            return d_ns - d_ew
         if self._bid_team == 0:
             if ns_raw >= self._bid_value:
                 return 60 if self._bid_kind == 3 else ns_raw

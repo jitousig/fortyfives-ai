@@ -1,0 +1,10 @@
+  [grid-d10] 100/300  running avg_diff=+2.300  n=100
+  [grid-d10] 200/300  running avg_diff=+3.300  n=200
+  [grid-d10] 300/300  running avg_diff=+2.033  n=300
+Agent: grid-d10  (paired vs baseline)
+  Hands:      300
+  Avg diff:   +2.033  (95% CI -0.146 to +4.212)
+  Beats base: 17.7% of hands
+  Avg points: +22.17
+  Avg tricks: 0.00 / ~4 (last trick not counted)
+DONE d=10 2.033333333333333 (np.float64(-0.14561350264262973), np.float64(4.212280169309296)) beats 0.17666666666666667
