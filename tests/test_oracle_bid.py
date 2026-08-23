@@ -90,7 +90,7 @@ class TestAuctionReplay(unittest.TestCase):
 class TestValuation(unittest.TestCase):
 
     def test_value_plumbing_and_bounds(self):
-        ob = OracleBidder(n_worlds=1, payoff='net')
+        ob = OracleBidder(n_worlds=1, payoff='net', declarer_penalty=0)
         rng = np.random.RandomState(0)
         deck = [FortyfivesCard(int(i)) for i in rng.permutation(52)]
         me = 0
@@ -104,9 +104,15 @@ class TestValuation(unittest.TestCase):
                     self.assertIsInstance(v, int)
                     self.assertTrue(-90 <= v <= 90)
         # payoff='delta' values lie in the NS-delta range
-        ob2 = OracleBidder(n_worlds=1, payoff='delta')
+        ob2 = OracleBidder(n_worlds=1, payoff='delta', declarer_penalty=0)
         v = ob2._value(me, my, hands, kitty, stock, 0, 3, 0, False)
         self.assertIn(v, list(range(-30, 31)) + [60])
+        # declarer penalty shifts the declaring side by d
+        ob3 = OracleBidder(n_worlds=1, payoff='net', declarer_penalty=15)
+        v0 = ob._value(me, my, hands, kitty, stock, 0, 1, 0, False)
+        self.assertEqual(ob3._value(me, my, hands, kitty, stock, 0, 1, 0, False), v0 - 15)
+        v1 = ob._value(me, my, hands, kitty, stock, 1, 1, 0, False)
+        self.assertEqual(ob3._value(me, my, hands, kitty, stock, 1, 1, 0, False), v1 + 15)
 
     def test_sample_world_partitions_deck(self):
         ob = OracleBidder(n_worlds=1)
