@@ -1,0 +1,10 @@
+  [w20-check] 200/600  running avg_diff=+2.225  n=200
+  [w20-check] 400/600  running avg_diff=+1.538  n=400
+  [w20-check] 600/600  running avg_diff=+0.850  n=600
+Agent: w20-check  (paired vs baseline)
+  Hands:      600
+  Avg diff:   +0.850  (95% CI -0.658 to +2.358)
+  Beats base: 20.8% of hands
+  Avg points: +22.02
+  Avg tricks: 0.00 / ~4 (last trick not counted)
+DONE w20 0.85 (np.float64(-0.6584144867286826), np.float64(2.3584144867286825))
