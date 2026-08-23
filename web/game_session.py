@@ -13,8 +13,12 @@ from fortyfives.games.fortyfives.game import (
     BID_20_KITTY, BID_25_KITTY, BID_30_KITTY,
 )
 
-# ── SOTA opponent (composite, wired exactly like play_eval._run_hand) ──
-# Phases 1/2/3 (bid/declare/discard) -> RuleBasedAgent
+# ── SOTA opponent (composite) ──
+# Phases 1/2   (bid/declare)         -> OracleBidder (exact double-dummy
+#                                       EV over sampled worlds; PR #43:
+#                                       +1.65/hand vs the rule-based
+#                                       bidder, n=4000 paired)
+# Phase  3     (discard)             -> RuleBasedAgent
 # Phase  4     (card play)           -> PIMCDDSAgent (PIMC determinization
 #                                       + exact per-world double-dummy
 #                                       solve; validated best fair agent,
@@ -30,6 +34,7 @@ for _p in (_REPO_ROOT, _EXAMPLES):
 
 from fortyfives_rule_based import RuleBasedAgent  # noqa: E402
 from fortyfives_pimc_dds import PIMCDDSAgent  # noqa: E402
+from fortyfives_oracle_bid import OracleBidder  # noqa: E402
 
 if 'fortyfives' not in registry.env_specs:
     register(
@@ -159,15 +164,19 @@ class GameSession:
         # seat's public post-discard draw count (+0.37 pooled vs flag
         # off, n=4000 paired). Not cheating — draw counts are visible
         # at a real table.
-        # auction=True (lever 2, 2026-08-22): worlds must also reproduce
-        # the public bids/passes under the rule-based bid model (+0.25
-        # pooled vs lever 1 alone, n=4000 paired). Exact vs the
-        # rule-based seats; a heuristic prior for human seats (a human
-        # bid no rule-based hand explains -> sampler falls back to
-        # lever 1; a dealer HOLD -> lever 2 off for that decision).
-        self._rule_agent = RuleBasedAgent(num_actions=18)
-        self._pimc_agent = PIMCDDSAgent(num_actions=18, n_worlds=10,
-                                        discard_counts=True, auction=True)
+        # auction=False (2026-08-22, with the oracle bidder): lever 2's
+        # hidden-hand inference assumes every seat bids like
+        # RuleBasedAgent. The bots now bid with OracleBidder (and humans
+        # never did), so that model would mis-infer; lever 2 was worth
+        # +0.25/hand, oracle bidding +1.65 -> net clearly positive.
+        # Re-enable only with a bid model that matches the table.
+        self._rule_agent = RuleBasedAgent(num_actions=21)
+        self._pimc_agent = PIMCDDSAgent(num_actions=21, n_worlds=10,
+                                        discard_counts=True, auction=False)
+        # Bidding/declaration by double-dummy EV (PR #43). n_worlds=20:
+        # ~0.8 s per bid decision on a laptop core (40 = the measured
+        # config, ~1.6 s); declarer_penalty=15 calibrates DD optimism.
+        self._bid_agent = OracleBidder(num_actions=21, n_worlds=20)
 
         # Neutral, seat-correct transcript: the log is broadcast
         # identically to every connection, so it must NOT be written
@@ -178,7 +187,11 @@ class GameSession:
         self._log_phase()
 
     def _agent_for_phase(self, phase):
-        return self._pimc_agent if phase == PHASE_GAMEPLAY else self._rule_agent
+        if phase == PHASE_GAMEPLAY:
+            return self._pimc_agent
+        if phase in (PHASE_AUCTION, PHASE_DECLARATION):
+            return self._bid_agent
+        return self._rule_agent
 
     def _log_phase(self):
         game = self.game
