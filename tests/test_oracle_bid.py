@@ -130,6 +130,47 @@ class TestValuation(unittest.TestCase):
             self.assertTrue(ob._seat_consistent(hands[1], turns[1]))
 
 
+class TestSeatSymmetry(unittest.TestCase):
+
+    def test_value_sign_flips_for_ew_seat(self):
+        ob = OracleBidder(n_worlds=1, declarer_penalty=0)
+        rng = np.random.RandomState(1)
+        deck = [FortyfivesCard(int(i)) for i in rng.permutation(52)]
+        hands = {s: deck[5 * s:5 * s + 5] for s in range(4)}
+        kitty, stock = deck[20:23], deck[23:]
+        for declarer in range(4):
+            for t in range(4):
+                v_ns = ob._value(0, hands[0], {1: hands[1], 2: hands[2], 3: hands[3]},
+                                 kitty, stock, declarer, 1, t, False)
+                v_ew = ob._value(1, hands[1], {0: hands[0], 2: hands[2], 3: hands[3]},
+                                 kitty, stock, declarer, 1, t, False)
+                self.assertEqual(v_ns, -v_ew)
+
+    def test_ew_oracle_is_not_reckless(self):
+        """Seat the oracle at EW (1, 3) with rule-based NS; it must not
+        bid 30 on most hands (the symptom of the NS-perspective bug)."""
+        ob = OracleBidder(n_worlds=8, seed=0)
+        rb = RuleBasedAgent(21)
+        n30 = n_dec = 0
+        for seed in range(25):
+            env = rlcard.make('fortyfives')
+            env.seed(seed)
+            state, pid = env.reset()
+            guard = 0
+            while env.game.phase == 1 and guard < 30:
+                guard += 1
+                if pid in (1, 3):
+                    a = ob.step(state)
+                    if len(state['legal_actions']) > 1:
+                        n_dec += 1
+                        n30 += (a == 3 or a == 20)
+                else:
+                    a = rb.step(state)
+                state, pid = env.step(a)
+        self.assertGreater(n_dec, 20)
+        self.assertLess(n30 / n_dec, 0.15, f'{n30}/{n_dec} decisions were 30 bids')
+
+
 class TestAgentAPI(unittest.TestCase):
 
     def test_deterministic_and_legal(self):

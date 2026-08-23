@@ -308,11 +308,15 @@ class OracleBidder:
         ids = tuple(tuple(c.id for c in post[s]) for s in range(4))
         solver = self._solver(trump, declarer % 2, level)
         self.stats['solves'] += 1
-        v = solver.solve(ids, (declarer + 1) % 4)
+        v = solver.solve(ids, (declarer + 1) % 4)     # NS perspective
         if self.declarer_penalty:
             v = v - self.declarer_penalty if declarer % 2 == 0 \
                 else v + self.declarer_penalty
-        return v
+        # The solver's payoff is ALWAYS dNS - dEW; an EW seat maximizes
+        # the negative. (bid_eval only ever seats the bidder at NS, so
+        # this was invisible there; at the web table it made EW bots bid
+        # 30 on junk. Gated by tests/test_oracle_bid.py symmetry test.)
+        return v if me % 2 == 0 else -v
 
     # ------------------------------------------------------------------
     # decisions
